@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const { safeEqual, jsonResponse, callGeminiWithRetry } = require('./lib/shared');
 
 const GEMINI_MODEL = 'gemini-flash-latest';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -73,24 +73,6 @@ Rules:
 - If a document doesn't fit either category well, use your best judgment on where it belongs, or omit it.
 - If nothing usable is found, return empty arrays for both fields.`;
 
-function safeEqual(a, b) {
-  const bufA = Buffer.from(String(a));
-  const bufB = Buffer.from(String(b));
-  if (bufA.length !== bufB.length) {
-    crypto.timingSafeEqual(bufA, bufA);
-    return false;
-  }
-  return crypto.timingSafeEqual(bufA, bufB);
-}
-
-function jsonResponse(statusCode, payload) {
-  return {
-    statusCode,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  };
-}
-
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return jsonResponse(405, { error: 'Method Not Allowed' });
@@ -139,17 +121,13 @@ exports.handler = async function (event) {
 
   let geminiRes;
   try {
-    geminiRes = await fetch(`${GEMINI_URL}?key=${encodeURIComponent(geminiKey)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          responseSchema: EXTRACT_SCHEMA,
-          temperature: 0.3,
-        },
-      }),
+    geminiRes = await callGeminiWithRetry(`${GEMINI_URL}?key=${encodeURIComponent(geminiKey)}`, {
+      contents: [{ role: 'user', parts }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: EXTRACT_SCHEMA,
+        temperature: 0.3,
+      },
     });
   } catch {
     return jsonResponse(502, { error: 'Could not reach the Gemini API.' });
@@ -157,7 +135,11 @@ exports.handler = async function (event) {
 
   if (!geminiRes.ok) {
     const errText = await geminiRes.text().catch(() => '');
-    return jsonResponse(502, { error: `Gemini API error (${geminiRes.status}). ${errText.slice(0, 300)}` });
+    const friendly =
+      geminiRes.status === 503
+        ? 'Gemini is under heavy load right now. Please wait a few seconds and try again.'
+        : `Gemini API error (${geminiRes.status}). ${errText.slice(0, 300)}`;
+    return jsonResponse(502, { error: friendly });
   }
 
   let geminiData;

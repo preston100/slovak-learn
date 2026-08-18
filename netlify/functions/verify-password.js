@@ -1,15 +1,4 @@
-const crypto = require('crypto');
-
-function safeEqual(a, b) {
-  const bufA = Buffer.from(String(a));
-  const bufB = Buffer.from(String(b));
-  if (bufA.length !== bufB.length) {
-    // Still run a comparison of equal length to avoid an obvious timing gap.
-    crypto.timingSafeEqual(bufA, bufA);
-    return false;
-  }
-  return crypto.timingSafeEqual(bufA, bufB);
-}
+const { safeEqual } = require('./lib/shared');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {

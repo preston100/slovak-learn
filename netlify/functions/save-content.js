@@ -1,24 +1,6 @@
-const crypto = require('crypto');
+const { safeEqual, jsonResponse } = require('./lib/shared');
 
 const GITHUB_API = 'https://api.github.com';
-
-function safeEqual(a, b) {
-  const bufA = Buffer.from(String(a));
-  const bufB = Buffer.from(String(b));
-  if (bufA.length !== bufB.length) {
-    crypto.timingSafeEqual(bufA, bufA);
-    return false;
-  }
-  return crypto.timingSafeEqual(bufA, bufB);
-}
-
-function jsonResponse(statusCode, payload) {
-  return {
-    statusCode,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  };
-}
 
 async function githubRequest(path, token, options = {}) {
   const res = await fetch(`${GITHUB_API}${path}`, {
