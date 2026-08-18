@@ -18,22 +18,29 @@ function jsonResponse(statusCode, payload) {
   };
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 // Netlify's free tier hard-kills synchronous functions at 10 seconds, and a
 // killed function returns a raw platform error with no useful message. So
-// retries here are budgeted against a wall-clock deadline (not just a retry
-// count) — each attempt is aborted early enough that we can still return our
-// own clean error response instead of getting killed by the platform.
+// every attempt below is budgeted against a wall-clock deadline — each is
+// aborted early enough that we can still return our own clean error response
+// instead of getting killed by the platform.
 const TOTAL_BUDGET_MS = 8500;
 
-async function callGeminiWithRetry(url, requestBody, maxRetries = 1) {
+// Freshly-launched flagship models (like the current "-latest" alias) tend to
+// get hit with a capacity crunch right after release. Falling back to the
+// lighter "-lite" model spreads load across a separate, usually less
+// congested capacity pool, and it's lower-latency too.
+const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+
+function geminiUrl(model, apiKey) {
+  return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+}
+
+async function callGemini(apiKey, requestBody) {
   const startedAt = Date.now();
   let lastRes;
+  let lastErr;
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+  for (const model of GEMINI_MODELS) {
     const remaining = TOTAL_BUDGET_MS - (Date.now() - startedAt);
     if (remaining < 1200) break; // not enough time left to make another attempt worthwhile
 
@@ -42,7 +49,7 @@ async function callGeminiWithRetry(url, requestBody, maxRetries = 1) {
 
     let res;
     try {
-      res = await fetch(url, {
+      res = await fetch(geminiUrl(model, apiKey), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
@@ -50,23 +57,25 @@ async function callGeminiWithRetry(url, requestBody, maxRetries = 1) {
       });
     } catch (err) {
       clearTimeout(timeoutId);
-      if (err.name === 'AbortError') {
-        throw new Error('Gemini took too long to respond. Please try again.');
-      }
-      if (attempt === maxRetries) throw err;
+      lastErr = err.name === 'AbortError' ? new Error('Gemini took too long to respond. Please try again.') : err;
       continue;
     }
     clearTimeout(timeoutId);
 
-    if (res.ok || res.status !== 503 || attempt === maxRetries) {
-      return res;
+    if (res.ok) return res;
+
+    if (res.status === 503) {
+      lastRes = res;
+      continue; // try the next model, no point waiting on an overloaded one
     }
 
-    lastRes = res;
-    await sleep(250);
+    // Non-503 errors (bad key, bad request, etc.) affect every model equally.
+    return res;
   }
 
-  return lastRes;
+  if (lastRes) return lastRes;
+  if (lastErr) throw lastErr;
+  throw new Error('Gemini took too long to respond. Please try again.');
 }
 
-module.exports = { safeEqual, jsonResponse, callGeminiWithRetry };
+module.exports = { safeEqual, jsonResponse, callGemini };

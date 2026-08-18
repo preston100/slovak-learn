@@ -1,9 +1,4 @@
-const { safeEqual, jsonResponse, callGeminiWithRetry } = require('./lib/shared');
-
-// "-latest" alias auto-updates to Google's current Flash model, so this
-// won't go stale the way a pinned version number does.
-const GEMINI_MODEL = 'gemini-flash-latest';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const { safeEqual, jsonResponse, callGemini } = require('./lib/shared');
 
 // Netlify's synchronous function payload limit is 6MB. Base64 inflates size by
 // ~33%, so we reject files that would risk crossing that ceiling well before
@@ -120,7 +115,7 @@ exports.handler = async function (event) {
 
   let geminiRes;
   try {
-    geminiRes = await callGeminiWithRetry(`${GEMINI_URL}?key=${encodeURIComponent(geminiKey)}`, {
+    geminiRes = await callGemini(geminiKey, {
       contents: [{ role: 'user', parts }],
       generationConfig: {
         responseMimeType: 'application/json',

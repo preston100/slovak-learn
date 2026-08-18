@@ -1,7 +1,4 @@
-const { safeEqual, jsonResponse, callGeminiWithRetry } = require('./lib/shared');
-
-const GEMINI_MODEL = 'gemini-flash-latest';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const { safeEqual, jsonResponse, callGemini } = require('./lib/shared');
 
 const MAX_TOTAL_BYTES = 4.5 * 1024 * 1024; // stays well under Netlify's 6MB sync function body limit
 const MAX_FILES = 6;
@@ -121,7 +118,7 @@ exports.handler = async function (event) {
 
   let geminiRes;
   try {
-    geminiRes = await callGeminiWithRetry(`${GEMINI_URL}?key=${encodeURIComponent(geminiKey)}`, {
+    geminiRes = await callGemini(geminiKey, {
       contents: [{ role: 'user', parts }],
       generationConfig: {
         responseMimeType: 'application/json',
