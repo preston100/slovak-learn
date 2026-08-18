@@ -64,12 +64,15 @@ async function callGemini(apiKey, requestBody) {
 
     if (res.ok) return res;
 
-    if (res.status === 503) {
+    if (res.status === 503 || res.status === 429) {
+      // 503 = temporary overload, 429 = rate/quota limit — each Gemini model
+      // has its own separate quota, so a 429 on one doesn't mean the other
+      // is blocked too. Worth trying the next model either way.
       lastRes = res;
-      continue; // try the next model, no point waiting on an overloaded one
+      continue;
     }
 
-    // Non-503 errors (bad key, bad request, etc.) affect every model equally.
+    // Other errors (bad key, bad request, etc.) affect every model equally.
     return res;
   }
 
@@ -78,4 +81,14 @@ async function callGemini(apiKey, requestBody) {
   throw new Error('Gemini took too long to respond. Please try again.');
 }
 
-module.exports = { safeEqual, jsonResponse, callGemini };
+function friendlyGeminiError(status, errText) {
+  if (status === 503) {
+    return 'Gemini is under heavy load right now. Please wait a few seconds and try again.';
+  }
+  if (status === 429) {
+    return "You've hit Gemini's rate limit (its free tier allows a limited number of requests per minute). Please wait about a minute and try again.";
+  }
+  return `Gemini API error (${status}). ${(errText || '').slice(0, 300)}`;
+}
+
+module.exports = { safeEqual, jsonResponse, callGemini, friendlyGeminiError };

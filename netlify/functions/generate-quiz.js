@@ -1,4 +1,4 @@
-const { safeEqual, jsonResponse, callGemini } = require('./lib/shared');
+const { safeEqual, jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
 
 // Netlify's synchronous function payload limit is 6MB. Base64 inflates size by
 // ~33%, so we reject files that would risk crossing that ceiling well before
@@ -129,11 +129,7 @@ exports.handler = async function (event) {
 
   if (!geminiRes.ok) {
     const errText = await geminiRes.text().catch(() => '');
-    const friendly =
-      geminiRes.status === 503
-        ? 'Gemini is under heavy load right now. Please wait a few seconds and try again.'
-        : `Gemini API error (${geminiRes.status}). ${errText.slice(0, 300)}`;
-    return jsonResponse(502, { error: friendly });
+    return jsonResponse(502, { error: friendlyGeminiError(geminiRes.status, errText) });
   }
 
   let geminiData;
