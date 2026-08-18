@@ -1,0 +1,667 @@
+/* ---------- Design tokens ---------- */
+:root {
+  --color-bg: #f7f7fb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fbfbfe;
+  --color-border: #e6e6ef;
+  --color-text: #1c1c28;
+  --color-text-muted: #6b6b80;
+  --color-text-faint: #9494a8;
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-soft: #eef0ff;
+  --color-success: #16a34a;
+  --color-success-soft: #eafaf0;
+  --color-error: #dc2626;
+  --color-error-soft: #fdecec;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 20, 43, 0.04);
+  --shadow-md: 0 4px 16px rgba(20, 20, 43, 0.06);
+  --shadow-lg: 0 12px 40px rgba(20, 20, 43, 0.12);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --max-width: 880px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Password gate ---------- */
+#password-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #f7f7fb 0%, #eceafc 100%);
+  z-index: 100;
+  padding: 24px;
+}
+
+.gate-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 40px 36px;
+  text-align: center;
+}
+
+.gate-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  margin: 0 auto 20px;
+}
+
+.gate-card h1 {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.gate-card p.gate-sub {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+#gate-code {
+  width: 100%;
+  font-size: 28px;
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding: 14px 10px 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#gate-code:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.gate-error {
+  color: var(--color-error);
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 20px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: white;
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px 20px;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.btn-primary:disabled {
+  background: var(--color-text-faint);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.btn-secondary:hover {
+  background: #e2e1fc;
+}
+
+/* ---------- App shell ---------- */
+#app {
+  min-height: 100%;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(247, 247, 251, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.topbar-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15.5px;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+}
+
+.tab-btn.active {
+  background: var(--color-accent);
+  color: white;
+}
+
+main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+  animation: fade-in 0.25s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel-header {
+  margin-bottom: 28px;
+}
+
+.panel-header h2 {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.panel-header p {
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+/* ---------- Grammar cards ---------- */
+.grammar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grammar-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.grammar-card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.grammar-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.grammar-card-title h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.grammar-card-title p {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+.chevron {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-faint);
+  transition: transform 0.2s ease;
+}
+
+.grammar-card[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.grammar-card-body {
+  padding: 0 22px 22px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+}
+
+.grammar-card-body .explanation {
+  white-space: pre-line;
+  font-size: 14.5px;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.example-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.example-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.example-row .sk {
+  font-weight: 600;
+  min-width: 40%;
+}
+
+.example-row .en {
+  color: var(--color-text-muted);
+}
+
+/* ---------- Vocabulary ---------- */
+.vocab-group {
+  margin-bottom: 30px;
+}
+
+.vocab-group h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.vocab-word {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.vocab-word .sk {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.vocab-word .en {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Tests ---------- */
+.test-mode-switch {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.mode-card {
+  flex: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-card h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.mode-card p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+select,
+input[type='text'] {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  outline: none;
+  margin-bottom: 14px;
+}
+
+select:focus,
+input[type='text']:focus {
+  border-color: var(--color-accent);
+}
+
+.file-drop {
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.file-drop:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.file-drop.has-file {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.quiz-status {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-accent-soft);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-banner {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13.5px;
+  margin-top: 10px;
+}
+
+/* ---------- Quiz ---------- */
+#quiz-area {
+  margin-top: 32px;
+}
+
+.quiz-question {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+}
+
+.quiz-question .q-index {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.quiz-question .q-text {
+  font-size: 15.5px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.q-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.q-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.q-option:hover {
+  border-color: var(--color-accent);
+}
+
+.q-option input {
+  accent-color: var(--color-accent);
+}
+
+.q-option.correct {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.q-option.incorrect {
+  border-color: var(--color-error);
+  background: var(--color-error-soft);
+}
+
+.q-explanation {
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: none;
+}
+
+.q-explanation.show {
+  display: block;
+}
+
+.quiz-score {
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.quiz-score .score-num {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.quiz-score .score-label {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-faint);
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .topbar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .tabs {
+    justify-content: center;
+  }
+
+  .test-mode-switch {
+    flex-direction: column;
+  }
+
+  .example-row {
+    flex-direction: column;
+  }
+
+  .example-row .sk {
+    min-width: 0;
+  }
+}

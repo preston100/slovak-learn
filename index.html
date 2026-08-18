@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slovenčina — Learn Slovak</title>
+  <meta name="description" content="Grammar, vocabulary, and AI-generated practice tests for learning Slovak." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234f46e5%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22Arial%22>S</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Password gate: this is the ONLY thing visible until a correct code is entered -->
+  <div id="password-gate">
+    <div class="gate-card">
+      <div class="gate-logo">S</div>
+      <h1>Slovenčina</h1>
+      <p class="gate-sub">Enter your 4-digit access code to continue.</p>
+      <form id="gate-form" autocomplete="off">
+        <input
+          id="gate-code"
+          type="password"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="4"
+          autocomplete="off"
+          placeholder="••••"
+          aria-label="4-digit access code"
+        />
+        <div class="gate-error" id="gate-error"></div>
+        <button class="btn btn-primary" type="submit" id="gate-submit">Unlock</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main app: hidden until the password gate passes -->
+  <div id="app" class="hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <span>Slovenčina</span>
+        </div>
+        <nav class="tabs" role="tablist" aria-label="Sections">
+          <button class="tab-btn active" data-tab="grammar" role="tab" aria-selected="true">Grammar</button>
+          <button class="tab-btn" data-tab="vocabulary" role="tab" aria-selected="false">Vocabulary</button>
+          <button class="tab-btn" data-tab="tests" role="tab" aria-selected="false">Tests</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Grammar panel -->
+      <section id="panel-grammar" class="panel active">
+        <div class="panel-header">
+          <h2>Grammar</h2>
+          <p>Core Slovak grammar topics, explained in plain English.</p>
+        </div>
+        <div id="grammar-list" class="grammar-list"></div>
+      </section>
+
+      <!-- Vocabulary panel -->
+      <section id="panel-vocabulary" class="panel">
+        <div class="panel-header">
+          <h2>Vocabulary</h2>
+          <p>Words and phrases, grouped by topic.</p>
+        </div>
+        <div id="vocab-list"></div>
+      </section>
+
+      <!-- Tests panel -->
+      <section id="panel-tests" class="panel">
+        <div class="panel-header">
+          <h2>Tests</h2>
+          <p>Generate a short practice quiz — by topic, or from your own material.</p>
+        </div>
+
+        <div class="test-mode-switch">
+          <div class="mode-card">
+            <h3>By topic</h3>
+            <p>Pick a topic and get a 5-question quiz.</p>
+            <label class="field-label" for="topic-select">Topic</label>
+            <select id="topic-select"></select>
+            <button class="btn btn-secondary" id="generate-topic-btn" style="width:100%">Generate Quiz</button>
+          </div>
+
+          <div class="mode-card">
+            <h3>From a file</h3>
+            <p>Upload a .txt or .pdf and get a quiz based on it.</p>
+            <label class="field-label" for="file-input">Document</label>
+            <div class="file-drop" id="file-drop">Click to choose a .txt or .pdf file (max 4MB)</div>
+            <input type="file" id="file-input" accept=".txt,.pdf,text/plain,application/pdf" class="hidden" />
+            <button class="btn btn-secondary" id="generate-file-btn" style="width:100%">Generate Quiz</button>
+          </div>
+        </div>
+
+        <div id="quiz-status" class="quiz-status hidden"></div>
+        <div id="quiz-error" class="error-banner hidden"></div>
+
+        <div id="quiz-area"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>

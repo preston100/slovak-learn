@@ -1,0 +1,56 @@
+[
+  {
+    "topic": "Greetings & Basics",
+    "words": [
+      { "sk": "ahoj", "en": "hi / bye (informal)" },
+      { "sk": "dobrý deň", "en": "good day / hello (formal)" },
+      { "sk": "dovidenia", "en": "goodbye (formal)" },
+      { "sk": "prosím", "en": "please" },
+      { "sk": "ďakujem", "en": "thank you" },
+      { "sk": "áno", "en": "yes" },
+      { "sk": "nie", "en": "no" },
+      { "sk": "prepáčte", "en": "excuse me / sorry (formal)" }
+    ]
+  },
+  {
+    "topic": "Family",
+    "words": [
+      { "sk": "rodina", "en": "family" },
+      { "sk": "mama", "en": "mom" },
+      { "sk": "otec", "en": "father" },
+      { "sk": "brat", "en": "brother" },
+      { "sk": "sestra", "en": "sister" },
+      { "sk": "starý otec", "en": "grandfather" },
+      { "sk": "stará mama", "en": "grandmother" },
+      { "sk": "dieťa", "en": "child" }
+    ]
+  },
+  {
+    "topic": "Food & Drink",
+    "words": [
+      { "sk": "chlieb", "en": "bread" },
+      { "sk": "voda", "en": "water" },
+      { "sk": "mlieko", "en": "milk" },
+      { "sk": "polievka", "en": "soup" },
+      { "sk": "mäso", "en": "meat" },
+      { "sk": "zelenina", "en": "vegetables" },
+      { "sk": "ovocie", "en": "fruit" },
+      { "sk": "raňajky", "en": "breakfast" }
+    ]
+  },
+  {
+    "topic": "Numbers 1-10",
+    "words": [
+      { "sk": "jeden", "en": "one" },
+      { "sk": "dva", "en": "two" },
+      { "sk": "tri", "en": "three" },
+      { "sk": "štyri", "en": "four" },
+      { "sk": "päť", "en": "five" },
+      { "sk": "šesť", "en": "six" },
+      { "sk": "sedem", "en": "seven" },
+      { "sk": "osem", "en": "eight" },
+      { "sk": "deväť", "en": "nine" },
+      { "sk": "desať", "en": "ten" }
+    ]
+  }
+]

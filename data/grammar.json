@@ -1,0 +1,35 @@
+[
+  {
+    "id": "nouns-gender",
+    "topic": "Noun Gender",
+    "summary": "Every Slovak noun is masculine, feminine, or neuter — gender determines how it declines.",
+    "explanation": "Slovak nouns belong to one of three grammatical genders: masculine (mužský rod), feminine (ženský rod), or neuter (stredný rod). Gender is usually predictable from the ending of the word in its dictionary (nominative singular) form:\n\n- Masculine nouns typically end in a consonant (hrad, strom, pes).\n- Feminine nouns typically end in -a or -a soft consonant (žena, ulica, dlaň).\n- Neuter nouns typically end in -o, -e, or -ie (mesto, srdce, vysvedčenie).\n\nGender matters because it controls adjective agreement, pronoun choice, and which declension pattern (vzor) a noun follows.",
+    "examples": [
+      { "sk": "ten hrad", "en": "that castle (masculine)" },
+      { "sk": "tá žena", "en": "that woman (feminine)" },
+      { "sk": "to mesto", "en": "that town (neuter)" }
+    ]
+  },
+  {
+    "id": "cases-overview",
+    "topic": "The Seven Cases",
+    "summary": "Slovak uses seven grammatical cases to show a noun's role in a sentence.",
+    "explanation": "Instead of relying only on word order or prepositions, Slovak changes the ending of nouns, adjectives, and pronouns depending on their grammatical role. The seven cases are:\n\n1. Nominative (nominatív) — the subject: kto? čo?\n2. Genitive (genitív) — possession, absence: koho? čoho?\n3. Dative (datív) — indirect object: komu? čomu?\n4. Accusative (akuzatív) — direct object: koho? čo?\n5. Locative (lokál) — location, always with a preposition: o kom? o čom?\n6. Instrumental (inštrumentál) — means, accompaniment: s kým? s čím?\n\n(Vocative exists historically but is rarely used in modern Slovak.)\n\nEach noun class (vzor) has its own set of endings for each case, in both singular and plural.",
+    "examples": [
+      { "sk": "Vidím psa.", "en": "I see a dog. (accusative)" },
+      { "sk": "Idem k psovi.", "en": "I'm going to the dog. (dative)" },
+      { "sk": "Hovorím o psovi.", "en": "I'm talking about the dog. (locative)" }
+    ]
+  },
+  {
+    "id": "present-tense",
+    "topic": "Present Tense Verbs",
+    "summary": "Slovak verbs conjugate for person and number; there is no separate continuous form.",
+    "explanation": "Slovak present-tense verbs change their ending depending on who is doing the action. A single present-tense form covers what English expresses as both simple present and present continuous (\"I write\" and \"I am writing\" are both píšem).\n\nMost verbs fall into a few conjugation patterns based on their infinitive ending (-ať, -iť, -ovať, -núť, etc). For example, robiť (to do/make):\n\nja robím — I do\nty robíš — you do (informal singular)\non/ona/ono robí — he/she/it does\nmy robíme — we do\nvy robíte — you do (formal / plural)\noni robia — they do",
+    "examples": [
+      { "sk": "Robím domácu úlohu.", "en": "I'm doing homework." },
+      { "sk": "Čo robíš?", "en": "What are you doing?" },
+      { "sk": "Oni robia večeru.", "en": "They are making dinner." }
+    ]
+  }
+]

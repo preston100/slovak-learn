@@ -1,0 +1,9 @@
+{
+  "name": "slovak-learn",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Slovak learning site with Grammar, Vocabulary, and AI-generated Tests.",
+  "engines": {
+    "node": ">=18"
+  }
+}
