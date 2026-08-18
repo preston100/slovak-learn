@@ -48,6 +48,7 @@
           <button class="tab-btn active" data-tab="grammar" role="tab" aria-selected="true">Grammar</button>
           <button class="tab-btn" data-tab="vocabulary" role="tab" aria-selected="false">Vocabulary</button>
           <button class="tab-btn" data-tab="tests" role="tab" aria-selected="false">Tests</button>
+          <button class="tab-btn" data-tab="add-content" role="tab" aria-selected="false">Add Content</button>
         </nav>
       </div>
     </header>
@@ -101,6 +102,28 @@
         <div id="quiz-error" class="error-banner hidden"></div>
 
         <div id="quiz-area"></div>
+      </section>
+
+      <!-- Add Content panel -->
+      <section id="panel-add-content" class="panel">
+        <div class="panel-header">
+          <h2>Add Content</h2>
+          <p>Upload photos of your notes and Gemini will turn them into new Grammar and Vocabulary entries.</p>
+        </div>
+
+        <div class="mode-card" style="max-width: 520px;">
+          <h3>Upload photos or PDFs</h3>
+          <p>Up to 6 files. Large photos are automatically compressed before upload.</p>
+          <div class="file-drop" id="content-file-drop">Click to choose photos or PDFs</div>
+          <input type="file" id="content-file-input" accept="image/*,.pdf,application/pdf" multiple class="hidden" />
+          <div id="content-file-list" class="file-chip-list"></div>
+          <button class="btn btn-secondary" id="extract-btn" style="width:100%; margin-top: 12px;">Extract Content</button>
+        </div>
+
+        <div id="extract-status" class="quiz-status hidden"></div>
+        <div id="extract-error" class="error-banner hidden"></div>
+
+        <div id="review-area"></div>
       </section>
     </main>
   </div>

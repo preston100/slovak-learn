@@ -1,6 +1,8 @@
 const crypto = require('crypto');
 
-const GEMINI_MODEL = 'gemini-2.5-flash';
+// "-latest" alias auto-updates to Google's current Flash model, so this
+// won't go stale the way a pinned version number does.
+const GEMINI_MODEL = 'gemini-flash-latest';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // Netlify's synchronous function payload limit is 6MB. Base64 inflates size by

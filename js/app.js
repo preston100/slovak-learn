@@ -82,6 +82,7 @@
     loadGrammar();
     loadVocab();
     setupTests();
+    setupAddContent();
   }
 
   /* ---- Tabs ---- */
@@ -459,6 +460,316 @@
     scoreCard.classList.remove('hidden');
     area.querySelector('#score-num').textContent = correctCount + '/' + total;
     scoreCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ---- Add Content ---- */
+
+  const MAX_CONTENT_FILES = 6;
+  let pendingFiles = []; // { file, name }
+  let lastExtraction = null; // { grammarTopics, vocabGroups }
+
+  function setupAddContent() {
+    const dropZone = document.getElementById('content-file-drop');
+    const fileInput = document.getElementById('content-file-input');
+
+    dropZone.addEventListener('click', function () {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function () {
+      Array.from(fileInput.files).forEach(function (file) {
+        if (pendingFiles.length >= MAX_CONTENT_FILES) return;
+        pendingFiles.push(file);
+      });
+      fileInput.value = '';
+      renderFileChips();
+    });
+
+    document.getElementById('extract-btn').addEventListener('click', function () {
+      if (!pendingFiles.length) {
+        showExtractError('Please choose at least one photo or PDF first.');
+        return;
+      }
+      runExtraction();
+    });
+  }
+
+  function renderFileChips() {
+    const list = document.getElementById('content-file-list');
+    list.innerHTML = pendingFiles
+      .map(function (file, i) {
+        return (
+          '<span class="file-chip">' +
+          escapeHtml(file.name) +
+          '<button type="button" data-remove-index="' +
+          i +
+          '" aria-label="Remove">×</button></span>'
+        );
+      })
+      .join('');
+
+    list.querySelectorAll('button[data-remove-index]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        pendingFiles.splice(Number(btn.dataset.removeIndex), 1);
+        renderFileChips();
+      });
+    });
+  }
+
+  // Downscales an image client-side before upload so a handful of phone
+  // photos stay comfortably under Netlify's ~6MB function payload limit.
+  function compressImage(file, maxDimension, quality) {
+    return new Promise(function (resolve, reject) {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = function () {
+        img.onload = function () {
+          let { width, height } = img;
+          if (width > maxDimension || height > maxDimension) {
+            const scale = maxDimension / Math.max(width, height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve({ mimeType: 'image/jpeg', data: dataUrl.split(',')[1] || '' });
+        };
+        img.onerror = function () {
+          reject(new Error('Could not read image: ' + file.name));
+        };
+        img.src = String(reader.result);
+      };
+      reader.onerror = function () {
+        reject(new Error('Could not read file: ' + file.name));
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function readFileAsBase64(file) {
+    return new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const dataUrl = String(reader.result);
+        resolve({ mimeType: file.type || 'application/pdf', data: dataUrl.split(',')[1] || '' });
+      };
+      reader.onerror = function () {
+        reject(new Error('Could not read file: ' + file.name));
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function runExtraction() {
+    hideExtractError();
+    document.getElementById('review-area').innerHTML = '';
+    showExtractStatus('Reading and compressing files…');
+
+    try {
+      const parts = await Promise.all(
+        pendingFiles.map(function (file) {
+          if (file.type && file.type.startsWith('image/')) {
+            return compressImage(file, 1400, 0.75);
+          }
+          return readFileAsBase64(file);
+        })
+      );
+
+      showExtractStatus('Asking Gemini to extract content… this can take a moment.');
+
+      const res = await fetch('/.netlify/functions/extract-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: getStoredPassword(), files: parts }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          sessionStorage.removeItem(SESSION_KEY);
+          location.reload();
+          return;
+        }
+        showExtractError(data.error || 'Something went wrong extracting content.');
+        return;
+      }
+
+      if (!data.grammarTopics.length && !data.vocabGroups.length) {
+        showExtractError('No usable grammar or vocabulary content was found in those files.');
+        return;
+      }
+
+      lastExtraction = data;
+      renderReview(data);
+    } catch (err) {
+      showExtractError('Could not reach the server. Please try again.');
+    } finally {
+      hideExtractStatus();
+    }
+  }
+
+  function showExtractStatus(msg) {
+    const el = document.getElementById('extract-status');
+    el.innerHTML = '<span class="spinner"></span><span>' + escapeHtml(msg) + '</span>';
+    el.classList.remove('hidden');
+  }
+
+  function hideExtractStatus() {
+    document.getElementById('extract-status').classList.add('hidden');
+  }
+
+  function showExtractError(msg) {
+    const el = document.getElementById('extract-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideExtractError() {
+    document.getElementById('extract-error').classList.add('hidden');
+  }
+
+  function renderReview(data) {
+    const area = document.getElementById('review-area');
+    area.innerHTML = '';
+
+    if (data.grammarTopics.length) {
+      const section = document.createElement('div');
+      section.className = 'review-section';
+      section.innerHTML = '<h3>New Grammar Topics (' + data.grammarTopics.length + ')</h3>';
+
+      data.grammarTopics.forEach(function (topic, i) {
+        const card = document.createElement('label');
+        card.className = 'review-card';
+        card.innerHTML =
+          '<input type="checkbox" checked data-type="grammar" data-index="' +
+          i +
+          '" />' +
+          '<div class="review-card-body"><h4>' +
+          escapeHtml(topic.topic) +
+          '</h4><p>' +
+          escapeHtml(topic.summary) +
+          '</p></div>';
+        section.appendChild(card);
+      });
+
+      area.appendChild(section);
+    }
+
+    if (data.vocabGroups.length) {
+      const section = document.createElement('div');
+      section.className = 'review-section';
+      section.innerHTML = '<h3>New Vocabulary Groups (' + data.vocabGroups.length + ')</h3>';
+
+      data.vocabGroups.forEach(function (group, i) {
+        const preview = (group.words || [])
+          .slice(0, 6)
+          .map(function (w) {
+            return w.sk;
+          })
+          .join(', ');
+
+        const card = document.createElement('label');
+        card.className = 'review-card';
+        card.innerHTML =
+          '<input type="checkbox" checked data-type="vocab" data-index="' +
+          i +
+          '" />' +
+          '<div class="review-card-body"><h4>' +
+          escapeHtml(group.topic) +
+          ' (' +
+          (group.words || []).length +
+          ' words)</h4>' +
+          '<p class="word-preview">' +
+          escapeHtml(preview) +
+          (group.words && group.words.length > 6 ? '…' : '') +
+          '</p></div>';
+        section.appendChild(card);
+      });
+
+      area.appendChild(section);
+    }
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-primary';
+    saveBtn.style.width = '100%';
+    saveBtn.style.marginTop = '16px';
+    saveBtn.textContent = 'Save Selected to Site';
+    area.appendChild(saveBtn);
+
+    saveBtn.addEventListener('click', function () {
+      saveReviewedContent(area, saveBtn);
+    });
+  }
+
+  async function saveReviewedContent(area, saveBtn) {
+    if (!lastExtraction) return;
+
+    const grammarTopics = Array.from(area.querySelectorAll('input[data-type="grammar"]:checked')).map(function (
+      cb
+    ) {
+      return lastExtraction.grammarTopics[Number(cb.dataset.index)];
+    });
+    const vocabGroups = Array.from(area.querySelectorAll('input[data-type="vocab"]:checked')).map(function (cb) {
+      return lastExtraction.vocabGroups[Number(cb.dataset.index)];
+    });
+
+    if (!grammarTopics.length && !vocabGroups.length) {
+      showExtractError('Select at least one item to save.');
+      return;
+    }
+
+    hideExtractError();
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      const res = await fetch('/.netlify/functions/save-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: getStoredPassword(),
+          grammarTopics: grammarTopics,
+          vocabGroups: vocabGroups,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          sessionStorage.removeItem(SESSION_KEY);
+          location.reload();
+          return;
+        }
+        showExtractError(data.error || 'Something went wrong saving content.');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Selected to Site';
+        return;
+      }
+
+      const successEl = document.createElement('div');
+      successEl.className = 'success-banner';
+      successEl.textContent =
+        'Saved! Your site will rebuild automatically and the new content will appear here in about a minute — refresh then to see it.';
+      area.appendChild(successEl);
+      saveBtn.remove();
+
+      pendingFiles = [];
+      renderFileChips();
+      lastExtraction = null;
+    } catch (err) {
+      showExtractError('Could not reach the server. Please try again.');
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Selected to Site';
+    }
   }
 
   /* ---- Utils ---- */
