@@ -129,7 +129,7 @@ exports.handler = async function (event) {
       },
     });
   } catch (err) {
-    return jsonResponse(502, { error: 'Could not reach the Gemini API.' });
+    return jsonResponse(502, { error: err.message || 'Could not reach the Gemini API.' });
   }
 
   if (!geminiRes.ok) {

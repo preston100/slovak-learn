@@ -129,8 +129,8 @@ exports.handler = async function (event) {
         temperature: 0.3,
       },
     });
-  } catch {
-    return jsonResponse(502, { error: 'Could not reach the Gemini API.' });
+  } catch (err) {
+    return jsonResponse(502, { error: err.message || 'Could not reach the Gemini API.' });
   }
 
   if (!geminiRes.ok) {

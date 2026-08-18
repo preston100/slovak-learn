@@ -22,32 +22,50 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Gemini's free-tier Flash models occasionally return 503 "high demand" errors.
-// These are transient, so a couple of short retries clears most of them up
-// without the user having to notice or re-click anything.
-async function callGeminiWithRetry(url, requestBody, maxRetries = 2) {
+// Netlify's free tier hard-kills synchronous functions at 10 seconds, and a
+// killed function returns a raw platform error with no useful message. So
+// retries here are budgeted against a wall-clock deadline (not just a retry
+// count) — each attempt is aborted early enough that we can still return our
+// own clean error response instead of getting killed by the platform.
+const TOTAL_BUDGET_MS = 8500;
+
+async function callGeminiWithRetry(url, requestBody, maxRetries = 1) {
+  const startedAt = Date.now();
   let lastRes;
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const remaining = TOTAL_BUDGET_MS - (Date.now() - startedAt);
+    if (remaining < 1200) break; // not enough time left to make another attempt worthwhile
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), remaining);
+
     let res;
     try {
       res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
+        signal: controller.signal,
       });
     } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error('Gemini took too long to respond. Please try again.');
+      }
       if (attempt === maxRetries) throw err;
-      await sleep(600 * (attempt + 1));
       continue;
     }
+    clearTimeout(timeoutId);
 
     if (res.ok || res.status !== 503 || attempt === maxRetries) {
       return res;
     }
 
     lastRes = res;
-    await sleep(600 * (attempt + 1));
+    await sleep(250);
   }
+
   return lastRes;
 }
 
