@@ -50,6 +50,16 @@
           <button class="tab-btn" data-tab="tests" role="tab" aria-selected="false">Tests</button>
           <button class="tab-btn" data-tab="add-content" role="tab" aria-selected="false">Add Content</button>
         </nav>
+        <div class="topbar-right">
+          <div class="streak-badge zero" id="streak-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c1.5 1.5 2 3.5 2 5a8 8 0 1 1-16 0c0-4 2-6 4-9 1-1.3 1.5-2 2-3 .7 1 1 2 2 0z"/></svg>
+            <span id="streak-count">0</span>
+          </div>
+          <button class="icon-btn" id="mute-toggle" aria-label="Mute sound effects" title="Sound effects">
+            <svg id="sound-on-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>
+            <svg id="sound-off-icon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -69,7 +79,24 @@
           <h2>Vocabulary</h2>
           <p>Words and phrases, grouped by topic.</p>
         </div>
+
+        <div class="vocab-mode-switch" role="tablist" aria-label="Vocabulary mode">
+          <button class="vocab-mode-btn active" data-vocab-mode="browse">Browse</button>
+          <button class="vocab-mode-btn" data-vocab-mode="practice">Practice</button>
+        </div>
+
         <div id="vocab-list"></div>
+
+        <div id="vocab-practice" class="hidden">
+          <div class="practice-setup">
+            <div>
+              <label class="field-label" for="practice-topic-select">Topic</label>
+              <select id="practice-topic-select"></select>
+            </div>
+            <button class="btn btn-secondary" id="practice-start-btn">Start Practice</button>
+          </div>
+          <div id="practice-stage" class="practice-stage"></div>
+        </div>
       </section>
 
       <!-- Tests panel -->

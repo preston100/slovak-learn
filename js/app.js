@@ -83,6 +83,9 @@
     loadVocab();
     setupTests();
     setupAddContent();
+    setupSound();
+    renderStreak();
+    setupVocabModes();
   }
 
   /* ---- Tabs ---- */
@@ -132,6 +135,7 @@
           .map(function (ex) {
             return (
               '<div class="example-row"><span class="sk">' +
+              speakerButtonHtml(ex.sk) +
               escapeHtml(ex.sk) +
               '</span><span class="en">' +
               escapeHtml(ex.en) +
@@ -191,6 +195,7 @@
           .map(function (w) {
             return (
               '<div class="vocab-word"><div class="sk">' +
+              speakerButtonHtml(w.sk) +
               escapeHtml(w.sk) +
               '</div><div class="en">' +
               escapeHtml(w.en) +
@@ -210,25 +215,311 @@
       .join('');
   }
 
+  /* ---- Speech & sound ---- */
+
+  function speakerButtonHtml(text) {
+    if (!text) return '';
+    return (
+      '<button type="button" class="speak-btn" data-speak="' +
+      escapeHtml(text) +
+      '" aria-label="Hear this said aloud" title="Hear it">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>' +
+      '</button>'
+    );
+  }
+
+  function speak(text) {
+    if (!text || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'sk-SK';
+      utter.rate = 0.92;
+      window.speechSynthesis.speak(utter);
+    } catch (err) {
+      /* speech synthesis not available in this browser — silently skip */
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.speak-btn');
+    if (btn) speak(btn.dataset.speak);
+  });
+
+  const MUTE_KEY = 'slovencina_muted';
+  let audioCtx = null;
+
+  function isMuted() {
+    return localStorage.getItem(MUTE_KEY) === '1';
+  }
+
+  function setupSound() {
+    const toggle = document.getElementById('mute-toggle');
+    const onIcon = document.getElementById('sound-on-icon');
+    const offIcon = document.getElementById('sound-off-icon');
+
+    function render() {
+      const muted = isMuted();
+      onIcon.classList.toggle('hidden', muted);
+      offIcon.classList.toggle('hidden', !muted);
+      toggle.classList.toggle('muted', muted);
+    }
+
+    toggle.addEventListener('click', function () {
+      localStorage.setItem(MUTE_KEY, isMuted() ? '0' : '1');
+      render();
+    });
+
+    render();
+  }
+
+  // Small synthesized tones (no audio files needed) for practice feedback.
+  function playTone(kind) {
+    if (isMuted()) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (kind === 'correct') {
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(783.99, now + 0.1);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else {
+        osc.frequency.setValueAtTime(220, now);
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        osc.start(now);
+        osc.stop(now + 0.28);
+      }
+    } catch (err) {
+      /* Web Audio not available — skip sound, no functional impact */
+    }
+  }
+
+  /* ---- Streak ---- */
+
+  const STREAK_COUNT_KEY = 'slovencina_streak_count';
+  const STREAK_DATE_KEY = 'slovencina_streak_last_date';
+
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function renderStreak() {
+    const badge = document.getElementById('streak-badge');
+    const countEl = document.getElementById('streak-count');
+    const count = Number(localStorage.getItem(STREAK_COUNT_KEY) || '0');
+    countEl.textContent = String(count);
+    badge.classList.toggle('zero', count === 0);
+  }
+
+  // Called once per completed practice card; only advances the streak the
+  // first time it's called on a given calendar day.
+  function recordPracticeToday() {
+    const today = todayStr();
+    const lastDate = localStorage.getItem(STREAK_DATE_KEY);
+    if (lastDate === today) return;
+
+    let count = Number(localStorage.getItem(STREAK_COUNT_KEY) || '0');
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    count = lastDate === yesterday ? count + 1 : 1;
+
+    localStorage.setItem(STREAK_COUNT_KEY, String(count));
+    localStorage.setItem(STREAK_DATE_KEY, today);
+    renderStreak();
+  }
+
+  /* ---- Vocabulary practice mode ---- */
+
+  const VOCAB_STATS_KEY = 'slovencina_vocab_stats';
+
+  function loadVocabStats() {
+    try {
+      return JSON.parse(localStorage.getItem(VOCAB_STATS_KEY) || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function saveVocabStats(stats) {
+    localStorage.setItem(VOCAB_STATS_KEY, JSON.stringify(stats));
+  }
+
+  function setupVocabModes() {
+    const buttons = document.querySelectorAll('.vocab-mode-btn');
+    const browseEl = document.getElementById('vocab-list');
+    const practiceEl = document.getElementById('vocab-practice');
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
+        const mode = btn.dataset.vocabMode;
+        browseEl.classList.toggle('hidden', mode !== 'browse');
+        practiceEl.classList.toggle('hidden', mode !== 'practice');
+      });
+    });
+
+    document.getElementById('practice-start-btn').addEventListener('click', function () {
+      const topic = document.getElementById('practice-topic-select').value;
+      startPractice(topic);
+    });
+  }
+
+  let practiceQueue = [];
+  let practiceIndex = 0;
+  let practiceCorrect = 0;
+  let practiceRevealed = false;
+  let practiceGraded = false;
+
+  function startPractice(topicFilter) {
+    const stats = loadVocabStats();
+    const pool = [];
+
+    vocabData.forEach(function (g) {
+      if (topicFilter !== '__all__' && g.topic !== topicFilter) return;
+      (g.words || []).forEach(function (w) {
+        const misses = (stats[w.sk] && stats[w.sk].misses) || 0;
+        // Words missed before appear more than once this session — a simple,
+        // transparent stand-in for real spaced repetition.
+        const copies = 1 + Math.min(misses, 3);
+        for (let i = 0; i < copies; i++) pool.push(w);
+      });
+    });
+
+    if (!pool.length) {
+      document.getElementById('practice-stage').innerHTML =
+        '<div class="empty-state">No words in this topic yet.</div>';
+      return;
+    }
+
+    // Shuffle (Fisher-Yates).
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = pool[i];
+      pool[i] = pool[j];
+      pool[j] = tmp;
+    }
+
+    practiceQueue = pool;
+    practiceIndex = 0;
+    practiceCorrect = 0;
+    renderPracticeCard();
+  }
+
+  function renderPracticeCard() {
+    const stage = document.getElementById('practice-stage');
+
+    if (practiceIndex >= practiceQueue.length) {
+      const total = practiceQueue.length;
+      stage.innerHTML =
+        '<div class="practice-summary">' +
+        '<div class="score-big">' + practiceCorrect + ' / ' + total + '</div>' +
+        '<p>words you knew right away</p>' +
+        '<button class="btn btn-primary" id="practice-again-btn">Practice Again</button>' +
+        '</div>';
+      document.getElementById('practice-again-btn').addEventListener('click', function () {
+        const topic = document.getElementById('practice-topic-select').value;
+        startPractice(topic);
+      });
+      return;
+    }
+
+    practiceRevealed = false;
+    practiceGraded = false;
+    const word = practiceQueue[practiceIndex];
+
+    stage.innerHTML =
+      '<div class="practice-progress">Card ' + (practiceIndex + 1) + ' of ' + practiceQueue.length + '</div>' +
+      '<div class="practice-card" id="practice-card">' +
+      '<div class="practice-word">' + speakerButtonHtml(word.sk) + escapeHtml(word.sk) + '</div>' +
+      '<div class="practice-answer" id="practice-answer"></div>' +
+      '<button class="btn btn-secondary" id="practice-reveal-btn">Show Answer</button>' +
+      '<div class="practice-grade-row hidden" id="practice-grade-row">' +
+      '<button class="btn-grade missed" id="practice-missed-btn">Missed it</button>' +
+      '<button class="btn-grade got-it" id="practice-gotit-btn">Got it</button>' +
+      '</div>' +
+      '</div>';
+
+    document.getElementById('practice-reveal-btn').addEventListener('click', function () {
+      practiceRevealed = true;
+      document.getElementById('practice-answer').textContent = word.en;
+      document.getElementById('practice-reveal-btn').classList.add('hidden');
+      document.getElementById('practice-grade-row').classList.remove('hidden');
+    });
+
+    document.getElementById('practice-missed-btn').addEventListener('click', function () {
+      gradeCard(word, false);
+    });
+    document.getElementById('practice-gotit-btn').addEventListener('click', function () {
+      gradeCard(word, true);
+    });
+  }
+
+  function gradeCard(word, gotIt) {
+    if (practiceGraded) return; // guards against a double-click grading the same card twice
+    practiceGraded = true;
+
+    const gradeRow = document.getElementById('practice-grade-row');
+    if (gradeRow) gradeRow.style.pointerEvents = 'none';
+
+    const stats = loadVocabStats();
+    const entry = stats[word.sk] || { misses: 0 };
+    entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
+    stats[word.sk] = entry;
+    saveVocabStats(stats);
+
+    if (gotIt) practiceCorrect++;
+    playTone(gotIt ? 'correct' : 'incorrect');
+    recordPracticeToday();
+
+    const card = document.getElementById('practice-card');
+    card.classList.add(gotIt ? 'flash-correct' : 'flash-incorrect');
+
+    setTimeout(function () {
+      practiceIndex++;
+      renderPracticeCard();
+    }, 450);
+  }
+
   /* ---- Tests ---- */
 
   function populateTopicSelect() {
     const select = document.getElementById('topic-select');
-    if (!select || (!grammarData.length && !vocabData.length)) return;
+    if (select && (grammarData.length || vocabData.length)) {
+      const topics = new Set();
+      grammarData.forEach(function (t) {
+        if (t.topic) topics.add(t.topic);
+      });
+      vocabData.forEach(function (g) {
+        if (g.topic) topics.add(g.topic);
+      });
 
-    const topics = new Set();
-    grammarData.forEach(function (t) {
-      if (t.topic) topics.add(t.topic);
-    });
-    vocabData.forEach(function (g) {
-      if (g.topic) topics.add(g.topic);
-    });
+      select.innerHTML = Array.from(topics)
+        .map(function (t) {
+          return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
+        })
+        .join('');
+    }
 
-    select.innerHTML = Array.from(topics)
-      .map(function (t) {
-        return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
-      })
-      .join('');
+    const practiceSelect = document.getElementById('practice-topic-select');
+    if (practiceSelect && vocabData.length) {
+      const vocabTopics = vocabData.map(function (g) { return g.topic; }).filter(Boolean);
+      practiceSelect.innerHTML =
+        '<option value="__all__">All topics</option>' +
+        vocabTopics
+          .map(function (t) {
+            return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
+          })
+          .join('');
+    }
   }
 
   let selectedFile = null;
@@ -340,34 +631,25 @@
   async function requestQuiz(payload) {
     hideQuizError();
     document.getElementById('quiz-area').innerHTML = '';
-    showQuizStatus('Generating your quiz…');
 
-    try {
-      const res = await fetch('/.netlify/functions/generate-quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.assign({ password: getStoredPassword() }, payload)),
-      });
+    const result = await postJsonWithRetry('/.netlify/functions/generate-quiz', Object.assign({ password: getStoredPassword() }, payload), {
+      initialMessage: 'Generating your quiz…',
+      onStatus: showQuizStatus,
+    });
 
-      const data = await res.json();
+    hideQuizStatus();
 
-      if (!res.ok) {
-        if (res.status === 401) {
-          // Session password no longer valid server-side; force re-entry.
-          sessionStorage.removeItem(SESSION_KEY);
-          location.reload();
-          return;
-        }
-        showQuizError(data.error || 'Something went wrong generating the quiz.');
+    if (!result.ok) {
+      if (result.status === 401) {
+        sessionStorage.removeItem(SESSION_KEY);
+        location.reload();
         return;
       }
-
-      renderQuiz(data.questions);
-    } catch (err) {
-      showQuizError('Could not reach the server. Please try again.');
-    } finally {
-      hideQuizStatus();
+      showQuizError(result.error);
+      return;
     }
+
+    renderQuiz(result.data.questions);
   }
 
   function renderQuiz(questions) {
@@ -572,8 +854,9 @@
     document.getElementById('review-area').innerHTML = '';
     showExtractStatus('Reading and compressing files…');
 
+    let parts;
     try {
-      const parts = await Promise.all(
+      parts = await Promise.all(
         pendingFiles.map(function (file) {
           if (file.type && file.type.startsWith('image/')) {
             return compressImage(file, 1400, 0.75);
@@ -581,39 +864,37 @@
           return readFileAsBase64(file);
         })
       );
-
-      showExtractStatus('Asking Gemini to extract content… this can take a moment.');
-
-      const res = await fetch('/.netlify/functions/extract-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: getStoredPassword(), files: parts }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          sessionStorage.removeItem(SESSION_KEY);
-          location.reload();
-          return;
-        }
-        showExtractError(data.error || 'Something went wrong extracting content.');
-        return;
-      }
-
-      if (!data.grammarTopics.length && !data.vocabGroups.length) {
-        showExtractError('No usable grammar or vocabulary content was found in those files.');
-        return;
-      }
-
-      lastExtraction = data;
-      renderReview(data);
     } catch (err) {
-      showExtractError('Could not reach the server. Please try again.');
-    } finally {
       hideExtractStatus();
+      showExtractError(err.message || 'Could not read one of the files.');
+      return;
     }
+
+    const result = await postJsonWithRetry(
+      '/.netlify/functions/extract-content',
+      { password: getStoredPassword(), files: parts },
+      { initialMessage: 'Asking Gemini to extract content… this can take a moment.', onStatus: showExtractStatus }
+    );
+
+    hideExtractStatus();
+
+    if (!result.ok) {
+      if (result.status === 401) {
+        sessionStorage.removeItem(SESSION_KEY);
+        location.reload();
+        return;
+      }
+      showExtractError(result.error);
+      return;
+    }
+
+    if (!result.data.grammarTopics.length && !result.data.vocabGroups.length) {
+      showExtractError('No usable grammar or vocabulary content was found in those files.');
+      return;
+    }
+
+    lastExtraction = result.data;
+    renderReview(result.data);
   }
 
   function showExtractStatus(msg) {
@@ -770,6 +1051,70 @@
       saveBtn.disabled = false;
       saveBtn.textContent = 'Save Selected to Site';
     }
+  }
+
+  /* ---- Resilient network calls ---- */
+
+  function sleep(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  // The server already retries Gemini once, but it's boxed in by Netlify's
+  // 10-second function limit. The browser has no such limit, so worthwhile
+  // failures (busy model, rate limit, timeout) get a few more tries here —
+  // each a brand-new function call with its own fresh 10-second budget —
+  // before the user ever sees an error.
+  function isTransientError(message) {
+    return /heavy load|rate limit|took too long/i.test(message || '');
+  }
+
+  async function postJsonWithRetry(url, body, opts) {
+    const maxAttempts = 3;
+    const onStatus = opts.onStatus || function () {};
+    let lastError = 'Something went wrong. Please try again.';
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      onStatus(attempt === 1 ? opts.initialMessage : `Still busy — retrying (attempt ${attempt} of ${maxAttempts})…`);
+
+      let res;
+      let data;
+      try {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        data = await res.json();
+      } catch (err) {
+        lastError = 'Could not reach the server. Please try again.';
+        if (attempt < maxAttempts) {
+          await sleep(3000);
+          continue;
+        }
+        return { ok: false, status: 0, error: lastError };
+      }
+
+      if (res.ok) {
+        return { ok: true, status: res.status, data: data };
+      }
+
+      if (res.status === 401) {
+        return { ok: false, status: 401, error: data.error };
+      }
+
+      lastError = data.error || 'Something went wrong. Please try again.';
+
+      if (attempt < maxAttempts && isTransientError(lastError)) {
+        await sleep(3000);
+        continue;
+      }
+
+      return { ok: false, status: res.status, error: lastError };
+    }
+
+    return { ok: false, status: 0, error: lastError };
   }
 
   /* ---- Utils ---- */

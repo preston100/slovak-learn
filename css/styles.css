@@ -14,6 +14,7 @@
   --color-success-soft: #eafaf0;
   --color-error: #dc2626;
   --color-error-soft: #fdecec;
+  --warm: #d97706;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -261,6 +262,95 @@ button {
   color: white;
 }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 6px 12px 6px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.streak-badge svg {
+  width: 16px;
+  height: 16px;
+  color: var(--warm, #d97706);
+  flex-shrink: 0;
+}
+
+.streak-badge.zero {
+  color: var(--color-text-faint);
+}
+.streak-badge.zero svg {
+  color: var(--color-text-faint);
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.icon-btn:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.icon-btn.muted {
+  color: var(--color-text-faint);
+}
+
+/* Small speaker button used inline next to any Slovak word/phrase */
+.speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+.speak-btn:hover {
+  background: var(--color-accent-soft);
+}
+.speak-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.speak-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 main {
   max-width: 1040px;
   margin: 0 auto;
@@ -383,6 +473,9 @@ main {
 .example-row .sk {
   font-weight: 600;
   min-width: 40%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .example-row .en {
@@ -417,12 +510,145 @@ main {
   font-weight: 600;
   font-size: 15px;
   margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .vocab-word .en {
   font-size: 13.5px;
   color: var(--color-text-muted);
 }
+
+/* ---------- Vocabulary: browse/practice toggle ---------- */
+.vocab-mode-switch {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+}
+
+.vocab-mode-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.vocab-mode-btn:hover { color: var(--color-text); }
+.vocab-mode-btn.active { background: var(--color-accent); color: white; }
+
+/* ---------- Practice mode ---------- */
+.practice-setup {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  max-width: 420px;
+  margin-bottom: 28px;
+}
+.practice-setup > div { flex: 1; }
+
+.practice-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.practice-progress {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.practice-card {
+  width: 100%;
+  max-width: 460px;
+  min-height: 220px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.practice-card.flash-correct {
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
+}
+.practice-card.flash-incorrect {
+  background: var(--color-error-soft);
+  border-color: var(--color-error);
+}
+
+.practice-word {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.practice-answer {
+  font-size: 17px;
+  color: var(--color-text-muted);
+  min-height: 24px;
+}
+
+.practice-card .btn { margin-top: 6px; }
+
+.practice-grade-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-grade {
+  flex: 1;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-grade.missed:hover { border-color: var(--color-error); color: var(--color-error); background: var(--color-error-soft); }
+.btn-grade.got-it:hover { border-color: var(--color-success); color: var(--color-success); background: var(--color-success-soft); }
+
+.practice-summary {
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 36px 32px;
+  max-width: 420px;
+}
+.practice-summary .score-big {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: 6px;
+}
+.practice-summary p { color: var(--color-text-muted); font-size: 14px; margin-bottom: 20px; }
 
 /* ---------- Tests ---------- */
 .test-mode-switch {
