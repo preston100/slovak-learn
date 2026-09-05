@@ -1,19 +1,5 @@
 const { safeEqual, jsonResponse } = require('./lib/shared');
-
-const GITHUB_API = 'https://api.github.com';
-
-async function githubRequest(path, token, options = {}) {
-  const res = await fetch(`${GITHUB_API}${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'User-Agent': 'slovak-learn-site',
-      ...(options.headers || {}),
-    },
-  });
-  return res;
-}
+const { updateJsonFile } = require('./lib/github');
 
 function mergeGrammar(existing, incoming) {
   const existingIds = new Set(existing.map((t) => t.id));
@@ -54,36 +40,6 @@ function mergeVocab(existing, incoming) {
   return merged;
 }
 
-async function updateFile(repo, branch, token, filePath, transform) {
-  const getRes = await githubRequest(`/repos/${repo}/contents/${filePath}?ref=${encodeURIComponent(branch)}`, token);
-  if (!getRes.ok) {
-    const t = await getRes.text().catch(() => '');
-    throw new Error(`Could not read ${filePath} from GitHub (${getRes.status}). ${t.slice(0, 200)}`);
-  }
-  const fileData = await getRes.json();
-  const currentText = Buffer.from(fileData.content, 'base64').toString('utf8');
-  const currentJson = JSON.parse(currentText);
-
-  const updatedJson = transform(currentJson);
-  const updatedText = JSON.stringify(updatedJson, null, 2) + '\n';
-
-  const putRes = await githubRequest(`/repos/${repo}/contents/${filePath}`, token, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: `Add content to ${filePath} via Add Content tool`,
-      content: Buffer.from(updatedText, 'utf8').toString('base64'),
-      sha: fileData.sha,
-      branch,
-    }),
-  });
-
-  if (!putRes.ok) {
-    const t = await putRes.text().catch(() => '');
-    throw new Error(`Could not save ${filePath} to GitHub (${putRes.status}). ${t.slice(0, 200)}`);
-  }
-}
-
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return jsonResponse(405, { error: 'Method Not Allowed' });
@@ -122,14 +78,14 @@ exports.handler = async function (event) {
 
   try {
     if (hasGrammar) {
-      await updateFile(githubRepo, githubBranch, githubToken, 'data/grammar.json', (current) =>
+      await updateJsonFile(githubRepo, githubBranch, githubToken, 'data/grammar.json', (current) =>
         mergeGrammar(current, grammarTopics)
-      );
+      , { message: 'Add content to data/grammar.json via Add Content tool' });
     }
     if (hasVocab) {
-      await updateFile(githubRepo, githubBranch, githubToken, 'data/vocab.json', (current) =>
+      await updateJsonFile(githubRepo, githubBranch, githubToken, 'data/vocab.json', (current) =>
         mergeVocab(current, vocabGroups)
-      );
+      , { message: 'Add content to data/vocab.json via Add Content tool' });
     }
   } catch (err) {
     return jsonResponse(502, { error: err.message || 'Failed to save content to GitHub.' });

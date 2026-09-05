@@ -86,6 +86,8 @@
     setupSound();
     renderStreak();
     setupVocabModes();
+    loadAudioManifest();
+    setupAudioGeneration();
   }
 
   /* ---- Tabs ---- */
@@ -117,6 +119,7 @@
       grammarData = await res.json();
       renderGrammar(grammarData);
       populateTopicSelect();
+      updateAudioGenSummary();
     } catch (err) {
       container.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
     }
@@ -177,6 +180,7 @@
       vocabData = await res.json();
       renderVocab(vocabData);
       populateTopicSelect();
+      updateAudioGenSummary();
     } catch (err) {
       container.innerHTML = '<div class="empty-state">Could not load vocabulary content.</div>';
     }
@@ -228,8 +232,21 @@
     );
   }
 
-  function speak(text) {
-    if (!text || !window.speechSynthesis) return;
+  let audioManifest = {};
+  let currentAudioEl = null;
+
+  async function loadAudioManifest() {
+    try {
+      const res = await fetch('data/audio-manifest.json');
+      if (res.ok) audioManifest = await res.json();
+    } catch (err) {
+      audioManifest = {};
+    }
+    updateAudioGenSummary();
+  }
+
+  function speakWithBrowserVoice(text) {
+    if (!window.speechSynthesis) return;
     try {
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
@@ -239,6 +256,30 @@
     } catch (err) {
       /* speech synthesis not available in this browser — silently skip */
     }
+  }
+
+  // Prefers real, pre-generated Slovak speech (see the "Pronunciation audio"
+  // tool in Add Content) and only falls back to the browser's built-in voice
+  // — which often mispronounces Slovak badly — for anything not yet generated.
+  function speak(text) {
+    if (!text) return;
+
+    if (currentAudioEl) {
+      currentAudioEl.pause();
+      currentAudioEl = null;
+    }
+
+    const filename = audioManifest[text];
+    if (filename) {
+      const audioEl = new Audio(filename);
+      currentAudioEl = audioEl;
+      audioEl.play().catch(function () {
+        speakWithBrowserVoice(text);
+      });
+      return;
+    }
+
+    speakWithBrowserVoice(text);
   }
 
   document.addEventListener('click', function (e) {
@@ -335,6 +376,77 @@
     localStorage.setItem(STREAK_COUNT_KEY, String(count));
     localStorage.setItem(STREAK_DATE_KEY, today);
     renderStreak();
+
+    if (count === 3) unlockAchievement('streak-3', '3-Day Streak!');
+    if (count === 7) unlockAchievement('streak-7', '7-Day Streak!');
+    if (count === 30) unlockAchievement('streak-30', '30-Day Streak — incredible.');
+  }
+
+  /* ---- Achievements ---- */
+
+  const ACHIEVEMENTS_KEY = 'slovencina_achievements';
+
+  function getEarnedAchievements() {
+    try {
+      return JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || '[]');
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function unlockAchievement(id, label) {
+    const earned = getEarnedAchievements();
+    if (earned.indexOf(id) !== -1) return;
+    earned.push(id);
+    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(earned));
+    showAchievementToast(label);
+  }
+
+  let toastTimer = null;
+
+  function showAchievementToast(label) {
+    const toast = document.getElementById('achievement-toast');
+    toast.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.5L21 9l-5 4.5L17.5 20 12 16.5 6.5 20 8 13.5 3 9l6.6-.5z"/></svg>' +
+      '<span>' + escapeHtml(label) + '</span>';
+    toast.classList.remove('hidden');
+    // A brief timeout (rather than requestAnimationFrame) so the class swap
+    // still triggers the fade-in transition even in a backgrounded tab,
+    // where rAF callbacks can be paused indefinitely.
+    setTimeout(function () {
+      toast.classList.add('show');
+    }, 10);
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toast.classList.remove('show');
+      setTimeout(function () { toast.classList.add('hidden'); }, 300);
+    }, 3000);
+  }
+
+  const CONFETTI_COLORS = ['#4f46e5', '#16a34a', '#d97706', '#dc2626', '#0891b2'];
+
+  function launchConfetti(container) {
+    if (!container) return;
+    for (let i = 0; i < 16; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.round(Math.random() * 100) + '%';
+      piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      piece.style.animationDelay = (Math.random() * 0.3).toFixed(2) + 's';
+      container.appendChild(piece);
+    }
+    setTimeout(function () {
+      container.querySelectorAll('.confetti-piece').forEach(function (p) { p.remove(); });
+    }, 1800);
+  }
+
+  function checkWordCountAchievements() {
+    const stats = loadVocabStats();
+    const wordsSeen = Object.keys(stats).length;
+    if (wordsSeen >= 25) unlockAchievement('words-25', '25 Words Practiced');
+    if (wordsSeen >= 50) unlockAchievement('words-50', '50 Words Practiced');
+    if (wordsSeen >= 100) unlockAchievement('words-100', '100 Words Practiced');
   }
 
   /* ---- Vocabulary practice mode ---- */
@@ -419,16 +531,24 @@
 
     if (practiceIndex >= practiceQueue.length) {
       const total = practiceQueue.length;
+      const isPerfect = total > 0 && practiceCorrect === total;
+
       stage.innerHTML =
-        '<div class="practice-summary">' +
+        '<div class="practice-summary' + (isPerfect ? ' perfect' : '') + '" id="practice-summary-card">' +
         '<div class="score-big">' + practiceCorrect + ' / ' + total + '</div>' +
-        '<p>words you knew right away</p>' +
+        '<p>' + (isPerfect ? 'Perfect round!' : 'words you knew right away') + '</p>' +
         '<button class="btn btn-primary" id="practice-again-btn">Practice Again</button>' +
         '</div>';
+
       document.getElementById('practice-again-btn').addEventListener('click', function () {
         const topic = document.getElementById('practice-topic-select').value;
         startPractice(topic);
       });
+
+      if (isPerfect) {
+        launchConfetti(document.getElementById('practice-summary-card'));
+        unlockAchievement('perfect-round', 'Perfect Round!');
+      }
       return;
     }
 
@@ -479,6 +599,8 @@
     if (gotIt) practiceCorrect++;
     playTone(gotIt ? 'correct' : 'incorrect');
     recordPracticeToday();
+    unlockAchievement('first-practice', 'First Practice Complete');
+    checkWordCountAchievements();
 
     const card = document.getElementById('practice-card');
     card.classList.add(gotIt ? 'flash-correct' : 'flash-incorrect');
@@ -1115,6 +1237,107 @@
     }
 
     return { ok: false, status: 0, error: lastError };
+  }
+
+  /* ---- Pronunciation audio generation ---- */
+
+  function collectAllPhrases() {
+    const set = new Set();
+    vocabData.forEach(function (g) {
+      (g.words || []).forEach(function (w) {
+        if (w.sk) set.add(w.sk);
+      });
+    });
+    grammarData.forEach(function (t) {
+      (t.examples || []).forEach(function (ex) {
+        if (ex.sk) set.add(ex.sk);
+      });
+    });
+    return Array.from(set);
+  }
+
+  function setupAudioGeneration() {
+    document.getElementById('generate-audio-btn').addEventListener('click', runAudioGeneration);
+  }
+
+  async function updateAudioGenSummary() {
+    const all = collectAllPhrases();
+    const summaryEl = document.getElementById('audio-gen-summary');
+    if (!all.length) {
+      summaryEl.textContent = '';
+      return;
+    }
+    const missing = all.filter(function (p) { return !audioManifest[p]; });
+    summaryEl.textContent =
+      missing.length === 0
+        ? 'All ' + all.length + ' phrases already have audio.'
+        : (all.length - missing.length) + ' of ' + all.length + ' phrases already have audio.';
+  }
+
+  const AUDIO_GEN_BATCH_SIZE = 3;
+
+  async function runAudioGeneration() {
+    const btn = document.getElementById('generate-audio-btn');
+    const errorEl = document.getElementById('audio-gen-error');
+    const progressEl = document.getElementById('audio-gen-progress');
+    const barFill = document.getElementById('audio-gen-bar-fill');
+    const progressText = document.getElementById('audio-gen-progress-text');
+
+    errorEl.classList.add('hidden');
+    await loadAudioManifest();
+
+    const all = collectAllPhrases();
+    const missing = all.filter(function (p) { return !audioManifest[p]; });
+
+    if (!missing.length) {
+      updateAudioGenSummary();
+      return;
+    }
+
+    btn.disabled = true;
+    progressEl.classList.remove('hidden');
+    barFill.style.width = '0%';
+    progressText.textContent = 'Starting… this can take a while for a lot of phrases. Feel free to leave this tab open.';
+
+    let failures = [];
+    let done = 0;
+
+    for (let i = 0; i < missing.length; i += AUDIO_GEN_BATCH_SIZE) {
+      const batch = missing.slice(i, i + AUDIO_GEN_BATCH_SIZE);
+
+      const result = await postJsonWithRetry(
+        '/.netlify/functions/generate-audio',
+        { password: getStoredPassword(), phrases: batch },
+        { initialMessage: '', onStatus: function () {} }
+      );
+
+      if (!result.ok) {
+        if (result.status === 401) {
+          sessionStorage.removeItem(SESSION_KEY);
+          location.reload();
+          return;
+        }
+        failures = failures.concat(batch);
+        errorEl.textContent = result.error;
+        errorEl.classList.remove('hidden');
+      } else {
+        Object.assign(audioManifest, result.data.generated);
+        if (result.data.errors && result.data.errors.length) {
+          failures = failures.concat(batch);
+        }
+      }
+
+      done += batch.length;
+      barFill.style.width = Math.round((done / missing.length) * 100) + '%';
+      progressText.textContent = 'Generating audio… ' + done + ' / ' + missing.length;
+    }
+
+    progressText.textContent = failures.length
+      ? 'Done — generated ' + (missing.length - failures.length) + ' of ' + missing.length + ' (' + failures.length + ' failed; click the button again to retry those).'
+      : 'Done! Generated audio for ' + missing.length + ' phrases.';
+
+    btn.disabled = false;
+    updateAudioGenSummary();
   }
 
   /* ---- Utils ---- */

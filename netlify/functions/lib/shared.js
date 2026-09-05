@@ -81,6 +81,92 @@ async function callGemini(apiKey, requestBody) {
   throw new Error('Gemini took too long to respond. Please try again.');
 }
 
+// TTS models are separate from the text models above and use their own
+// pair for the same reason: a fresher/pricier model as primary, a cheaper
+// one as fallback if it's overloaded or rate-limited.
+const TTS_MODELS = ['gemini-2.5-flash-preview-tts', 'gemini-3.1-flash-tts-preview'];
+const TTS_BUDGET_MS = 8500;
+
+async function callGeminiTTS(apiKey, text, voiceName) {
+  const startedAt = Date.now();
+  const requestBody = {
+    contents: [{ role: 'user', parts: [{ text: 'Say clearly, in a natural Slovak accent: ' + text }] }],
+    generationConfig: {
+      responseModalities: ['AUDIO'],
+      speechConfig: {
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName || 'Kore' } },
+        languageCode: 'sk-SK',
+      },
+    },
+  };
+
+  let lastRes;
+  let lastErr;
+
+  for (const model of TTS_MODELS) {
+    const remaining = TTS_BUDGET_MS - (Date.now() - startedAt);
+    if (remaining < 1200) break;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), remaining);
+
+    let res;
+    try {
+      res = await fetch(geminiUrl(model, apiKey), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      clearTimeout(timeoutId);
+      lastErr = err.name === 'AbortError' ? new Error('Gemini TTS took too long to respond.') : err;
+      continue;
+    }
+    clearTimeout(timeoutId);
+
+    if (res.ok) return res;
+    if (res.status === 503 || res.status === 429) {
+      lastRes = res;
+      continue;
+    }
+    return res;
+  }
+
+  if (lastRes) return lastRes;
+  if (lastErr) throw lastErr;
+  throw new Error('Gemini TTS took too long to respond.');
+}
+
+// Gemini's TTS models return raw headerless PCM (16-bit signed, little-endian,
+// mono, 24kHz) — this wraps it in a standard 44-byte WAV header so any
+// browser's <audio> element can play it directly.
+function pcmToWav(pcmBuffer, sampleRate, channels, bitDepth) {
+  sampleRate = sampleRate || 24000;
+  channels = channels || 1;
+  bitDepth = bitDepth || 16;
+
+  const byteRate = (sampleRate * channels * bitDepth) / 8;
+  const blockAlign = (channels * bitDepth) / 8;
+  const header = Buffer.alloc(44);
+
+  header.write('RIFF', 0);
+  header.writeUInt32LE(36 + pcmBuffer.length, 4);
+  header.write('WAVE', 8);
+  header.write('fmt ', 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM format
+  header.writeUInt16LE(channels, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(byteRate, 28);
+  header.writeUInt16LE(blockAlign, 32);
+  header.writeUInt16LE(bitDepth, 34);
+  header.write('data', 36);
+  header.writeUInt32LE(pcmBuffer.length, 40);
+
+  return Buffer.concat([header, pcmBuffer]);
+}
+
 function friendlyGeminiError(status, errText) {
   if (status === 503) {
     return 'Gemini is under heavy load right now. Please wait a few seconds and try again.';
@@ -91,4 +177,4 @@ function friendlyGeminiError(status, errText) {
   return `Gemini API error (${status}). ${(errText || '').slice(0, 300)}`;
 }
 
-module.exports = { safeEqual, jsonResponse, callGemini, friendlyGeminiError };
+module.exports = { safeEqual, jsonResponse, callGemini, callGeminiTTS, pcmToWav, friendlyGeminiError };

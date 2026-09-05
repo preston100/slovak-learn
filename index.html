@@ -38,6 +38,7 @@
 
   <!-- Main app: hidden until the password gate passes -->
   <div id="app" class="hidden">
+    <div id="achievement-toast" class="achievement-toast hidden"></div>
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">
@@ -151,6 +152,18 @@
         <div id="extract-error" class="error-banner hidden"></div>
 
         <div id="review-area"></div>
+
+        <div class="mode-card" style="max-width: 520px; margin-top: 28px;">
+          <h3>Pronunciation audio</h3>
+          <p>Generates real spoken Slovak (via Gemini) for every word and example that doesn't have audio yet, and saves it permanently — no per-visit cost.</p>
+          <div id="audio-gen-summary" class="audio-gen-summary"></div>
+          <button class="btn btn-secondary" id="generate-audio-btn" style="width:100%; margin-top: 12px;">Check &amp; Generate Missing Audio</button>
+          <div id="audio-gen-progress" class="audio-gen-progress hidden">
+            <div class="audio-gen-bar-track"><div class="audio-gen-bar-fill" id="audio-gen-bar-fill"></div></div>
+            <div id="audio-gen-progress-text"></div>
+          </div>
+          <div id="audio-gen-error" class="error-banner hidden"></div>
+        </div>
       </section>
     </main>
   </div>
