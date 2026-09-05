@@ -28,10 +28,12 @@ exports.handler = async function (event) {
   }
 
   const sitePassword = process.env.SITE_PASSWORD;
-  const sttKey = process.env.GOOGLE_TTS_API_KEY;
+  // Deliberately a separate key from GOOGLE_TTS_API_KEY — each is restricted
+  // to just one Google API, so a leaked key can't be used for the other.
+  const sttKey = process.env.GOOGLE_STT_API_KEY;
 
   if (!sitePassword || !sttKey) {
-    return jsonResponse(500, { error: 'Server is not configured. Missing SITE_PASSWORD or GOOGLE_TTS_API_KEY.' });
+    return jsonResponse(500, { error: 'Server is not configured. Missing SITE_PASSWORD or GOOGLE_STT_API_KEY.' });
   }
 
   let body;
