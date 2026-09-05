@@ -39,6 +39,18 @@
   <!-- Main app: hidden until the password gate passes -->
   <div id="app" class="hidden">
     <div id="achievement-toast" class="achievement-toast hidden"></div>
+
+    <!-- Full-screen lesson flow: Learn -> Practice -> Voice -> Quiz for one roadmap section -->
+    <div id="lesson-overlay" class="lesson-overlay hidden">
+      <div class="lesson-topbar">
+        <button class="icon-btn" id="lesson-exit-btn" aria-label="Exit lesson">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <div class="lesson-progress-track"><div class="lesson-progress-fill" id="lesson-progress-fill"></div></div>
+        <div class="lesson-phase-label" id="lesson-phase-label"></div>
+      </div>
+      <div class="lesson-body" id="lesson-body"></div>
+    </div>
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">
@@ -46,8 +58,8 @@
           <span>Slovenčina</span>
         </div>
         <nav class="tabs" role="tablist" aria-label="Sections">
-          <button class="tab-btn active" data-tab="grammar" role="tab" aria-selected="true">Grammar</button>
-          <button class="tab-btn" data-tab="vocabulary" role="tab" aria-selected="false">Vocabulary</button>
+          <button class="tab-btn active" data-tab="profile" role="tab" aria-selected="true">Profile</button>
+          <button class="tab-btn" data-tab="learn" role="tab" aria-selected="false">Learn</button>
           <button class="tab-btn" data-tab="tests" role="tab" aria-selected="false">Tests</button>
           <button class="tab-btn" data-tab="add-content" role="tab" aria-selected="false">Add Content</button>
         </nav>
@@ -65,47 +77,101 @@
     </header>
 
     <main>
-      <!-- Grammar panel -->
-      <section id="panel-grammar" class="panel active">
+      <!-- Profile panel -->
+      <section id="panel-profile" class="panel active">
         <div class="panel-header">
-          <h2>Grammar</h2>
-          <p>Core Slovak grammar topics, explained in plain English.</p>
+          <h2>Your Progress</h2>
+          <p>A quick look at how far you've come.</p>
         </div>
 
-        <div class="content-mode-switch" role="tablist" aria-label="Grammar mode">
-          <button class="content-mode-btn active" data-grammar-mode="focus">Learn</button>
-          <button class="content-mode-btn" data-grammar-mode="browse">Browse All</button>
-        </div>
-
-        <div id="grammar-focus">
-          <div class="topic-pager">
-            <button class="icon-btn" id="grammar-prev-btn" aria-label="Previous topic">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <div class="topic-pager-label" id="grammar-focus-progress"></div>
-            <button class="icon-btn" id="grammar-next-btn" aria-label="Next topic">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
+        <div class="profile-hero">
+          <div class="profile-ring-wrap">
+            <svg class="profile-ring" viewBox="0 0 120 120">
+              <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+              <circle class="ring-fill" id="profile-ring-fill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="profile-ring-label">
+              <div class="ring-pct" id="profile-pct">0%</div>
+              <div class="ring-sub">complete</div>
+            </div>
           </div>
-          <div id="grammar-focus-card"></div>
+          <div class="profile-hero-stats">
+            <div class="profile-stat"><div class="stat-num" id="stat-sections">0 / 0</div><div class="stat-label">Sections cleared</div></div>
+            <div class="profile-stat"><div class="stat-num" id="stat-words">0</div><div class="stat-label">Words practiced</div></div>
+            <div class="profile-stat"><div class="stat-num" id="stat-time">0m</div><div class="stat-label">Time spent</div></div>
+            <div class="profile-stat"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Day streak</div></div>
+          </div>
         </div>
 
-        <div id="grammar-list" class="grammar-list hidden"></div>
+        <div class="profile-next-card" id="profile-next-card"></div>
+
+        <h3 class="browse-subhead">Badges</h3>
+        <div id="profile-badges" class="badge-grid"></div>
       </section>
 
-      <!-- Vocabulary panel -->
-      <section id="panel-vocabulary" class="panel">
+      <!-- Learn panel: the unified roadmap -->
+      <section id="panel-learn" class="panel">
         <div class="panel-header">
-          <h2>Vocabulary</h2>
-          <p>Words and phrases, grouped by topic.</p>
+          <h2>Learn</h2>
+          <p>One path through everything — grammar and vocabulary together.</p>
         </div>
 
-        <div class="content-mode-switch" role="tablist" aria-label="Vocabulary mode">
-          <button class="content-mode-btn active" data-vocab-mode="learn">Learn</button>
-          <button class="content-mode-btn" data-vocab-mode="browse">Browse All</button>
+        <div class="content-mode-switch" role="tablist" aria-label="Learn mode">
+          <button class="content-mode-btn active" data-learn-mode="roadmap">Roadmap</button>
+          <button class="content-mode-btn" data-learn-mode="browse">Browse All</button>
         </div>
 
-        <div id="vocab-learn">
+        <div id="roadmap-view">
+          <div id="roadmap-map" class="round-map"></div>
+        </div>
+
+        <div id="learn-browse" class="hidden">
+          <h3 class="browse-subhead">Grammar</h3>
+          <div id="grammar-list" class="grammar-list"></div>
+          <h3 class="browse-subhead">Vocabulary</h3>
+          <div id="vocab-list"></div>
+        </div>
+      </section>
+
+      <!-- Tests panel -->
+      <section id="panel-tests" class="panel">
+        <div class="panel-header">
+          <h2>Tests</h2>
+          <p>Generate an AI quiz, or freely practice any topic — including anything you've added yourself.</p>
+        </div>
+
+        <div class="content-mode-switch" role="tablist" aria-label="Tests mode">
+          <button class="content-mode-btn active" data-tests-mode="quiz">AI Quiz</button>
+          <button class="content-mode-btn" data-tests-mode="practice">Practice</button>
+        </div>
+
+        <div id="tests-quiz-mode">
+          <div class="test-mode-switch">
+            <div class="mode-card">
+              <h3>By topic</h3>
+              <p>Pick a topic and get a 5-question quiz.</p>
+              <label class="field-label" for="topic-select">Topic</label>
+              <select id="topic-select"></select>
+              <button class="btn btn-secondary" id="generate-topic-btn" style="width:100%">Generate Quiz</button>
+            </div>
+
+            <div class="mode-card">
+              <h3>From a file</h3>
+              <p>Upload a .txt or .pdf and get a quiz based on it.</p>
+              <label class="field-label" for="file-input">Document</label>
+              <div class="file-drop" id="file-drop">Click to choose a .txt or .pdf file (max 4MB)</div>
+              <input type="file" id="file-input" accept=".txt,.pdf,text/plain,application/pdf" class="hidden" />
+              <button class="btn btn-secondary" id="generate-file-btn" style="width:100%">Generate Quiz</button>
+            </div>
+          </div>
+
+          <div id="quiz-status" class="quiz-status hidden"></div>
+          <div id="quiz-error" class="error-banner hidden"></div>
+
+          <div id="quiz-area"></div>
+        </div>
+
+        <div id="tests-practice-mode" class="hidden">
           <div class="practice-setup">
             <div>
               <label class="field-label" for="learn-topic-select">Topic</label>
@@ -115,40 +181,6 @@
           <div id="round-map" class="round-map"></div>
           <div id="practice-stage" class="practice-stage"></div>
         </div>
-
-        <div id="vocab-list" class="hidden"></div>
-      </section>
-
-      <!-- Tests panel -->
-      <section id="panel-tests" class="panel">
-        <div class="panel-header">
-          <h2>Tests</h2>
-          <p>Generate a short practice quiz — by topic, or from your own material.</p>
-        </div>
-
-        <div class="test-mode-switch">
-          <div class="mode-card">
-            <h3>By topic</h3>
-            <p>Pick a topic and get a 5-question quiz.</p>
-            <label class="field-label" for="topic-select">Topic</label>
-            <select id="topic-select"></select>
-            <button class="btn btn-secondary" id="generate-topic-btn" style="width:100%">Generate Quiz</button>
-          </div>
-
-          <div class="mode-card">
-            <h3>From a file</h3>
-            <p>Upload a .txt or .pdf and get a quiz based on it.</p>
-            <label class="field-label" for="file-input">Document</label>
-            <div class="file-drop" id="file-drop">Click to choose a .txt or .pdf file (max 4MB)</div>
-            <input type="file" id="file-input" accept=".txt,.pdf,text/plain,application/pdf" class="hidden" />
-            <button class="btn btn-secondary" id="generate-file-btn" style="width:100%">Generate Quiz</button>
-          </div>
-        </div>
-
-        <div id="quiz-status" class="quiz-status hidden"></div>
-        <div id="quiz-error" class="error-banner hidden"></div>
-
-        <div id="quiz-area"></div>
       </section>
 
       <!-- Add Content panel -->

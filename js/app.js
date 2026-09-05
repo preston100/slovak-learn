@@ -82,11 +82,13 @@
     loadGrammar();
     loadVocab();
     setupTests();
+    setupTestsModes();
     setupAddContent();
     setupSound();
     renderStreak();
-    setupVocabModes();
-    setupGrammarModes();
+    setupLearnModes();
+    setupLessonOverlay();
+    setupTimeTracking();
     loadAudioManifest();
     setupAudioGeneration();
   }
@@ -119,9 +121,9 @@
       const res = await fetch('data/grammar.json');
       grammarData = await res.json();
       renderGrammar(grammarData);
-      renderGrammarFocus();
       populateTopicSelect();
       updateAudioGenSummary();
+      buildRoadmapSections();
     } catch (err) {
       container.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
     }
@@ -177,63 +179,6 @@
       .join('');
   }
 
-  let grammarFocusIndex = 0;
-
-  function setupGrammarModes() {
-    const buttons = document.querySelectorAll('#panel-grammar .content-mode-btn');
-    const browseEl = document.getElementById('grammar-list');
-    const focusEl = document.getElementById('grammar-focus');
-
-    buttons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
-        const mode = btn.dataset.grammarMode;
-        browseEl.classList.toggle('hidden', mode !== 'browse');
-        focusEl.classList.toggle('hidden', mode !== 'focus');
-      });
-    });
-
-    document.getElementById('grammar-prev-btn').addEventListener('click', function () {
-      grammarFocusIndex = Math.max(0, grammarFocusIndex - 1);
-      renderGrammarFocus();
-    });
-    document.getElementById('grammar-next-btn').addEventListener('click', function () {
-      grammarFocusIndex = Math.min(grammarData.length - 1, grammarFocusIndex + 1);
-      renderGrammarFocus();
-    });
-  }
-
-  function renderGrammarFocus() {
-    const cardEl = document.getElementById('grammar-focus-card');
-    const progressEl = document.getElementById('grammar-focus-progress');
-    const prevBtn = document.getElementById('grammar-prev-btn');
-    const nextBtn = document.getElementById('grammar-next-btn');
-
-    if (!grammarData.length) {
-      cardEl.innerHTML = '<div class="empty-state">No grammar topics yet.</div>';
-      progressEl.textContent = '';
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
-      return;
-    }
-
-    grammarFocusIndex = Math.max(0, Math.min(grammarData.length - 1, grammarFocusIndex));
-    const t = grammarData[grammarFocusIndex];
-    const examples = examplesHtml(t.examples);
-
-    progressEl.textContent = 'Topic ' + (grammarFocusIndex + 1) + ' of ' + grammarData.length;
-    prevBtn.disabled = grammarFocusIndex === 0;
-    nextBtn.disabled = grammarFocusIndex === grammarData.length - 1;
-
-    cardEl.innerHTML =
-      '<div class="focus-card">' +
-      '<h3>' + escapeHtml(t.topic) + '</h3>' +
-      '<div class="summary">' + escapeHtml(t.summary || '') + '</div>' +
-      '<div class="explanation">' + escapeHtml(t.explanation || '') + '</div>' +
-      (examples ? '<div class="example-list">' + examples + '</div>' : '') +
-      '</div>';
-  }
-
   /* ---- Vocabulary ---- */
 
   async function loadVocab() {
@@ -244,6 +189,7 @@
       renderVocab(vocabData);
       populateTopicSelect();
       updateAudioGenSummary();
+      buildRoadmapSections();
     } catch (err) {
       container.innerHTML = '<div class="empty-state">Could not load vocabulary content.</div>';
     }
@@ -528,17 +474,19 @@
     localStorage.setItem(VOCAB_STATS_KEY, JSON.stringify(stats));
   }
 
-  function setupVocabModes() {
-    const buttons = document.querySelectorAll('#panel-vocabulary .content-mode-btn');
-    const browseEl = document.getElementById('vocab-list');
-    const learnEl = document.getElementById('vocab-learn');
+  // Toggles the Tests tab between the AI-generated quiz and the free-practice
+  // round picker (this used to be Vocabulary's own tab; it lives here now).
+  function setupTestsModes() {
+    const buttons = document.querySelectorAll('#panel-tests .content-mode-btn');
+    const quizEl = document.getElementById('tests-quiz-mode');
+    const practiceEl = document.getElementById('tests-practice-mode');
 
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
-        const mode = btn.dataset.vocabMode;
-        browseEl.classList.toggle('hidden', mode !== 'browse');
-        learnEl.classList.toggle('hidden', mode !== 'learn');
+        const mode = btn.dataset.testsMode;
+        quizEl.classList.toggle('hidden', mode !== 'quiz');
+        practiceEl.classList.toggle('hidden', mode !== 'practice');
       });
     });
 
@@ -795,6 +743,677 @@
       practiceIndex++;
       renderPracticeCard();
     }, 450);
+  }
+
+  /* ---- Utility: shuffle ---- */
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  /* ---- Unified Roadmap (Learn tab) ---- */
+
+  let roadmapSections = [];
+  const ROADMAP_PROGRESS_KEY = 'slovencina_roadmap_progress';
+
+  // Builds the single combined path the moment both grammar and vocabulary
+  // have loaded — whichever of the two finishes loading last is the one that
+  // actually triggers this, since both call it.
+  function buildRoadmapSections() {
+    if (!grammarData.length || !vocabData.length) return;
+    if (roadmapSections.length) return; // already built once
+
+    const vocabSections = [];
+    vocabData.forEach(function (g) {
+      const rounds = chunkIntoRounds(g.words || [], ROUND_SIZE);
+      rounds.forEach(function (round, i) {
+        vocabSections.push({
+          type: 'vocab',
+          title: g.topic + (rounds.length > 1 ? ' · Part ' + (i + 1) : ''),
+          subtitle: round.length + ' words',
+          items: round,
+          explanation: '',
+        });
+      });
+    });
+
+    const grammarSections = grammarData.map(function (t) {
+      return {
+        type: 'grammar',
+        title: t.topic,
+        subtitle: t.summary || '',
+        items: t.examples || [],
+        explanation: t.explanation || '',
+      };
+    });
+
+    // Interleave one vocab section with one grammar section at a time, so
+    // grammar rules show up spread through the path near related vocabulary
+    // instead of front- or back-loaded as one big block.
+    const sections = [];
+    let vi = 0;
+    let gi = 0;
+    while (vi < vocabSections.length || gi < grammarSections.length) {
+      if (vi < vocabSections.length) sections.push(vocabSections[vi++]);
+      if (gi < grammarSections.length) sections.push(grammarSections[gi++]);
+    }
+
+    roadmapSections = sections;
+    renderRoadmapMap();
+    renderProfile();
+  }
+
+  function loadRoadmapProgress() {
+    try {
+      return JSON.parse(localStorage.getItem(ROADMAP_PROGRESS_KEY) || '[]');
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function isSectionCleared(index) {
+    const p = loadRoadmapProgress();
+    return !!p[index];
+  }
+
+  function setSectionCleared(index) {
+    const p = loadRoadmapProgress();
+    p[index] = true;
+    localStorage.setItem(ROADMAP_PROGRESS_KEY, JSON.stringify(p));
+  }
+
+  function setupLearnModes() {
+    const buttons = document.querySelectorAll('#panel-learn .content-mode-btn');
+    const roadmapEl = document.getElementById('roadmap-view');
+    const browseEl = document.getElementById('learn-browse');
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
+        const mode = btn.dataset.learnMode;
+        roadmapEl.classList.toggle('hidden', mode !== 'roadmap');
+        browseEl.classList.toggle('hidden', mode !== 'browse');
+      });
+    });
+  }
+
+  function renderRoadmapMap() {
+    const mapEl = document.getElementById('roadmap-map');
+    if (!roadmapSections.length) {
+      mapEl.innerHTML = '<div class="empty-state">Loading your roadmap…</div>';
+      return;
+    }
+
+    const LANES = ['align-center', 'align-end', 'align-start'];
+    const LOCK_ICON =
+      '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+    const STAR_ICON =
+      '<svg class="round-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"/></svg>';
+
+    mapEl.innerHTML =
+      roadmapSections
+        .map(function (section, i) {
+          const cleared = isSectionCleared(i);
+          const locked = i > 0 && !isSectionCleared(i - 1);
+          const isCurrent = !cleared && !locked;
+          const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
+          const inner = cleared ? STAR_ICON : locked ? LOCK_ICON : '<span class="round-num-badge">' + (i + 1) + '</span>';
+
+          return (
+            '<div class="round-row ' + LANES[i % LANES.length] + '">' +
+            '<div class="round-node-slot">' +
+            '<div class="round-node ' + stateClass + '" data-section-index="' + i + '" data-locked="' + locked + '">' +
+            inner +
+            '<div class="round-label">' + escapeHtml(section.title) + '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>'
+          );
+        })
+        .join('') +
+      '<div class="round-map-hint">Get ' + Math.round(ROUND_CLEAR_THRESHOLD * 100) + '%+ overall to unlock the next section.</div>';
+
+    mapEl.querySelectorAll('.round-node').forEach(function (node) {
+      node.addEventListener('click', function () {
+        if (node.dataset.locked === 'true') return;
+        startLesson(Number(node.dataset.sectionIndex));
+      });
+    });
+  }
+
+  /* ---- Full-screen lesson flow: Learn -> Practice -> Voice -> Quiz ---- */
+
+  let lessonSectionIndex = -1;
+  let lessonPhase = 'learn';
+  let lessonPracticeCorrect = 0;
+  let lessonPracticeTotal = 0;
+  let lessonVoiceCorrect = 0;
+  let lessonVoiceTotal = 0;
+  let lessonQuizCorrect = 0;
+  let lessonQuizTotal = 0;
+
+  function setupLessonOverlay() {
+    document.getElementById('lesson-exit-btn').addEventListener('click', exitLesson);
+  }
+
+  function startLesson(index) {
+    lessonSectionIndex = index;
+    lessonPhase = 'learn';
+    lessonPracticeCorrect = 0;
+    lessonPracticeTotal = 0;
+    lessonVoiceCorrect = 0;
+    lessonVoiceTotal = 0;
+    lessonQuizCorrect = 0;
+    lessonQuizTotal = 0;
+    document.getElementById('lesson-overlay').classList.remove('hidden');
+    renderLessonPhase();
+  }
+
+  function exitLesson() {
+    stopVoiceRecognition();
+    document.getElementById('lesson-overlay').classList.add('hidden');
+    renderRoadmapMap();
+    renderProfile();
+  }
+
+  function updateLessonChrome(label, stepIndex) {
+    document.getElementById('lesson-phase-label').textContent = label;
+    document.getElementById('lesson-progress-fill').style.width = (stepIndex / 4) * 100 + '%';
+  }
+
+  function renderLessonPhase() {
+    if (lessonPhase === 'learn') renderLearnPhase();
+    else if (lessonPhase === 'practice') renderPracticePhase();
+    else if (lessonPhase === 'voice') renderVoicePhase();
+    else if (lessonPhase === 'quiz') renderQuizPhase();
+    else renderFinishPhase();
+  }
+
+  function renderLearnPhase() {
+    updateLessonChrome('Learn', 0);
+    const section = roadmapSections[lessonSectionIndex];
+    const body = document.getElementById('lesson-body');
+
+    const list = section.items
+      .map(function (it) {
+        return (
+          '<div class="lesson-learn-row"><span class="sk">' +
+          speakerButtonHtml(it.sk) +
+          escapeHtml(it.sk) +
+          '</span><span class="en">' +
+          escapeHtml(it.en) +
+          '</span></div>'
+        );
+      })
+      .join('');
+
+    body.innerHTML =
+      '<div class="lesson-stage">' +
+      '<div class="lesson-eyebrow">' + (section.type === 'grammar' ? 'Grammar' : 'Vocabulary') + '</div>' +
+      '<h2 class="lesson-heading">' + escapeHtml(section.title) + '</h2>' +
+      (section.subtitle ? '<p class="lesson-sub">' + escapeHtml(section.subtitle) + '</p>' : '') +
+      (section.explanation ? '<div class="lesson-grammar-explanation">' + escapeHtml(section.explanation) + '</div>' : '') +
+      (list ? '<div class="lesson-learn-list">' + list + '</div>' : '') +
+      '<button class="btn btn-primary" id="lesson-learn-next-btn" style="width:100%; max-width:320px;">I’m Ready — Start Practice</button>' +
+      '</div>';
+
+    document.getElementById('lesson-learn-next-btn').addEventListener('click', function () {
+      lessonPhase = 'practice';
+      renderLessonPhase();
+    });
+  }
+
+  let lessonQueue = [];
+  let lessonQueueIndex = 0;
+  let lessonCardGraded = false;
+  let lessonCurrentPracticeItem = null;
+
+  function renderPracticePhase() {
+    updateLessonChrome('Practice', 1);
+    lessonQueue = shuffleArray(roadmapSections[lessonSectionIndex].items.slice());
+    lessonQueueIndex = 0;
+    lessonPracticeCorrect = 0;
+    lessonPracticeTotal = lessonQueue.length;
+    renderPracticeCardStep();
+  }
+
+  function renderPracticeCardStep() {
+    const body = document.getElementById('lesson-body');
+
+    if (lessonQueueIndex >= lessonQueue.length) {
+      lessonPhase = 'voice';
+      renderLessonPhase();
+      return;
+    }
+
+    lessonCardGraded = false;
+    const item = lessonQueue[lessonQueueIndex];
+    lessonCurrentPracticeItem = item;
+
+    body.innerHTML =
+      '<div class="lesson-stage">' +
+      '<div class="lesson-eyebrow">Practice · ' + (lessonQueueIndex + 1) + ' / ' + lessonQueue.length + '</div>' +
+      '<div class="practice-card" id="lesson-practice-card" style="max-width:460px;">' +
+      '<div class="practice-word">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</div>' +
+      '<div class="practice-answer" id="lesson-practice-answer"></div>' +
+      '<button class="btn btn-secondary" id="lesson-reveal-btn">Show Answer</button>' +
+      '<div class="practice-grade-row hidden" id="lesson-grade-row">' +
+      '<button class="btn-grade missed" id="lesson-missed-btn">Missed it</button>' +
+      '<button class="btn-grade got-it" id="lesson-gotit-btn">Got it</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+
+    document.getElementById('lesson-reveal-btn').addEventListener('click', function () {
+      document.getElementById('lesson-practice-answer').textContent = item.en;
+      document.getElementById('lesson-reveal-btn').classList.add('hidden');
+      document.getElementById('lesson-grade-row').classList.remove('hidden');
+    });
+    document.getElementById('lesson-missed-btn').addEventListener('click', function () { gradeLessonPracticeCard(false); });
+    document.getElementById('lesson-gotit-btn').addEventListener('click', function () { gradeLessonPracticeCard(true); });
+  }
+
+  function gradeLessonPracticeCard(gotIt) {
+    if (lessonCardGraded) return;
+    lessonCardGraded = true;
+
+    // Feeds the same shared word-stats store Tests > Practice uses, so
+    // "words practiced" on the Profile tab and the word-count achievements
+    // count roadmap practice too, not just the standalone practice picker.
+    if (lessonCurrentPracticeItem) {
+      const stats = loadVocabStats();
+      const entry = stats[lessonCurrentPracticeItem.sk] || { misses: 0 };
+      entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
+      stats[lessonCurrentPracticeItem.sk] = entry;
+      saveVocabStats(stats);
+    }
+
+    if (gotIt) lessonPracticeCorrect++;
+    playTone(gotIt ? 'correct' : 'incorrect');
+
+    const card = document.getElementById('lesson-practice-card');
+    card.classList.add(gotIt ? 'flash-correct' : 'flash-incorrect');
+
+    setTimeout(function () {
+      lessonQueueIndex++;
+      renderPracticeCardStep();
+    }, 400);
+  }
+
+  // Speech recognition transcripts frequently drop Slovak diacritics even
+  // when the pronunciation itself was correct, so comparison is deliberately
+  // lenient — it strips diacritics on both sides rather than requiring an
+  // exact match, which would punish correct speech for a transcription quirk.
+  function normalizeForVoiceCompare(text) {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9\s]/g, '')
+      .trim();
+  }
+
+  let voiceQueue = [];
+  let voiceIndex = 0;
+  let voiceRecognizer = null;
+
+  function renderVoicePhase() {
+    updateLessonChrome('Voice', 2);
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRec) {
+      const body = document.getElementById('lesson-body');
+      body.innerHTML =
+        '<div class="lesson-stage">' +
+        '<div class="lesson-eyebrow">Voice</div>' +
+        '<h2 class="lesson-heading">Voice practice isn’t available in this browser</h2>' +
+        '<p class="lesson-sub">Speech recognition isn’t supported here — this phase is skipped and won’t count against you.</p>' +
+        '<button class="btn btn-primary" id="lesson-voice-skip-btn">Continue to Quiz</button>' +
+        '</div>';
+      document.getElementById('lesson-voice-skip-btn').addEventListener('click', function () {
+        lessonVoiceTotal = 0;
+        lessonVoiceCorrect = 0;
+        lessonPhase = 'quiz';
+        renderLessonPhase();
+      });
+      return;
+    }
+
+    // Capped at 5 items so this phase stays quick even for a big section.
+    voiceQueue = shuffleArray(roadmapSections[lessonSectionIndex].items.slice()).slice(0, 5);
+    voiceIndex = 0;
+    lessonVoiceCorrect = 0;
+    lessonVoiceTotal = voiceQueue.length;
+    renderVoiceStep();
+  }
+
+  function renderVoiceStep() {
+    const body = document.getElementById('lesson-body');
+
+    if (voiceIndex >= voiceQueue.length) {
+      lessonPhase = 'quiz';
+      renderLessonPhase();
+      return;
+    }
+
+    const item = voiceQueue[voiceIndex];
+
+    body.innerHTML =
+      '<div class="lesson-stage">' +
+      '<div class="lesson-eyebrow">Voice · ' + (voiceIndex + 1) + ' / ' + voiceQueue.length + '</div>' +
+      '<h2 class="lesson-heading">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</h2>' +
+      '<p class="lesson-sub">Listen, then tap the mic and say it out loud.</p>' +
+      '<button class="mic-btn" id="lesson-mic-btn" aria-label="Start speaking">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 19v3"/></svg>' +
+      '</button>' +
+      '<div class="voice-heard" id="voice-heard"></div>' +
+      '<div id="voice-result"></div>' +
+      '</div>';
+
+    document.getElementById('lesson-mic-btn').addEventListener('click', function () {
+      startVoiceRecognition(item);
+    });
+  }
+
+  function startVoiceRecognition(item) {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micBtn = document.getElementById('lesson-mic-btn');
+    const heardEl = document.getElementById('voice-heard');
+    const resultEl = document.getElementById('voice-result');
+    if (micBtn.classList.contains('listening')) return;
+
+    try {
+      voiceRecognizer = new SpeechRec();
+    } catch (err) {
+      heardEl.textContent = 'Could not start the microphone.';
+      return;
+    }
+
+    voiceRecognizer.lang = 'sk-SK';
+    voiceRecognizer.maxAlternatives = 3;
+    micBtn.classList.add('listening');
+    heardEl.textContent = 'Listening…';
+    resultEl.innerHTML = '';
+
+    voiceRecognizer.onresult = function (event) {
+      const alternatives = Array.from(event.results[0]).map(function (r) { return r.transcript; });
+      const target = normalizeForVoiceCompare(item.sk);
+      const isMatch = alternatives.some(function (alt) {
+        const norm = normalizeForVoiceCompare(alt);
+        return norm.length > 0 && (norm === target || norm.indexOf(target) !== -1 || target.indexOf(norm) !== -1);
+      });
+
+      heardEl.textContent = 'Heard: “' + alternatives[0] + '”';
+      resultEl.innerHTML = isMatch
+        ? '<div class="voice-feedback correct">Nice!</div>'
+        : '<div class="voice-feedback incorrect">Not quite — expected “' + escapeHtml(item.sk) + '”</div>';
+
+      if (isMatch) {
+        lessonVoiceCorrect++;
+        playTone('correct');
+      } else {
+        playTone('incorrect');
+      }
+
+      setTimeout(function () {
+        voiceIndex++;
+        renderVoiceStep();
+      }, 1200);
+    };
+
+    voiceRecognizer.onerror = function (event) {
+      heardEl.textContent = 'Could not hear you (' + event.error + '). Try tapping the mic again.';
+      micBtn.classList.remove('listening');
+    };
+
+    voiceRecognizer.onend = function () {
+      micBtn.classList.remove('listening');
+    };
+
+    try {
+      voiceRecognizer.start();
+    } catch (err) {
+      heardEl.textContent = 'Could not start the microphone.';
+      micBtn.classList.remove('listening');
+    }
+  }
+
+  function stopVoiceRecognition() {
+    if (voiceRecognizer) {
+      try {
+        voiceRecognizer.abort();
+      } catch (err) {
+        /* already stopped */
+      }
+      voiceRecognizer = null;
+    }
+  }
+
+  let quizQueue = [];
+  let quizIndex = 0;
+  let quizAnswered = false;
+
+  function renderQuizPhase() {
+    updateLessonChrome('Quiz', 3);
+    const section = roadmapSections[lessonSectionIndex];
+    const count = Math.min(5, section.items.length);
+    quizQueue = shuffleArray(section.items.slice()).slice(0, count);
+    quizIndex = 0;
+    lessonQuizCorrect = 0;
+    lessonQuizTotal = quizQueue.length;
+    renderQuizStep();
+  }
+
+  function renderQuizStep() {
+    const body = document.getElementById('lesson-body');
+
+    if (quizIndex >= quizQueue.length) {
+      lessonPhase = 'finish';
+      renderLessonPhase();
+      return;
+    }
+
+    quizAnswered = false;
+    const correct = quizQueue[quizIndex];
+    const section = roadmapSections[lessonSectionIndex];
+
+    let distractorPool = section.items.filter(function (it) { return it.en !== correct.en; });
+    if (distractorPool.length < 3) {
+      const allPairs = [];
+      vocabData.forEach(function (g) { (g.words || []).forEach(function (w) { allPairs.push(w); }); });
+      distractorPool = allPairs.filter(function (w) { return w.en !== correct.en; });
+    }
+    const distractors = shuffleArray(distractorPool.slice()).slice(0, 3);
+    const options = shuffleArray([correct].concat(distractors));
+
+    body.innerHTML =
+      '<div class="lesson-stage">' +
+      '<div class="lesson-eyebrow">Quiz · ' + (quizIndex + 1) + ' / ' + quizQueue.length + '</div>' +
+      '<h2 class="lesson-heading">' + speakerButtonHtml(correct.sk) + escapeHtml(correct.sk) + '</h2>' +
+      '<p class="lesson-sub">What does this mean?</p>' +
+      '<div class="quiz-choice-list">' +
+      options
+        .map(function (opt) {
+          return (
+            '<button type="button" class="quiz-choice-btn" data-correct="' +
+            (opt.en === correct.en) +
+            '">' +
+            escapeHtml(opt.en) +
+            '</button>'
+          );
+        })
+        .join('') +
+      '</div>' +
+      '</div>';
+
+    body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { gradeQuizChoice(btn); });
+    });
+  }
+
+  function gradeQuizChoice(btn) {
+    if (quizAnswered) return;
+    quizAnswered = true;
+
+    const isCorrect = btn.dataset.correct === 'true';
+    const body = document.getElementById('lesson-body');
+
+    body.querySelectorAll('.quiz-choice-btn').forEach(function (b) {
+      b.disabled = true;
+      if (b.dataset.correct === 'true') b.classList.add('correct');
+      else if (b === btn) b.classList.add('incorrect');
+    });
+
+    if (isCorrect) lessonQuizCorrect++;
+    playTone(isCorrect ? 'correct' : 'incorrect');
+
+    setTimeout(function () {
+      quizIndex++;
+      renderQuizStep();
+    }, 700);
+  }
+
+  function renderFinishPhase() {
+    updateLessonChrome('Done', 4);
+
+    const totalRight = lessonPracticeCorrect + lessonVoiceCorrect + lessonQuizCorrect;
+    const totalPossible = lessonPracticeTotal + lessonVoiceTotal + lessonQuizTotal;
+    const pct = totalPossible > 0 ? totalRight / totalPossible : 0;
+    const cleared = pct >= ROUND_CLEAR_THRESHOLD;
+    const isPerfect = totalPossible > 0 && totalRight === totalPossible;
+
+    if (cleared) setSectionCleared(lessonSectionIndex);
+    recordPracticeToday();
+    unlockAchievement('first-practice', 'First Practice Complete');
+    checkWordCountAchievements();
+
+    const hasNext = lessonSectionIndex + 1 < roadmapSections.length;
+    const summaryClass = isPerfect ? 'perfect' : cleared ? 'cleared' : 'not-cleared';
+    const message = isPerfect ? 'Perfect!' : cleared ? 'Section cleared!' : 'Not quite — try this section again.';
+
+    const body = document.getElementById('lesson-body');
+    body.innerHTML =
+      '<div class="lesson-finish-card ' + summaryClass + '" id="lesson-finish-card">' +
+      '<div class="score-big">' + Math.round(pct * 100) + '%</div>' +
+      '<p>' + message + '</p>' +
+      '<div class="round-summary-actions">' +
+      (cleared && hasNext ? '<button class="btn btn-primary" id="lesson-next-section-btn">Next Section</button>' : '') +
+      '<button class="btn ' + (cleared && hasNext ? 'btn-secondary' : 'btn-primary') + '" id="lesson-retry-btn">Retry This Section</button>' +
+      '<button class="btn btn-secondary" id="lesson-done-btn">Back to Roadmap</button>' +
+      '</div>' +
+      '</div>';
+
+    if (isPerfect) {
+      launchConfetti(document.getElementById('lesson-finish-card'));
+      unlockAchievement('perfect-round', 'Perfect Round!');
+    }
+
+    const nextBtn = document.getElementById('lesson-next-section-btn');
+    if (nextBtn) nextBtn.addEventListener('click', function () { startLesson(lessonSectionIndex + 1); });
+    document.getElementById('lesson-retry-btn').addEventListener('click', function () { startLesson(lessonSectionIndex); });
+    document.getElementById('lesson-done-btn').addEventListener('click', exitLesson);
+  }
+
+  /* ---- Profile ---- */
+
+  const TIME_SPENT_KEY = 'slovencina_time_spent_ms';
+  let sessionStartTime = Date.now();
+
+  function getTotalTimeSpentMs() {
+    const stored = Number(localStorage.getItem(TIME_SPENT_KEY) || '0');
+    return stored + (Date.now() - sessionStartTime);
+  }
+
+  function flushTimeSpent() {
+    localStorage.setItem(TIME_SPENT_KEY, String(getTotalTimeSpentMs()));
+    sessionStartTime = Date.now();
+  }
+
+  function setupTimeTracking() {
+    setInterval(flushTimeSpent, 30000);
+    window.addEventListener('beforeunload', flushTimeSpent);
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) flushTimeSpent();
+    });
+    document.querySelector('[data-tab="profile"]').addEventListener('click', renderProfile);
+  }
+
+  const ALL_BADGES = [
+    { id: 'first-practice', label: 'First Practice' },
+    { id: 'perfect-round', label: 'Perfect Round' },
+    { id: 'streak-3', label: '3-Day Streak' },
+    { id: 'streak-7', label: '7-Day Streak' },
+    { id: 'streak-30', label: '30-Day Streak' },
+    { id: 'words-25', label: '25 Words' },
+    { id: 'words-50', label: '50 Words' },
+    { id: 'words-100', label: '100 Words' },
+  ];
+
+  function renderBadges() {
+    const earned = getEarnedAchievements();
+    const starIcon = '<svg class="badge-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"/></svg>';
+
+    document.getElementById('profile-badges').innerHTML = ALL_BADGES.map(function (b) {
+      const has = earned.indexOf(b.id) !== -1;
+      return '<div class="badge-card' + (has ? '' : ' locked') + '">' + starIcon + '<div class="badge-name">' + b.label + '</div></div>';
+    }).join('');
+  }
+
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 52;
+
+  function renderProfile() {
+    const totalSections = roadmapSections.length;
+    const progress = loadRoadmapProgress();
+    const clearedCount = progress.filter(Boolean).length;
+    const pct = totalSections > 0 ? Math.round((clearedCount / totalSections) * 100) : 0;
+
+    document.getElementById('profile-pct').textContent = pct + '%';
+    document.getElementById('profile-ring-fill').style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - pct / 100));
+    document.getElementById('stat-sections').textContent = clearedCount + ' / ' + totalSections;
+
+    const stats = loadVocabStats();
+    document.getElementById('stat-words').textContent = String(Object.keys(stats).length);
+
+    const minutes = Math.round(getTotalTimeSpentMs() / 60000);
+    document.getElementById('stat-time').textContent =
+      minutes < 60 ? minutes + 'm' : Math.floor(minutes / 60) + 'h ' + (minutes % 60) + 'm';
+
+    document.getElementById('stat-streak').textContent = String(Number(localStorage.getItem(STREAK_COUNT_KEY) || '0'));
+
+    let nextIdx = -1;
+    for (let i = 0; i < totalSections; i++) {
+      if (!progress[i]) {
+        nextIdx = i;
+        break;
+      }
+    }
+
+    const nextCard = document.getElementById('profile-next-card');
+    if (totalSections === 0) {
+      nextCard.innerHTML = '<div class="next-label">Loading…</div>';
+      nextCard.onclick = null;
+    } else if (nextIdx === -1) {
+      nextCard.innerHTML = '<div class="next-label">All done</div><div class="next-title">You’ve cleared every section!</div>';
+      nextCard.onclick = null;
+    } else {
+      const section = roadmapSections[nextIdx];
+      nextCard.innerHTML =
+        '<div class="next-label">Up next</div>' +
+        '<div class="next-title">' + escapeHtml(section.title) + '</div>' +
+        '<div class="next-sub">' + (section.type === 'grammar' ? 'Grammar' : 'Vocabulary') + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>';
+      nextCard.onclick = function () {
+        document.querySelector('[data-tab="learn"]').click();
+        startLesson(nextIdx);
+      };
+    }
+
+    renderBadges();
   }
 
   /* ---- Tests ---- */
