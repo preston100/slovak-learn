@@ -1114,11 +1114,22 @@
       '</button>' +
       '<div class="voice-heard" id="voice-heard"></div>' +
       '<div id="voice-result"></div>' +
+      '<div id="voice-skip-wrap"></div>' +
       '</div>';
 
     document.getElementById('lesson-mic-btn').addEventListener('click', function () {
       startVoiceRecognition(item);
     });
+  }
+
+  // Ends the voice phase early, counting only the items actually attempted
+  // (not the ones skipped) — used when the browser/network can't do speech
+  // recognition at all, so the user isn't stuck retrying something that will
+  // never succeed.
+  function skipRestOfVoicePhase() {
+    lessonVoiceTotal = voiceIndex;
+    lessonPhase = 'quiz';
+    renderLessonPhase();
   }
 
   function startVoiceRecognition(item) {
@@ -1168,8 +1179,24 @@
     };
 
     voiceRecognizer.onerror = function (event) {
-      heardEl.textContent = 'Could not hear you (' + event.error + '). Try tapping the mic again.';
       micBtn.classList.remove('listening');
+      const skipWrap = document.getElementById('voice-skip-wrap');
+
+      // "network" and "service-not-allowed" mean the browser itself refused
+      // to reach the speech-recognition service — most commonly Brave (which
+      // blocks it by default as a privacy Shield) or a restrictive network.
+      // Retrying changes nothing here, so say so plainly and offer to skip
+      // instead of repeating a message that implies trying again will help.
+      if (event.error === 'network' || event.error === 'service-not-allowed') {
+        heardEl.textContent = "Your browser or network is blocking speech recognition — this is common in Brave (its Shields block it by default) or on restrictive networks. Try Chrome or Edge, or skip this phase.";
+        if (skipWrap) {
+          skipWrap.innerHTML = '<button class="btn btn-secondary" id="voice-skip-btn" style="margin-top:12px;">Skip Voice Practice</button>';
+          document.getElementById('voice-skip-btn').addEventListener('click', skipRestOfVoicePhase);
+        }
+        return;
+      }
+
+      heardEl.textContent = 'Could not hear you (' + event.error + '). Try tapping the mic again.';
     };
 
     voiceRecognizer.onend = function () {
