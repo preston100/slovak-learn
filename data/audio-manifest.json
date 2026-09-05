@@ -12,5 +12,8 @@
   "Veľký / Malý": "audio/6fa31a25455a9947.wav",
   "Čistý / Špinavý": "audio/47b86878e0bf3fb8.wav",
   "Silný / Slabý": "audio/ddff2c6987d1f07b.wav",
-  "Ťažký / Ľahký": "audio/2ac1e7547bc7a397.wav"
+  "Ťažký / Ľahký": "audio/2ac1e7547bc7a397.wav",
+  "Dlhý / Krátky": "audio/e59dad8c794928bc.wav",
+  "Mladý / Starý": "audio/927ecb907f2681bb.wav",
+  "Krásny / Škaredý": "audio/e4852269ebc56dc0.wav"
 }
