@@ -1,1 +1,24 @@
-{}
+{
+  "ahoj": "audio/edb433bdd7c13851.wav",
+  "dobrý deň": "audio/cc117422078dedb8.wav",
+  "ďakujem": "audio/fa60117f973ed87e.wav",
+  "áno": "audio/14e444bfa57a273c.wav",
+  "nie": "audio/9df1ac4df853dbec.wav",
+  "prepáčte": "audio/5b1c0286e2c298f2.wav",
+  "Nerozumiem.": "audio/f5674c113f8b70a8.wav",
+  "Prosím, pomalšie.": "audio/f998a5923d8d4b96.wav",
+  "Gauč / Sedačka": "audio/a40e58531fd3d4be.wav",
+  "Lampa / Kôš": "audio/68613ce370254837.wav",
+  "Veľký / Malý": "audio/6fa31a25455a9947.wav",
+  "Čistý / Špinavý": "audio/47b86878e0bf3fb8.wav",
+  "Silný / Slabý": "audio/ddff2c6987d1f07b.wav",
+  "Ťažký / Ľahký": "audio/2ac1e7547bc7a397.wav",
+  "Dlhý / Krátky": "audio/e59dad8c794928bc.wav",
+  "Mladý / Starý": "audio/927ecb907f2681bb.wav",
+  "Krásny / Škaredý": "audio/e4852269ebc56dc0.wav",
+  "Lenivý / Chorý": "audio/80831e451087a241.wav",
+  "Neperlivá / Perlivá": "audio/65f71da10780f289.wav",
+  "Vonku / Vnútri": "audio/23a6920c8f9b9cbb.wav",
+  "pozerať televíziu": "audio/3be7e7cf23bbef49.wav",
+  "chodiť (chodím)": "audio/e371fc06c95ae7e2.wav"
+}
