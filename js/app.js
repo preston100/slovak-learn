@@ -1061,19 +1061,39 @@
 
   let voiceQueue = [];
   let voiceIndex = 0;
-  let voiceRecognizer = null;
+  let activeMediaRecorder = null;
+  let activeMediaStream = null;
+  let recordedChunks = [];
+
+  // Records locally via the standard MediaRecorder API (not gated by any
+  // browser's speech-recognition backend — Brave's Shields, for instance,
+  // block Google's built-in SpeechRecognition service specifically, but
+  // plain microphone recording is untouched) and sends the clip to our own
+  // server for transcription instead of relying on the browser's free,
+  // Google-backend-dependent speech feature.
+  function getSupportedRecordingFormat() {
+    if (!window.MediaRecorder) return null;
+    const candidates = [
+      { mime: 'audio/webm;codecs=opus', encoding: 'WEBM_OPUS' },
+      { mime: 'audio/webm', encoding: 'WEBM_OPUS' },
+      { mime: 'audio/ogg;codecs=opus', encoding: 'OGG_OPUS' },
+    ];
+    for (let i = 0; i < candidates.length; i++) {
+      if (MediaRecorder.isTypeSupported(candidates[i].mime)) return candidates[i];
+    }
+    return null;
+  }
 
   function renderVoicePhase() {
     updateLessonChrome('Voice', 2);
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRec) {
+    if (!getSupportedRecordingFormat() || !navigator.mediaDevices) {
       const body = document.getElementById('lesson-body');
       body.innerHTML =
         '<div class="lesson-stage">' +
         '<div class="lesson-eyebrow">Voice</div>' +
         '<h2 class="lesson-heading">Voice practice isn’t available in this browser</h2>' +
-        '<p class="lesson-sub">Speech recognition isn’t supported here — this phase is skipped and won’t count against you.</p>' +
+        '<p class="lesson-sub">Microphone recording isn’t supported here — this phase is skipped and won’t count against you.</p>' +
         '<button class="btn btn-primary" id="lesson-voice-skip-btn">Continue to Quiz</button>' +
         '</div>';
       document.getElementById('lesson-voice-skip-btn').addEventListener('click', function () {
@@ -1108,8 +1128,8 @@
       '<div class="lesson-stage">' +
       '<div class="lesson-eyebrow">Voice · ' + (voiceIndex + 1) + ' / ' + voiceQueue.length + '</div>' +
       '<h2 class="lesson-heading">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</h2>' +
-      '<p class="lesson-sub">Listen, then tap the mic and say it out loud.</p>' +
-      '<button class="mic-btn" id="lesson-mic-btn" aria-label="Start speaking">' +
+      '<p class="lesson-sub">Listen, tap the mic, say it, then tap again to check.</p>' +
+      '<button class="mic-btn" id="lesson-mic-btn" aria-label="Start recording">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 19v3"/></svg>' +
       '</button>' +
       '<div class="voice-heard" id="voice-heard"></div>' +
@@ -1118,49 +1138,118 @@
       '</div>';
 
     document.getElementById('lesson-mic-btn').addEventListener('click', function () {
-      startVoiceRecognition(item);
+      toggleVoiceRecording(item);
     });
   }
 
   // Ends the voice phase early, counting only the items actually attempted
-  // (not the ones skipped) — used when the browser/network can't do speech
-  // recognition at all, so the user isn't stuck retrying something that will
-  // never succeed.
+  // (not the ones skipped) — used when recording or transcription genuinely
+  // can't work (e.g. mic permission denied), so the user isn't stuck
+  // retrying something that won't succeed.
   function skipRestOfVoicePhase() {
     lessonVoiceTotal = voiceIndex;
     lessonPhase = 'quiz';
     renderLessonPhase();
   }
 
-  function startVoiceRecognition(item) {
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function showVoiceSkipOption() {
+    const skipWrap = document.getElementById('voice-skip-wrap');
+    if (!skipWrap) return;
+    skipWrap.innerHTML = '<button class="btn btn-secondary" id="voice-skip-btn" style="margin-top:12px;">Skip Voice Practice</button>';
+    document.getElementById('voice-skip-btn').addEventListener('click', skipRestOfVoicePhase);
+  }
+
+  async function toggleVoiceRecording(item) {
     const micBtn = document.getElementById('lesson-mic-btn');
     const heardEl = document.getElementById('voice-heard');
     const resultEl = document.getElementById('voice-result');
-    if (micBtn.classList.contains('listening')) return;
 
-    try {
-      voiceRecognizer = new SpeechRec();
-    } catch (err) {
-      heardEl.textContent = 'Could not start the microphone.';
+    if (micBtn.classList.contains('listening')) {
+      if (activeMediaRecorder && activeMediaRecorder.state !== 'inactive') activeMediaRecorder.stop();
       return;
     }
 
-    voiceRecognizer.lang = 'sk-SK';
-    voiceRecognizer.maxAlternatives = 3;
-    micBtn.classList.add('listening');
-    heardEl.textContent = 'Listening…';
+    const format = getSupportedRecordingFormat();
     resultEl.innerHTML = '';
 
-    voiceRecognizer.onresult = function (event) {
-      const alternatives = Array.from(event.results[0]).map(function (r) { return r.transcript; });
-      const target = normalizeForVoiceCompare(item.sk);
-      const isMatch = alternatives.some(function (alt) {
-        const norm = normalizeForVoiceCompare(alt);
-        return norm.length > 0 && (norm === target || norm.indexOf(target) !== -1 || target.indexOf(norm) !== -1);
-      });
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      heardEl.textContent = 'Microphone access was denied or is unavailable.';
+      showVoiceSkipOption();
+      return;
+    }
 
-      heardEl.textContent = 'Heard: “' + alternatives[0] + '”';
+    activeMediaStream = stream;
+    const audioTrack = stream.getAudioTracks()[0];
+    const sampleRateHertz = (audioTrack && audioTrack.getSettings && audioTrack.getSettings().sampleRate) || 48000;
+
+    recordedChunks = [];
+    let recorder;
+    try {
+      recorder = new MediaRecorder(stream, { mimeType: format.mime });
+    } catch (err) {
+      heardEl.textContent = 'Could not start recording in this browser.';
+      stream.getTracks().forEach(function (t) { t.stop(); });
+      showVoiceSkipOption();
+      return;
+    }
+    activeMediaRecorder = recorder;
+
+    recorder.ondataavailable = function (e) {
+      if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    recorder.onstop = function () {
+      stream.getTracks().forEach(function (t) { t.stop(); });
+      micBtn.classList.remove('listening');
+      const blob = new Blob(recordedChunks, { type: format.mime });
+      transcribeRecording(blob, format.encoding, sampleRateHertz, item);
+    };
+
+    recorder.start();
+    micBtn.classList.add('listening');
+    heardEl.textContent = 'Listening… tap the mic again to stop.';
+
+    // Safety-net auto-stop so a forgotten tap doesn't record indefinitely.
+    setTimeout(function () {
+      if (recorder.state !== 'inactive') recorder.stop();
+    }, 6000);
+  }
+
+  function transcribeRecording(blob, encoding, sampleRateHertz, item) {
+    const heardEl = document.getElementById('voice-heard');
+    const resultEl = document.getElementById('voice-result');
+    heardEl.textContent = 'Checking what you said…';
+
+    const reader = new FileReader();
+    reader.onload = async function () {
+      const base64 = String(reader.result).split(',')[1] || '';
+
+      const result = await postJsonWithRetry(
+        '/.netlify/functions/transcribe-audio',
+        { password: getStoredPassword(), audioBase64: base64, encoding: encoding, sampleRateHertz: sampleRateHertz },
+        { initialMessage: '', onStatus: function () {} }
+      );
+
+      if (!result.ok) {
+        if (result.status === 401) {
+          sessionStorage.removeItem(SESSION_KEY);
+          location.reload();
+          return;
+        }
+        heardEl.textContent = result.error;
+        showVoiceSkipOption();
+        return;
+      }
+
+      const transcript = result.data.transcript || '';
+      const target = normalizeForVoiceCompare(item.sk);
+      const norm = normalizeForVoiceCompare(transcript);
+      const isMatch = norm.length > 0 && (norm === target || norm.indexOf(target) !== -1 || target.indexOf(norm) !== -1);
+
+      heardEl.textContent = transcript ? 'Heard: “' + transcript + '”' : 'Didn’t catch that — try again next time.';
       resultEl.innerHTML = isMatch
         ? '<div class="voice-feedback correct">Nice!</div>'
         : '<div class="voice-feedback incorrect">Not quite — expected “' + escapeHtml(item.sk) + '”</div>';
@@ -1177,49 +1266,26 @@
         renderVoiceStep();
       }, 1200);
     };
-
-    voiceRecognizer.onerror = function (event) {
-      micBtn.classList.remove('listening');
-      const skipWrap = document.getElementById('voice-skip-wrap');
-
-      // "network" and "service-not-allowed" mean the browser itself refused
-      // to reach the speech-recognition service — most commonly Brave (which
-      // blocks it by default as a privacy Shield) or a restrictive network.
-      // Retrying changes nothing here, so say so plainly and offer to skip
-      // instead of repeating a message that implies trying again will help.
-      if (event.error === 'network' || event.error === 'service-not-allowed') {
-        heardEl.textContent = "Your browser or network is blocking speech recognition — this is common in Brave (its Shields block it by default) or on restrictive networks. Try Chrome or Edge, or skip this phase.";
-        if (skipWrap) {
-          skipWrap.innerHTML = '<button class="btn btn-secondary" id="voice-skip-btn" style="margin-top:12px;">Skip Voice Practice</button>';
-          document.getElementById('voice-skip-btn').addEventListener('click', skipRestOfVoicePhase);
-        }
-        return;
-      }
-
-      heardEl.textContent = 'Could not hear you (' + event.error + '). Try tapping the mic again.';
+    reader.onerror = function () {
+      heardEl.textContent = 'Could not process the recording.';
+      showVoiceSkipOption();
     };
-
-    voiceRecognizer.onend = function () {
-      micBtn.classList.remove('listening');
-    };
-
-    try {
-      voiceRecognizer.start();
-    } catch (err) {
-      heardEl.textContent = 'Could not start the microphone.';
-      micBtn.classList.remove('listening');
-    }
+    reader.readAsDataURL(blob);
   }
 
   function stopVoiceRecognition() {
-    if (voiceRecognizer) {
+    if (activeMediaRecorder && activeMediaRecorder.state !== 'inactive') {
       try {
-        voiceRecognizer.abort();
+        activeMediaRecorder.stop();
       } catch (err) {
         /* already stopped */
       }
-      voiceRecognizer = null;
     }
+    if (activeMediaStream) {
+      activeMediaStream.getTracks().forEach(function (t) { t.stop(); });
+      activeMediaStream = null;
+    }
+    activeMediaRecorder = null;
   }
 
   let quizQueue = [];
