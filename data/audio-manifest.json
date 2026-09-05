@@ -119,5 +119,8 @@
   "Dovolenka / Prázdniny": "audio/e4d49d4debfda237.mp3",
   "Sekundy / Minúty / Hodina": "audio/8eeaa2649ef2f70a.mp3",
   "Vpravo / Vľavo": "audio/d57634aaaa9e96ff.mp3",
-  "Hore / Dole": "audio/b40312a6516a6535.mp3"
+  "Hore / Dole": "audio/b40312a6516a6535.mp3",
+  "S ľadom / Bez ľadu": "audio/9321d8ce662e19d0.mp3",
+  "hodina": "audio/d89ec458644426d0.mp3",
+  "pol": "audio/d28b28e5a8b7d159.mp3"
 }
