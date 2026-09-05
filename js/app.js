@@ -86,6 +86,7 @@
     setupSound();
     renderStreak();
     setupVocabModes();
+    setupGrammarModes();
     loadAudioManifest();
     setupAudioGeneration();
   }
@@ -118,11 +119,27 @@
       const res = await fetch('data/grammar.json');
       grammarData = await res.json();
       renderGrammar(grammarData);
+      renderGrammarFocus();
       populateTopicSelect();
       updateAudioGenSummary();
     } catch (err) {
       container.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
     }
+  }
+
+  function examplesHtml(examples) {
+    return (examples || [])
+      .map(function (ex) {
+        return (
+          '<div class="example-row"><span class="sk">' +
+          speakerButtonHtml(ex.sk) +
+          escapeHtml(ex.sk) +
+          '</span><span class="en">' +
+          escapeHtml(ex.en) +
+          '</span></div>'
+        );
+      })
+      .join('');
   }
 
   function renderGrammar(topics) {
@@ -134,18 +151,7 @@
 
     container.innerHTML = topics
       .map(function (t, i) {
-        const examples = (t.examples || [])
-          .map(function (ex) {
-            return (
-              '<div class="example-row"><span class="sk">' +
-              speakerButtonHtml(ex.sk) +
-              escapeHtml(ex.sk) +
-              '</span><span class="en">' +
-              escapeHtml(ex.en) +
-              '</span></div>'
-            );
-          })
-          .join('');
+        const examples = examplesHtml(t.examples);
 
         return (
           '<details class="grammar-card"' +
@@ -169,6 +175,63 @@
         );
       })
       .join('');
+  }
+
+  let grammarFocusIndex = 0;
+
+  function setupGrammarModes() {
+    const buttons = document.querySelectorAll('#panel-grammar .content-mode-btn');
+    const browseEl = document.getElementById('grammar-list');
+    const focusEl = document.getElementById('grammar-focus');
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
+        const mode = btn.dataset.grammarMode;
+        browseEl.classList.toggle('hidden', mode !== 'browse');
+        focusEl.classList.toggle('hidden', mode !== 'focus');
+      });
+    });
+
+    document.getElementById('grammar-prev-btn').addEventListener('click', function () {
+      grammarFocusIndex = Math.max(0, grammarFocusIndex - 1);
+      renderGrammarFocus();
+    });
+    document.getElementById('grammar-next-btn').addEventListener('click', function () {
+      grammarFocusIndex = Math.min(grammarData.length - 1, grammarFocusIndex + 1);
+      renderGrammarFocus();
+    });
+  }
+
+  function renderGrammarFocus() {
+    const cardEl = document.getElementById('grammar-focus-card');
+    const progressEl = document.getElementById('grammar-focus-progress');
+    const prevBtn = document.getElementById('grammar-prev-btn');
+    const nextBtn = document.getElementById('grammar-next-btn');
+
+    if (!grammarData.length) {
+      cardEl.innerHTML = '<div class="empty-state">No grammar topics yet.</div>';
+      progressEl.textContent = '';
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      return;
+    }
+
+    grammarFocusIndex = Math.max(0, Math.min(grammarData.length - 1, grammarFocusIndex));
+    const t = grammarData[grammarFocusIndex];
+    const examples = examplesHtml(t.examples);
+
+    progressEl.textContent = 'Topic ' + (grammarFocusIndex + 1) + ' of ' + grammarData.length;
+    prevBtn.disabled = grammarFocusIndex === 0;
+    nextBtn.disabled = grammarFocusIndex === grammarData.length - 1;
+
+    cardEl.innerHTML =
+      '<div class="focus-card">' +
+      '<h3>' + escapeHtml(t.topic) + '</h3>' +
+      '<div class="summary">' + escapeHtml(t.summary || '') + '</div>' +
+      '<div class="explanation">' + escapeHtml(t.explanation || '') + '</div>' +
+      (examples ? '<div class="example-list">' + examples + '</div>' : '') +
+      '</div>';
   }
 
   /* ---- Vocabulary ---- */
@@ -466,22 +529,110 @@
   }
 
   function setupVocabModes() {
-    const buttons = document.querySelectorAll('.vocab-mode-btn');
+    const buttons = document.querySelectorAll('#panel-vocabulary .content-mode-btn');
     const browseEl = document.getElementById('vocab-list');
-    const practiceEl = document.getElementById('vocab-practice');
+    const learnEl = document.getElementById('vocab-learn');
 
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
         const mode = btn.dataset.vocabMode;
         browseEl.classList.toggle('hidden', mode !== 'browse');
-        practiceEl.classList.toggle('hidden', mode !== 'practice');
+        learnEl.classList.toggle('hidden', mode !== 'learn');
       });
     });
 
-    document.getElementById('practice-start-btn').addEventListener('click', function () {
-      const topic = document.getElementById('practice-topic-select').value;
-      startPractice(topic);
+    document.getElementById('learn-topic-select').addEventListener('change', function (e) {
+      renderRoundMap(e.target.value);
+    });
+  }
+
+  // Every topic's word list is split into small rounds of this size — small
+  // enough to hold in your head at once, instead of scrolling a wall of words.
+  const ROUND_SIZE = 8;
+  // A round counts as cleared, unlocking the next one, once you know at
+  // least this fraction of its words without needing to think too hard.
+  const ROUND_CLEAR_THRESHOLD = 0.8;
+
+  const ROUND_PROGRESS_KEY = 'slovencina_round_progress';
+
+  function getWordsForTopic(topic) {
+    const group = vocabData.find(function (g) { return g.topic === topic; });
+    return (group && group.words) || [];
+  }
+
+  function chunkIntoRounds(words, size) {
+    const rounds = [];
+    for (let i = 0; i < words.length; i += size) {
+      rounds.push(words.slice(i, i + size));
+    }
+    return rounds;
+  }
+
+  function loadRoundProgress() {
+    try {
+      return JSON.parse(localStorage.getItem(ROUND_PROGRESS_KEY) || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function isRoundCleared(topic, roundIndex) {
+    const progress = loadRoundProgress();
+    return !!(progress[topic] && progress[topic][roundIndex]);
+  }
+
+  function setRoundCleared(topic, roundIndex) {
+    const progress = loadRoundProgress();
+    progress[topic] = progress[topic] || [];
+    progress[topic][roundIndex] = true;
+    localStorage.setItem(ROUND_PROGRESS_KEY, JSON.stringify(progress));
+  }
+
+  function renderRoundMap(topic) {
+    document.getElementById('practice-stage').innerHTML = '';
+    const mapEl = document.getElementById('round-map');
+    if (!topic) {
+      mapEl.innerHTML = '';
+      return;
+    }
+
+    const rounds = chunkIntoRounds(getWordsForTopic(topic), ROUND_SIZE);
+    if (!rounds.length) {
+      mapEl.innerHTML = '<div class="empty-state">No words in this topic yet.</div>';
+      return;
+    }
+
+    mapEl.innerHTML =
+      rounds
+        .map(function (round, i) {
+          const cleared = isRoundCleared(topic, i);
+          const locked = i > 0 && !isRoundCleared(topic, i - 1);
+          const stateClass = cleared ? 'cleared' : locked ? 'locked' : '';
+          const icon = cleared
+            ? '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>'
+            : locked
+            ? '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+            : '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>';
+
+          return (
+            '<div class="round-node ' + stateClass + '" data-round-index="' + i + '" data-locked="' + locked + '">' +
+            icon +
+            '<div class="round-num">Round ' + (i + 1) + '</div>' +
+            '<div class="round-count">' + round.length + ' words</div>' +
+            '</div>'
+          );
+        })
+        .join('') +
+      '<div class="round-map-hint" style="width:100%">Get ' +
+      Math.round(ROUND_CLEAR_THRESHOLD * 100) +
+      '%+ in a round to unlock the next one.</div>';
+
+    mapEl.querySelectorAll('.round-node').forEach(function (node) {
+      node.addEventListener('click', function () {
+        if (node.dataset.locked === 'true') return;
+        startRound(topic, Number(node.dataset.roundIndex));
+      });
     });
   }
 
@@ -490,29 +641,30 @@
   let practiceCorrect = 0;
   let practiceRevealed = false;
   let practiceGraded = false;
+  let currentRoundTopic = null;
+  let currentRoundIndex = -1;
 
-  function startPractice(topicFilter) {
-    const stats = loadVocabStats();
-    const pool = [];
+  function backToRoundsLinkHtml() {
+    return (
+      '<button type="button" class="back-to-rounds" id="back-to-rounds-btn">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
+      'Back to rounds</button>'
+    );
+  }
 
-    vocabData.forEach(function (g) {
-      if (topicFilter !== '__all__' && g.topic !== topicFilter) return;
-      (g.words || []).forEach(function (w) {
-        const misses = (stats[w.sk] && stats[w.sk].misses) || 0;
-        // Words missed before appear more than once this session — a simple,
-        // transparent stand-in for real spaced repetition.
-        const copies = 1 + Math.min(misses, 3);
-        for (let i = 0; i < copies; i++) pool.push(w);
-      });
-    });
+  function goBackToRounds() {
+    practiceQueue = [];
+    document.getElementById('round-map').classList.remove('hidden');
+    renderRoundMap(currentRoundTopic);
+  }
 
-    if (!pool.length) {
-      document.getElementById('practice-stage').innerHTML =
-        '<div class="empty-state">No words in this topic yet.</div>';
-      return;
-    }
+  function startRound(topic, roundIndex) {
+    const rounds = chunkIntoRounds(getWordsForTopic(topic), ROUND_SIZE);
+    const words = rounds[roundIndex] || [];
+    if (!words.length) return;
 
-    // Shuffle (Fisher-Yates).
+    // Shuffle (Fisher-Yates) so the same round doesn't feel identical on a retry.
+    const pool = words.slice();
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       const tmp = pool[i];
@@ -520,9 +672,13 @@
       pool[j] = tmp;
     }
 
+    currentRoundTopic = topic;
+    currentRoundIndex = roundIndex;
     practiceQueue = pool;
     practiceIndex = 0;
     practiceCorrect = 0;
+
+    document.getElementById('round-map').classList.add('hidden');
     renderPracticeCard();
   }
 
@@ -531,19 +687,33 @@
 
     if (practiceIndex >= practiceQueue.length) {
       const total = practiceQueue.length;
+      const scorePct = total > 0 ? practiceCorrect / total : 0;
       const isPerfect = total > 0 && practiceCorrect === total;
+      const isCleared = scorePct >= ROUND_CLEAR_THRESHOLD;
+
+      if (isCleared) setRoundCleared(currentRoundTopic, currentRoundIndex);
+
+      const rounds = chunkIntoRounds(getWordsForTopic(currentRoundTopic), ROUND_SIZE);
+      const hasNext = currentRoundIndex + 1 < rounds.length;
+
+      const summaryClass = isPerfect ? 'perfect' : isCleared ? 'cleared' : 'not-cleared';
+      const message = isPerfect ? 'Perfect round!' : isCleared ? 'Round cleared!' : 'Not quite — try this round again.';
 
       stage.innerHTML =
-        '<div class="practice-summary' + (isPerfect ? ' perfect' : '') + '" id="practice-summary-card">' +
+        backToRoundsLinkHtml() +
+        '<div class="practice-summary ' + summaryClass + '" id="practice-summary-card">' +
         '<div class="score-big">' + practiceCorrect + ' / ' + total + '</div>' +
-        '<p>' + (isPerfect ? 'Perfect round!' : 'words you knew right away') + '</p>' +
-        '<button class="btn btn-primary" id="practice-again-btn">Practice Again</button>' +
+        '<p>' + message + '</p>' +
+        '<div class="round-summary-actions">' +
+        (isCleared && hasNext ? '<button class="btn btn-primary" id="next-round-btn">Next Round</button>' : '') +
+        '<button class="btn ' + (isCleared && hasNext ? 'btn-secondary' : 'btn-primary') + '" id="retry-round-btn">Retry This Round</button>' +
+        '</div>' +
         '</div>';
 
-      document.getElementById('practice-again-btn').addEventListener('click', function () {
-        const topic = document.getElementById('practice-topic-select').value;
-        startPractice(topic);
-      });
+      document.getElementById('back-to-rounds-btn').addEventListener('click', goBackToRounds);
+      const nextBtn = document.getElementById('next-round-btn');
+      if (nextBtn) nextBtn.addEventListener('click', function () { startRound(currentRoundTopic, currentRoundIndex + 1); });
+      document.getElementById('retry-round-btn').addEventListener('click', function () { startRound(currentRoundTopic, currentRoundIndex); });
 
       if (isPerfect) {
         launchConfetti(document.getElementById('practice-summary-card'));
@@ -557,6 +727,7 @@
     const word = practiceQueue[practiceIndex];
 
     stage.innerHTML =
+      backToRoundsLinkHtml() +
       '<div class="practice-progress">Card ' + (practiceIndex + 1) + ' of ' + practiceQueue.length + '</div>' +
       '<div class="practice-card" id="practice-card">' +
       '<div class="practice-word">' + speakerButtonHtml(word.sk) + escapeHtml(word.sk) + '</div>' +
@@ -567,6 +738,8 @@
       '<button class="btn-grade got-it" id="practice-gotit-btn">Got it</button>' +
       '</div>' +
       '</div>';
+
+    document.getElementById('back-to-rounds-btn').addEventListener('click', goBackToRounds);
 
     document.getElementById('practice-reveal-btn').addEventListener('click', function () {
       practiceRevealed = true;
@@ -631,16 +804,16 @@
         .join('');
     }
 
-    const practiceSelect = document.getElementById('practice-topic-select');
-    if (practiceSelect && vocabData.length) {
+    const learnSelect = document.getElementById('learn-topic-select');
+    if (learnSelect && vocabData.length) {
       const vocabTopics = vocabData.map(function (g) { return g.topic; }).filter(Boolean);
-      practiceSelect.innerHTML =
-        '<option value="__all__">All topics</option>' +
-        vocabTopics
-          .map(function (t) {
-            return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
-          })
-          .join('');
+      const wasEmpty = !learnSelect.value;
+      learnSelect.innerHTML = vocabTopics
+        .map(function (t) {
+          return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
+        })
+        .join('');
+      if (wasEmpty && vocabTopics.length) renderRoundMap(vocabTopics[0]);
     }
   }
 

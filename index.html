@@ -71,7 +71,26 @@
           <h2>Grammar</h2>
           <p>Core Slovak grammar topics, explained in plain English.</p>
         </div>
-        <div id="grammar-list" class="grammar-list"></div>
+
+        <div class="content-mode-switch" role="tablist" aria-label="Grammar mode">
+          <button class="content-mode-btn active" data-grammar-mode="focus">Learn</button>
+          <button class="content-mode-btn" data-grammar-mode="browse">Browse All</button>
+        </div>
+
+        <div id="grammar-focus">
+          <div class="topic-pager">
+            <button class="icon-btn" id="grammar-prev-btn" aria-label="Previous topic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="topic-pager-label" id="grammar-focus-progress"></div>
+            <button class="icon-btn" id="grammar-next-btn" aria-label="Next topic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div id="grammar-focus-card"></div>
+        </div>
+
+        <div id="grammar-list" class="grammar-list hidden"></div>
       </section>
 
       <!-- Vocabulary panel -->
@@ -81,23 +100,23 @@
           <p>Words and phrases, grouped by topic.</p>
         </div>
 
-        <div class="vocab-mode-switch" role="tablist" aria-label="Vocabulary mode">
-          <button class="vocab-mode-btn active" data-vocab-mode="browse">Browse</button>
-          <button class="vocab-mode-btn" data-vocab-mode="practice">Practice</button>
+        <div class="content-mode-switch" role="tablist" aria-label="Vocabulary mode">
+          <button class="content-mode-btn active" data-vocab-mode="learn">Learn</button>
+          <button class="content-mode-btn" data-vocab-mode="browse">Browse All</button>
         </div>
 
-        <div id="vocab-list"></div>
-
-        <div id="vocab-practice" class="hidden">
+        <div id="vocab-learn">
           <div class="practice-setup">
             <div>
-              <label class="field-label" for="practice-topic-select">Topic</label>
-              <select id="practice-topic-select"></select>
+              <label class="field-label" for="learn-topic-select">Topic</label>
+              <select id="learn-topic-select"></select>
             </div>
-            <button class="btn btn-secondary" id="practice-start-btn">Start Practice</button>
           </div>
+          <div id="round-map" class="round-map"></div>
           <div id="practice-stage" class="practice-stage"></div>
         </div>
+
+        <div id="vocab-list" class="hidden"></div>
       </section>
 
       <!-- Tests panel -->
