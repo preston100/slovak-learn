@@ -603,28 +603,41 @@
       return;
     }
 
+    // Three lanes the path snakes across, like a mobile game's level-select
+    // screen, instead of a plain row of cards.
+    const LANES = ['align-center', 'align-end', 'align-start'];
+
+    // The lock icon (locked), a star (cleared, like a game level-complete
+    // badge), or the round's own number (the one node you can actually play
+    // next — there's only ever exactly one, since unlocking is sequential).
+    const LOCK_ICON =
+      '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+    const STAR_ICON =
+      '<svg class="round-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"/></svg>';
+
     mapEl.innerHTML =
       rounds
         .map(function (round, i) {
           const cleared = isRoundCleared(topic, i);
           const locked = i > 0 && !isRoundCleared(topic, i - 1);
-          const stateClass = cleared ? 'cleared' : locked ? 'locked' : '';
-          const icon = cleared
-            ? '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>'
-            : locked
-            ? '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
-            : '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>';
+          const isCurrent = !cleared && !locked;
+          const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
+
+          const inner = cleared ? STAR_ICON : locked ? LOCK_ICON : '<span class="round-num-badge">' + (i + 1) + '</span>';
 
           return (
+            '<div class="round-row ' + LANES[i % LANES.length] + '">' +
+            '<div class="round-node-slot">' +
             '<div class="round-node ' + stateClass + '" data-round-index="' + i + '" data-locked="' + locked + '">' +
-            icon +
-            '<div class="round-num">Round ' + (i + 1) + '</div>' +
-            '<div class="round-count">' + round.length + ' words</div>' +
+            inner +
+            '<div class="round-label">Round ' + (i + 1) + (isCurrent ? ' · ' + round.length + ' words' : '') + '</div>' +
+            '</div>' +
+            '</div>' +
             '</div>'
           );
         })
         .join('') +
-      '<div class="round-map-hint" style="width:100%">Get ' +
+      '<div class="round-map-hint">Get ' +
       Math.round(ROUND_CLEAR_THRESHOLD * 100) +
       '%+ in a round to unlock the next one.</div>';
 
@@ -1474,6 +1487,8 @@
 
     let failures = [];
     let done = 0;
+    let consecutiveFullBatchFailures = 0;
+    let stoppedEarly = false;
 
     for (let i = 0; i < missing.length; i += AUDIO_GEN_BATCH_SIZE) {
       const batch = missing.slice(i, i + AUDIO_GEN_BATCH_SIZE);
@@ -1493,16 +1508,40 @@
         failures = failures.concat(batch);
         errorEl.textContent = result.error;
         errorEl.classList.remove('hidden');
+        consecutiveFullBatchFailures++;
       } else {
         Object.assign(audioManifest, result.data.generated);
-        if (result.data.errors && result.data.errors.length) {
+        const batchErrors = result.data.errors || [];
+        if (batchErrors.length) {
           failures = failures.concat(batch);
+          // Show the actual reason, not just a count — this is what was
+          // missing before and made a real failure (e.g. billing not
+          // enabled) look like an unexplained "213 failed."
+          errorEl.textContent = batchErrors[0];
+          errorEl.classList.remove('hidden');
         }
+        consecutiveFullBatchFailures = batchErrors.length >= batch.length ? consecutiveFullBatchFailures + 1 : 0;
       }
 
       done += batch.length;
       barFill.style.width = Math.round((done / missing.length) * 100) + '%';
       progressText.textContent = 'Generating audio… ' + done + ' / ' + missing.length;
+
+      // If entire batches keep failing outright, it's a config problem (bad
+      // key, billing, API not enabled) that retrying 200 more times won't
+      // fix — stop early instead of grinding through all of them uselessly.
+      if (consecutiveFullBatchFailures >= 2) {
+        stoppedEarly = true;
+        break;
+      }
+    }
+
+    if (stoppedEarly) {
+      progressText.textContent =
+        'Stopped early after repeated failures (' + (missing.length - failures.length) + ' generated so far). See the error above — fix that, then click the button again to pick up where it left off.';
+      btn.disabled = false;
+      updateAudioGenSummary();
+      return;
     }
 
     progressText.textContent = failures.length

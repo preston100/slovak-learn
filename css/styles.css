@@ -591,65 +591,135 @@ main {
   margin-bottom: 20px;
 }
 
-/* ---------- Vocabulary: round map ---------- */
+/* ---------- Vocabulary: gamified round path ---------- */
 .round-map {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  max-width: 640px;
-  margin: 0 auto 8px;
+  position: relative;
+  max-width: 420px;
+  margin: 8px auto 0;
+  padding: 12px 0 4px;
 }
 
+/* The winding "spine" every node sits along, like a game level-select screen. */
+.round-map::before {
+  content: '';
+  position: absolute;
+  top: 44px;
+  bottom: 44px;
+  left: 50%;
+  width: 4px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: repeating-linear-gradient(to bottom, var(--color-border) 0 8px, transparent 8px 18px);
+  z-index: 0;
+}
+
+.round-row {
+  position: relative;
+  display: flex;
+  z-index: 1;
+  margin-bottom: 34px;
+}
+.round-row.align-start { justify-content: flex-start; }
+.round-row.align-end { justify-content: flex-end; }
+.round-row.align-center { justify-content: center; }
+
+.round-node-slot {
+  position: relative;
+  width: 50%;
+  display: flex;
+}
+.round-row.align-start .round-node-slot { justify-content: flex-start; padding-left: 6%; }
+.round-row.align-end .round-node-slot { justify-content: flex-end; padding-right: 6%; margin-left: auto; }
+.round-row.align-center .round-node-slot { width: 100%; justify-content: center; }
+
 .round-node {
-  flex: 1;
-  min-width: 130px;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  padding: 16px 14px;
-  text-align: center;
+  position: relative;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  background: var(--color-surface);
+  border: 3px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
 }
 
 .round-node:hover:not(.locked) {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-sm);
-}
-
-.round-node .round-num {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-text-muted);
-  margin-bottom: 4px;
+  transform: scale(1.06);
 }
 
 .round-node .round-icon {
-  width: 22px;
-  height: 22px;
-  margin: 0 auto 6px;
+  width: 28px;
+  height: 28px;
   color: var(--color-text-faint);
 }
 
-.round-node .round-count {
-  font-size: 12px;
-  color: var(--color-text-faint);
+.round-node .round-num-badge {
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-accent);
 }
 
-.round-node.cleared { border-color: var(--color-success); background: var(--color-success-soft); }
-.round-node.cleared .round-icon { color: var(--color-success); }
-.round-node.cleared .round-num { color: var(--color-success); }
+.round-node .round-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px;
+  width: max-content;
+  max-width: 120px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.round-node.cleared {
+  background: linear-gradient(160deg, #ffd76a, #f5a623);
+  border-color: #e2911a;
+}
+.round-node.cleared .round-icon { color: white; }
 
 .round-node.locked {
   cursor: default;
-  opacity: 0.55;
+  background: var(--color-surface-alt);
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+.round-node.locked .round-icon { color: var(--color-text-faint); }
+
+.round-node.current {
+  border-color: var(--color-accent);
+  animation: node-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes node-pulse {
+  0%, 100% { box-shadow: var(--shadow-md), 0 0 0 0 rgba(79, 70, 229, 0.35); }
+  50% { box-shadow: var(--shadow-md), 0 0 0 10px rgba(79, 70, 229, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-node.current { animation: none; }
 }
 
 .round-map-hint {
   text-align: center;
   font-size: 12.5px;
   color: var(--color-text-faint);
+  margin-top: 40px;
   margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+  .round-node { width: 62px; height: 62px; }
+  .round-node .round-icon { width: 24px; height: 24px; }
+  .round-node .round-num-badge { font-size: 17px; }
 }
 
 .back-to-rounds {
