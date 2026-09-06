@@ -71,6 +71,7 @@
 
   const SESSION_TOKEN_KEY = 'slovencina_session_token';
   const SESSION_USER_KEY = 'slovencina_session_user';
+  const MIGRATED_KEY = 'slovencina_migrated';
 
   const authGateEl = document.getElementById('auth-gate');
   const authForm = document.getElementById('auth-form');
@@ -193,6 +194,13 @@
   // (page load) and right after a fresh login/signup.
   async function finishLogin(token, user) {
     setSession(token, user);
+    // Marks this browser as "already has an account on it" — the signup
+    // handler uses this so only the very first account ever created here
+    // can inherit pre-existing localStorage progress. Without it, a second
+    // signup in the same browser would re-send whatever the first account
+    // just hydrated and silently clone that account's progress onto the
+    // new one.
+    localStorage.setItem(MIGRATED_KEY, '1');
     try {
       const res = await fetch('/.netlify/functions/progress', {
         headers: { Authorization: 'Bearer ' + token },
@@ -274,7 +282,12 @@
         const payload = { sitePassword: getStoredPassword(), email: email, password: password };
         if (mode === 'signup') {
           payload.name = name;
-          payload.progressSnapshot = collectProgressSnapshot();
+          // Only the first account ever created on this browser can inherit
+          // pre-existing localStorage progress — every account after that
+          // starts at zero, even signed up from the same browser.
+          if (!localStorage.getItem(MIGRATED_KEY)) {
+            payload.progressSnapshot = collectProgressSnapshot();
+          }
         }
 
         const res = await fetch('/.netlify/functions/' + endpoint, {
