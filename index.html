@@ -107,6 +107,10 @@
             <svg class="streak-tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c1.5 1.5 2 3.5 2 5a8 8 0 1 1-16 0c0-4 2-6 4-9 1-1.3 1.5-2 2-3 .7 1 1 2 2 0z"/></svg>
             <div class="stat-num" id="stat-streak">0</div>
             <div class="stat-label">Day streak</div>
+            <div class="daily-goal-row">
+              <div class="daily-goal-track"><div class="daily-goal-fill" id="daily-goal-fill"></div></div>
+              <button type="button" class="daily-goal-label" id="daily-goal-label" title="Click to change your daily goal">0 / 10 today</button>
+            </div>
           </div>
 
           <div class="profile-next-card bento-span-3" id="profile-next-card"></div>
@@ -135,6 +139,7 @@
         </div>
 
         <div id="learn-browse" class="hidden">
+          <input type="text" id="browse-search-input" class="browse-search-input" placeholder="Search grammar and vocabulary…" autocomplete="off" />
           <h3 class="browse-subhead">Grammar</h3>
           <div id="grammar-list" class="grammar-list"></div>
           <h3 class="browse-subhead">Vocabulary</h3>
@@ -152,6 +157,7 @@
         <div class="content-mode-switch" role="tablist" aria-label="Tests mode">
           <button class="content-mode-btn active" data-tests-mode="quiz">AI Quiz</button>
           <button class="content-mode-btn" data-tests-mode="practice">Practice</button>
+          <button class="content-mode-btn" data-tests-mode="review">Review <span class="review-count-badge hidden" id="review-count-badge">0</span></button>
         </div>
 
         <div id="tests-quiz-mode">
@@ -189,6 +195,11 @@
           </div>
           <div id="round-map" class="round-map"></div>
           <div id="practice-stage" class="practice-stage"></div>
+        </div>
+
+        <div id="tests-review-mode" class="hidden">
+          <p class="review-intro">Words you've missed in Practice or Learn show up here, most-missed first — clearing them removes them from the queue.</p>
+          <div id="review-stage" class="practice-stage"></div>
         </div>
       </section>
 

@@ -86,6 +86,7 @@
     setupAddContent();
     setupSound();
     renderStreak();
+    setupDailyGoal();
     setupLearnModes();
     setupLessonOverlay();
     setupTimeTracking();
@@ -144,10 +145,10 @@
       .join('');
   }
 
-  function renderGrammar(topics) {
+  function renderGrammar(topics, emptyMessage) {
     const container = document.getElementById('grammar-list');
     if (!topics.length) {
-      container.innerHTML = '<div class="empty-state">No grammar topics yet.</div>';
+      container.innerHTML = '<div class="empty-state">' + (emptyMessage || 'No grammar topics yet.') + '</div>';
       return;
     }
 
@@ -195,10 +196,10 @@
     }
   }
 
-  function renderVocab(groups) {
+  function renderVocab(groups, emptyMessage) {
     const container = document.getElementById('vocab-list');
     if (!groups.length) {
-      container.innerHTML = '<div class="empty-state">No vocabulary yet.</div>';
+      container.innerHTML = '<div class="empty-state">' + (emptyMessage || 'No vocabulary yet.') + '</div>';
       return;
     }
 
@@ -226,6 +227,41 @@
         );
       })
       .join('');
+  }
+
+  // Filters the already-loaded grammar/vocab arrays client-side and re-renders
+  // both lists — no server round-trip, since everything's already in memory.
+  function filterBrowseContent(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      renderGrammar(grammarData);
+      renderVocab(vocabData);
+      return;
+    }
+
+    const matchedGrammar = grammarData.filter(function (t) {
+      return (
+        (t.topic || '').toLowerCase().indexOf(q) !== -1 ||
+        (t.summary || '').toLowerCase().indexOf(q) !== -1 ||
+        (t.explanation || '').toLowerCase().indexOf(q) !== -1 ||
+        (t.examples || []).some(function (ex) {
+          return (ex.sk || '').toLowerCase().indexOf(q) !== -1 || (ex.en || '').toLowerCase().indexOf(q) !== -1;
+        })
+      );
+    });
+
+    const matchedVocab = vocabData
+      .map(function (g) {
+        const words = (g.words || []).filter(function (w) {
+          return (w.sk || '').toLowerCase().indexOf(q) !== -1 || (w.en || '').toLowerCase().indexOf(q) !== -1;
+        });
+        return words.length ? { topic: g.topic, words: words } : null;
+      })
+      .filter(Boolean);
+
+    const noMatch = 'No matches for “' + escapeHtml(query.trim()) + '”.';
+    renderGrammar(matchedGrammar, noMatch);
+    renderVocab(matchedVocab, noMatch);
   }
 
   /* ---- Speech & sound ---- */
@@ -391,6 +427,57 @@
     if (count === 30) unlockAchievement('streak-30', '30-Day Streak — incredible.');
   }
 
+  /* ---- Daily word goal ---- */
+
+  const DAILY_GOAL_TARGET_KEY = 'slovencina_daily_goal_target';
+  const DAILY_COUNT_KEY = 'slovencina_daily_practice_count';
+  const DEFAULT_DAILY_GOAL = 10;
+
+  function getDailyGoalTarget() {
+    return Number(localStorage.getItem(DAILY_GOAL_TARGET_KEY)) || DEFAULT_DAILY_GOAL;
+  }
+
+  function setDailyGoalTarget(n) {
+    localStorage.setItem(DAILY_GOAL_TARGET_KEY, String(n));
+    renderProfile();
+  }
+
+  function loadDailyCount() {
+    try {
+      const data = JSON.parse(localStorage.getItem(DAILY_COUNT_KEY) || '{}');
+      return data.date === todayStr() ? data.count || 0 : 0;
+    } catch (err) {
+      return 0;
+    }
+  }
+
+  // Counts every graded card today (right or wrong) toward the goal — same
+  // philosophy as the "words practiced" stat, which counts exposure, not
+  // just correct answers.
+  function incrementDailyCount() {
+    const today = todayStr();
+    let data;
+    try {
+      data = JSON.parse(localStorage.getItem(DAILY_COUNT_KEY) || '{}');
+    } catch (err) {
+      data = {};
+    }
+    const count = data.date === today ? (data.count || 0) + 1 : 1;
+    localStorage.setItem(DAILY_COUNT_KEY, JSON.stringify({ date: today, count: count }));
+    if (count === getDailyGoalTarget()) unlockAchievement('daily-goal', 'Daily Goal Reached!');
+  }
+
+  function setupDailyGoal() {
+    const btn = document.getElementById('daily-goal-label');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      const input = window.prompt('Set your daily word goal:', String(getDailyGoalTarget()));
+      if (input === null) return;
+      const n = parseInt(input, 10);
+      if (Number.isFinite(n) && n > 0) setDailyGoalTarget(n);
+    });
+  }
+
   /* ---- Achievements ---- */
 
   const ACHIEVEMENTS_KEY = 'slovencina_achievements';
@@ -480,6 +567,7 @@
     const buttons = document.querySelectorAll('#panel-tests .content-mode-btn');
     const quizEl = document.getElementById('tests-quiz-mode');
     const practiceEl = document.getElementById('tests-practice-mode');
+    const reviewEl = document.getElementById('tests-review-mode');
 
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -487,6 +575,8 @@
         const mode = btn.dataset.testsMode;
         quizEl.classList.toggle('hidden', mode !== 'quiz');
         practiceEl.classList.toggle('hidden', mode !== 'practice');
+        reviewEl.classList.toggle('hidden', mode !== 'review');
+        if (mode === 'review') renderReviewQueue();
       });
     });
 
@@ -733,8 +823,10 @@
     if (gotIt) practiceCorrect++;
     playTone(gotIt ? 'correct' : 'incorrect');
     recordPracticeToday();
+    incrementDailyCount();
     unlockAchievement('first-practice', 'First Practice Complete');
     checkWordCountAchievements();
+    renderProfile();
 
     const card = document.getElementById('practice-card');
     card.classList.add(gotIt ? 'flash-correct' : 'flash-incorrect');
@@ -742,6 +834,103 @@
     setTimeout(function () {
       practiceIndex++;
       renderPracticeCard();
+    }, 450);
+  }
+
+  /* ---- Review (spaced-repetition-lite) ---- */
+
+  // No SM-2 scheduling — just resurfaces whatever currently has misses > 0,
+  // worst-missed first. Simpler to reason about, and "misses" is the only
+  // signal already being tracked per word.
+  const REVIEW_QUEUE_CAP = 25;
+
+  let reviewQueue = [];
+  let reviewIndex = 0;
+  let reviewGraded = false;
+
+  function getDueReviewWords() {
+    const stats = loadVocabStats();
+    const allWords = [];
+    vocabData.forEach(function (g) {
+      (g.words || []).forEach(function (w) { allWords.push(w); });
+    });
+    const due = allWords.filter(function (w) { return stats[w.sk] && stats[w.sk].misses > 0; });
+    due.sort(function (a, b) { return (stats[b.sk].misses || 0) - (stats[a.sk].misses || 0); });
+    return due;
+  }
+
+  function updateReviewCountBadge() {
+    const badge = document.getElementById('review-count-badge');
+    if (!badge) return;
+    const count = getDueReviewWords().length;
+    badge.textContent = String(count);
+    badge.classList.toggle('hidden', count === 0);
+  }
+
+  function renderReviewQueue() {
+    reviewQueue = getDueReviewWords().slice(0, REVIEW_QUEUE_CAP);
+    reviewIndex = 0;
+    renderReviewCard();
+  }
+
+  function renderReviewCard() {
+    const stage = document.getElementById('review-stage');
+    if (reviewIndex >= reviewQueue.length) {
+      stage.innerHTML = reviewQueue.length
+        ? '<div class="empty-state">Review complete — nice work!</div>'
+        : '<div class="empty-state">Nothing to review right now. Words you miss in Practice or Learn will show up here.</div>';
+      return;
+    }
+
+    reviewGraded = false;
+    const word = reviewQueue[reviewIndex];
+    stage.innerHTML =
+      '<div class="practice-progress">Reviewing ' + (reviewIndex + 1) + ' of ' + reviewQueue.length + '</div>' +
+      '<div class="practice-card" id="review-card">' +
+      '<div class="practice-word">' + speakerButtonHtml(word.sk) + escapeHtml(word.sk) + '</div>' +
+      '<div class="practice-answer" id="review-answer"></div>' +
+      '<button class="btn btn-secondary" id="review-reveal-btn">Show Answer</button>' +
+      '<div class="practice-grade-row hidden" id="review-grade-row">' +
+      '<button class="btn-grade missed" id="review-missed-btn">Missed it</button>' +
+      '<button class="btn-grade got-it" id="review-gotit-btn">Got it</button>' +
+      '</div>' +
+      '</div>';
+
+    document.getElementById('review-reveal-btn').addEventListener('click', function () {
+      document.getElementById('review-answer').textContent = word.en;
+      document.getElementById('review-reveal-btn').classList.add('hidden');
+      document.getElementById('review-grade-row').classList.remove('hidden');
+    });
+    document.getElementById('review-missed-btn').addEventListener('click', function () { gradeReviewCard(word, false); });
+    document.getElementById('review-gotit-btn').addEventListener('click', function () { gradeReviewCard(word, true); });
+  }
+
+  function gradeReviewCard(word, gotIt) {
+    if (reviewGraded) return;
+    reviewGraded = true;
+
+    const gradeRow = document.getElementById('review-grade-row');
+    if (gradeRow) gradeRow.style.pointerEvents = 'none';
+
+    const stats = loadVocabStats();
+    const entry = stats[word.sk] || { misses: 0 };
+    entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
+    stats[word.sk] = entry;
+    saveVocabStats(stats);
+
+    playTone(gotIt ? 'correct' : 'incorrect');
+    recordPracticeToday();
+    incrementDailyCount();
+    unlockAchievement('first-practice', 'First Practice Complete');
+    checkWordCountAchievements();
+    renderProfile();
+
+    const card = document.getElementById('review-card');
+    card.classList.add(gotIt ? 'flash-correct' : 'flash-incorrect');
+
+    setTimeout(function () {
+      reviewIndex++;
+      renderReviewCard();
     }, 450);
   }
 
@@ -841,6 +1030,13 @@
         browseEl.classList.toggle('hidden', mode !== 'browse');
       });
     });
+
+    const searchInput = document.getElementById('browse-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function (e) {
+        filterBrowseContent(e.target.value);
+      });
+    }
   }
 
   function renderRoadmapMap() {
@@ -1032,6 +1228,7 @@
       entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
       stats[lessonCurrentPracticeItem.sk] = entry;
       saveVocabStats(stats);
+      incrementDailyCount();
     }
 
     if (gotIt) lessonPracticeCorrect++;
@@ -1446,6 +1643,7 @@
     { id: 'words-25', label: '25 Words' },
     { id: 'words-50', label: '50 Words' },
     { id: 'words-100', label: '100 Words' },
+    { id: 'daily-goal', label: 'Daily Goal Hit' },
   ];
 
   function renderBadges() {
@@ -1479,6 +1677,15 @@
 
     document.getElementById('stat-streak').textContent = String(Number(localStorage.getItem(STREAK_COUNT_KEY) || '0'));
 
+    const dailyCount = loadDailyCount();
+    const dailyTarget = getDailyGoalTarget();
+    const dailyFill = document.getElementById('daily-goal-fill');
+    if (dailyFill) dailyFill.style.width = Math.min(100, Math.round((dailyCount / dailyTarget) * 100)) + '%';
+    const dailyLabel = document.getElementById('daily-goal-label');
+    if (dailyLabel) dailyLabel.textContent = dailyCount + ' / ' + dailyTarget + ' today';
+
+    updateReviewCountBadge();
+
     let nextIdx = -1;
     for (let i = 0; i < totalSections; i++) {
       if (!progress[i]) {
@@ -1489,17 +1696,19 @@
 
     const nextCard = document.getElementById('profile-next-card');
     if (totalSections === 0) {
-      nextCard.innerHTML = '<div class="next-label">Loading…</div>';
+      nextCard.innerHTML = '<div class="next-info"><div class="next-label">Loading…</div></div>';
       nextCard.onclick = null;
     } else if (nextIdx === -1) {
-      nextCard.innerHTML = '<div class="next-label">All done</div><div class="next-title">You’ve cleared every section!</div>';
+      nextCard.innerHTML = '<div class="next-info"><div class="next-label">All done</div><div class="next-title">You’ve cleared every section!</div></div>';
       nextCard.onclick = null;
     } else {
       const section = roadmapSections[nextIdx];
       nextCard.innerHTML =
+        '<div class="next-info">' +
         '<div class="next-label">Up next</div>' +
         '<div class="next-title">' + escapeHtml(section.title) + '</div>' +
-        '<div class="next-sub">' + (section.type === 'grammar' ? 'Grammar' : 'Vocabulary') + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>';
+        '<div class="next-sub">' + (section.type === 'grammar' ? 'Grammar' : 'Vocabulary') + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>' +
+        '</div>';
       nextCard.onclick = function () {
         document.querySelector('[data-tab="learn"]').click();
         startLesson(nextIdx);
