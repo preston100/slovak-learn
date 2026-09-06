@@ -1,32 +1,61 @@
 /* ---------- Design tokens ---------- */
+/* A warm, folk-embroidery-inspired palette (brick red + gold) in place of
+   the generic indigo-on-white starter-kit look, with a matching dark theme. */
 :root {
-  --color-bg: #f7f7fb;
+  --color-bg: #faf5ef;
   --color-surface: #ffffff;
-  --color-surface-alt: #fbfbfe;
-  --color-border: #e6e6ef;
-  --color-text: #1c1c28;
-  --color-text-muted: #6b6b80;
-  --color-text-faint: #9494a8;
-  --color-accent: #4f46e5;
-  --color-accent-hover: #4338ca;
-  --color-accent-soft: #eef0ff;
-  --color-success: #16a34a;
-  --color-success-soft: #eafaf0;
-  --color-error: #dc2626;
-  --color-error-soft: #fdecec;
-  --warm: #d97706;
+  --color-surface-alt: #f3ece3;
+  --color-border: #e6d9c9;
+  --color-text: #2e1b1b;
+  --color-text-muted: #6b5850;
+  --color-text-faint: #9c8a80;
+  --color-accent: #b23a3a;
+  --color-accent-hover: #96302f;
+  --color-accent-soft: #f5e6e1;
+  --color-success: #3f8f5c;
+  --color-success-soft: #e6f3ea;
+  --color-error: #c73e3e;
+  --color-error-soft: #fbe9e6;
+  --warm: #c98a2e;
+  --warm-soft: #f6e9d3;
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
 
-  --shadow-sm: 0 1px 2px rgba(20, 20, 43, 0.04);
-  --shadow-md: 0 4px 16px rgba(20, 20, 43, 0.06);
-  --shadow-lg: 0 12px 40px rgba(20, 20, 43, 0.12);
+  --shadow-sm: 0 1px 2px rgba(46, 27, 27, 0.05);
+  --shadow-md: 0 4px 16px rgba(46, 27, 27, 0.07);
+  --shadow-lg: 0 12px 40px rgba(46, 27, 27, 0.14);
 
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Lora', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Karla', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --max-width: 880px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1c1210;
+    --color-surface: #2a1c1a;
+    --color-surface-alt: #33221f;
+    --color-border: rgba(246, 233, 228, 0.14);
+    --color-text: #f6e9e4;
+    --color-text-muted: #d8b9b2;
+    --color-text-faint: #96736c;
+    --color-accent: #e0685f;
+    --color-accent-hover: #ea8078;
+    --color-accent-soft: #3a211c;
+    --color-success: #6fbf8b;
+    --color-success-soft: #1c3326;
+    --color-error: #e0796a;
+    --color-error-soft: #3a211c;
+    --warm: #e0a94c;
+    --warm-soft: #3a2c17;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
 }
 
 * {
@@ -51,8 +80,9 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.005em;
   line-height: 1.25;
   margin: 0;
 }
@@ -76,7 +106,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(160deg, #f7f7fb 0%, #eceafc 100%);
+  background: linear-gradient(160deg, var(--color-bg) 0%, var(--color-accent-soft) 100%);
   z-index: 100;
   padding: 24px;
 }
@@ -100,6 +130,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 20px;
   margin: 0 auto 20px;
@@ -183,7 +214,7 @@ button {
 }
 
 .btn-secondary:hover {
-  background: #e2e1fc;
+  background: var(--warm-soft);
 }
 
 /* ---------- App shell ---------- */
@@ -214,8 +245,9 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 700;
-  font-size: 15.5px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
 }
 
 .brand-mark {
@@ -285,7 +317,7 @@ button {
 .streak-badge svg {
   width: 16px;
   height: 16px;
-  color: var(--warm, #d97706);
+  color: var(--warm);
   flex-shrink: 0;
 }
 
@@ -681,8 +713,8 @@ main {
 }
 
 .round-node.cleared {
-  background: linear-gradient(160deg, #ffd76a, #f5a623);
-  border-color: #e2911a;
+  background: linear-gradient(160deg, #e8b458, var(--warm));
+  border-color: #a6721f;
 }
 .round-node.cleared .round-icon { color: white; }
 
@@ -700,8 +732,8 @@ main {
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: var(--shadow-md), 0 0 0 0 rgba(79, 70, 229, 0.35); }
-  50% { box-shadow: var(--shadow-md), 0 0 0 10px rgba(79, 70, 229, 0); }
+  0%, 100% { box-shadow: var(--shadow-md), 0 0 0 0 rgba(178, 58, 58, 0.35); }
+  50% { box-shadow: var(--shadow-md), 0 0 0 10px rgba(178, 58, 58, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -834,6 +866,7 @@ main {
   max-width: 420px;
 }
 .practice-summary .score-big {
+  font-family: var(--font-display);
   font-size: 32px;
   font-weight: 700;
   color: var(--color-accent);
@@ -1007,8 +1040,9 @@ main {
 }
 
 .ring-pct {
+  font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -1028,8 +1062,9 @@ main {
 }
 
 .profile-stat .stat-num {
+  font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-accent);
   font-variant-numeric: tabular-nums;
 }
@@ -1040,7 +1075,7 @@ main {
 }
 
 .profile-next-card {
-  background: linear-gradient(135deg, var(--color-accent), #7c72f0);
+  background: linear-gradient(135deg, var(--color-accent), #d4783f);
   color: white;
   border-radius: var(--radius-lg);
   padding: 24px 28px;
@@ -1257,8 +1292,8 @@ main {
   animation: mic-pulse 1.2s ease-in-out infinite;
 }
 @keyframes mic-pulse {
-  0%, 100% { box-shadow: var(--shadow-lg), 0 0 0 0 rgba(220, 38, 38, 0.4); }
-  50% { box-shadow: var(--shadow-lg), 0 0 0 14px rgba(220, 38, 38, 0); }
+  0%, 100% { box-shadow: var(--shadow-lg), 0 0 0 0 rgba(199, 62, 62, 0.4); }
+  50% { box-shadow: var(--shadow-lg), 0 0 0 14px rgba(199, 62, 62, 0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .mic-btn.listening { animation: none; }

@@ -433,7 +433,7 @@
     }, 3000);
   }
 
-  const CONFETTI_COLORS = ['#4f46e5', '#16a34a', '#d97706', '#dc2626', '#0891b2'];
+  const CONFETTI_COLORS = ['#b23a3a', '#c98a2e', '#3f8f5c', '#d4783f', '#7a4a3a'];
 
   function launchConfetti(container) {
     if (!container) return;
