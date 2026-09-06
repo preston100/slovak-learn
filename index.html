@@ -36,6 +36,37 @@
     </div>
   </div>
 
+  <!-- Account login/signup: shown after the site password, before the app -->
+  <div id="auth-gate" class="hidden">
+    <div class="gate-card">
+      <div class="gate-logo">S</div>
+      <h1 id="auth-gate-title">Log In</h1>
+      <p class="gate-sub" id="auth-gate-sub">Welcome back — log in to see your progress.</p>
+
+      <div class="content-mode-switch">
+        <button type="button" class="content-mode-btn auth-mode-btn active" data-auth-mode="login">Log In</button>
+        <button type="button" class="content-mode-btn auth-mode-btn" data-auth-mode="signup">Sign Up</button>
+      </div>
+
+      <form id="auth-form" autocomplete="off">
+        <div class="auth-field hidden" id="auth-name-field">
+          <label class="field-label" for="auth-name">Name</label>
+          <input type="text" id="auth-name" autocomplete="name" placeholder="Your name" />
+        </div>
+        <div class="auth-field">
+          <label class="field-label" for="auth-email">Email</label>
+          <input type="email" id="auth-email" autocomplete="username" placeholder="you@example.com" />
+        </div>
+        <div class="auth-field">
+          <label class="field-label" for="auth-password">Password</label>
+          <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <div class="gate-error" id="auth-error"></div>
+        <button class="btn btn-primary" type="submit" id="auth-submit">Log In</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Main app: hidden until the password gate passes -->
   <div id="app" class="hidden">
     <div id="achievement-toast" class="achievement-toast hidden"></div>
@@ -71,6 +102,9 @@
           <button class="icon-btn" id="mute-toggle" aria-label="Mute sound effects" title="Sound effects">
             <svg id="sound-on-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>
             <svg id="sound-off-icon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+          </button>
+          <button class="icon-btn" id="logout-btn" aria-label="Log out" title="Log out">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
           </button>
         </div>
       </div>
@@ -118,6 +152,11 @@
           <div class="badges-tile bento-span-3">
             <h3 class="browse-subhead">Badges</h3>
             <div id="profile-badges" class="badge-grid"></div>
+          </div>
+
+          <div class="leaderboard-tile bento-span-3">
+            <h3 class="browse-subhead">Leaderboard</h3>
+            <div id="leaderboard-list" class="leaderboard-list"></div>
           </div>
         </div>
       </section>

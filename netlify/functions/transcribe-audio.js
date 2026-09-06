@@ -1,4 +1,5 @@
-const { safeEqual, jsonResponse } = require('./lib/shared');
+const { jsonResponse } = require('./lib/shared');
+const { requireSession } = require('./lib/auth');
 
 const STT_URL = 'https://speech.googleapis.com/v1/speech:recognize';
 const STT_TIMEOUT_MS = 8500;
@@ -27,14 +28,15 @@ exports.handler = async function (event) {
     return jsonResponse(405, { error: 'Method Not Allowed' });
   }
 
-  const sitePassword = process.env.SITE_PASSWORD;
   // Deliberately a separate key from GOOGLE_TTS_API_KEY — each is restricted
   // to just one Google API, so a leaked key can't be used for the other.
   const sttKey = process.env.GOOGLE_STT_API_KEY;
-
-  if (!sitePassword || !sttKey) {
-    return jsonResponse(500, { error: 'Server is not configured. Missing SITE_PASSWORD or GOOGLE_STT_API_KEY.' });
+  if (!sttKey) {
+    return jsonResponse(500, { error: 'Server is not configured. Missing GOOGLE_STT_API_KEY.' });
   }
+
+  const auth = requireSession(event);
+  if (auth.error) return auth.error;
 
   let body;
   try {
@@ -43,11 +45,7 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { password, audioBase64, encoding, sampleRateHertz } = body;
-
-  if (typeof password !== 'string' || !safeEqual(password, sitePassword)) {
-    return jsonResponse(401, { error: 'Incorrect or missing site password.' });
-  }
+  const { audioBase64, encoding, sampleRateHertz } = body;
 
   if (typeof audioBase64 !== 'string' || !audioBase64) {
     return jsonResponse(400, { error: 'No audio was provided.' });

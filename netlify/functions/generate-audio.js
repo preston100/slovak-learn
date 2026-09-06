@@ -1,5 +1,6 @@
 const crypto = require('crypto');
-const { safeEqual, jsonResponse, callCloudTTS } = require('./lib/shared');
+const { jsonResponse, callCloudTTS } = require('./lib/shared');
+const { requireSession } = require('./lib/auth');
 const { updateJsonFile, putBinaryFile } = require('./lib/github');
 
 // Keeps each invocation comfortably inside Netlify's 10-second function
@@ -38,17 +39,19 @@ exports.handler = async function (event) {
     return jsonResponse(405, { error: 'Method Not Allowed' });
   }
 
-  const sitePassword = process.env.SITE_PASSWORD;
   const ttsKey = process.env.GOOGLE_TTS_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
   const githubRepo = process.env.GITHUB_REPO;
   const githubBranch = process.env.GITHUB_BRANCH || 'main';
 
-  if (!sitePassword || !ttsKey || !githubToken || !githubRepo) {
+  if (!ttsKey || !githubToken || !githubRepo) {
     return jsonResponse(500, {
-      error: 'Server is not configured. Missing SITE_PASSWORD, GOOGLE_TTS_API_KEY, GITHUB_TOKEN, or GITHUB_REPO.',
+      error: 'Server is not configured. Missing GOOGLE_TTS_API_KEY, GITHUB_TOKEN, or GITHUB_REPO.',
     });
   }
+
+  const auth = requireSession(event);
+  if (auth.error) return auth.error;
 
   let body;
   try {
@@ -57,11 +60,7 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { password, phrases } = body;
-
-  if (typeof password !== 'string' || !safeEqual(password, sitePassword)) {
-    return jsonResponse(401, { error: 'Incorrect or missing site password.' });
-  }
+  const { phrases } = body;
 
   if (!Array.isArray(phrases) || phrases.length === 0) {
     return jsonResponse(400, { error: 'At least one phrase is required.' });

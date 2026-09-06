@@ -1,4 +1,5 @@
-const { safeEqual, jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { requireSession } = require('./lib/auth');
 
 const MAX_TOTAL_BYTES = 4.5 * 1024 * 1024; // stays well under Netlify's 6MB sync function body limit
 const MAX_FILES = 6;
@@ -75,12 +76,13 @@ exports.handler = async function (event) {
     return jsonResponse(405, { error: 'Method Not Allowed' });
   }
 
-  const sitePassword = process.env.SITE_PASSWORD;
   const geminiKey = process.env.GEMINI_API_KEY;
-
-  if (!sitePassword || !geminiKey) {
+  if (!geminiKey) {
     return jsonResponse(500, { error: 'Server is not configured. Missing environment variables.' });
   }
+
+  const auth = requireSession(event);
+  if (auth.error) return auth.error;
 
   let body;
   try {
@@ -89,11 +91,7 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { password, files } = body;
-
-  if (typeof password !== 'string' || !safeEqual(password, sitePassword)) {
-    return jsonResponse(401, { error: 'Incorrect or missing site password.' });
-  }
+  const { files } = body;
 
   if (!Array.isArray(files) || files.length === 0) {
     return jsonResponse(400, { error: 'At least one file is required.' });

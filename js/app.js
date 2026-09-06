@@ -18,8 +18,7 @@
 
   function showApp() {
     gateEl.classList.add('hidden');
-    appEl.classList.remove('hidden');
-    initApp();
+    resolveSession();
   }
 
   async function checkPassword(pw) {
@@ -68,6 +67,255 @@
     });
   })();
 
+  /* ---------------- Accounts (sits between the site password and the app) ---------------- */
+
+  const SESSION_TOKEN_KEY = 'slovencina_session_token';
+  const SESSION_USER_KEY = 'slovencina_session_user';
+
+  const authGateEl = document.getElementById('auth-gate');
+  const authForm = document.getElementById('auth-form');
+  const authNameField = document.getElementById('auth-name-field');
+  const authNameInput = document.getElementById('auth-name');
+  const authEmailInput = document.getElementById('auth-email');
+  const authPasswordInput = document.getElementById('auth-password');
+  const authError = document.getElementById('auth-error');
+  const authSubmit = document.getElementById('auth-submit');
+  const authTitle = document.getElementById('auth-gate-title');
+  const authSub = document.getElementById('auth-gate-sub');
+  const authModeButtons = document.querySelectorAll('.auth-mode-btn');
+
+  function getSessionToken() {
+    return localStorage.getItem(SESSION_TOKEN_KEY) || '';
+  }
+
+  function setSession(token, user) {
+    localStorage.setItem(SESSION_TOKEN_KEY, token);
+    if (user) localStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
+  }
+
+  function clearSessionToken() {
+    localStorage.removeItem(SESSION_TOKEN_KEY);
+    localStorage.removeItem(SESSION_USER_KEY);
+  }
+
+  function getSessionUser() {
+    try {
+      return JSON.parse(localStorage.getItem(SESSION_USER_KEY) || 'null');
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function showAuthGate() {
+    authGateEl.classList.remove('hidden');
+  }
+
+  function showAuthenticatedApp() {
+    authGateEl.classList.add('hidden');
+    appEl.classList.remove('hidden');
+    initApp();
+  }
+
+  // Pulls the 9 progress-related localStorage keys into one snapshot object,
+  // reusing the same load functions the rest of the app already has —
+  // defined further down the file, but safe to call here since this is only
+  // ever invoked from event handlers that fire well after the whole script
+  // has finished its initial synchronous run.
+  function collectProgressSnapshot() {
+    let dailyPracticeCount;
+    try {
+      dailyPracticeCount = JSON.parse(localStorage.getItem(DAILY_COUNT_KEY) || '{}');
+    } catch (err) {
+      dailyPracticeCount = { date: null, count: 0 };
+    }
+
+    return {
+      streakCount: Number(localStorage.getItem(STREAK_COUNT_KEY) || '0'),
+      streakLastDate: localStorage.getItem(STREAK_DATE_KEY) || null,
+      vocabStats: loadVocabStats(),
+      achievements: getEarnedAchievements(),
+      roundProgress: loadRoundProgress(),
+      roadmapProgress: loadRoadmapProgress(),
+      timeSpentMs: getTotalTimeSpentMs(),
+      dailyGoalTarget: getDailyGoalTarget(),
+      dailyPracticeCount: dailyPracticeCount,
+    };
+  }
+
+  // The inverse of collectProgressSnapshot: writes a progress object fetched
+  // from the server back into the same localStorage keys, overwriting
+  // whatever was there — correct both for a fresh browser (nothing to lose)
+  // and for switching accounts on a browser that already has a different
+  // account's leftover data.
+  function hydrateFromProgress(progress) {
+    if (!progress) return;
+    localStorage.setItem(STREAK_COUNT_KEY, String(progress.streakCount || 0));
+    if (progress.streakLastDate) localStorage.setItem(STREAK_DATE_KEY, progress.streakLastDate);
+    else localStorage.removeItem(STREAK_DATE_KEY);
+    localStorage.setItem(VOCAB_STATS_KEY, JSON.stringify(progress.vocabStats || {}));
+    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(progress.achievements || []));
+    localStorage.setItem(ROUND_PROGRESS_KEY, JSON.stringify(progress.roundProgress || {}));
+    localStorage.setItem(ROADMAP_PROGRESS_KEY, JSON.stringify(progress.roadmapProgress || []));
+    localStorage.setItem(TIME_SPENT_KEY, String(progress.timeSpentMs || 0));
+    localStorage.setItem(DAILY_GOAL_TARGET_KEY, String(progress.dailyGoalTarget || DEFAULT_DAILY_GOAL));
+    localStorage.setItem(DAILY_COUNT_KEY, JSON.stringify(progress.dailyPracticeCount || { date: null, count: 0 }));
+  }
+
+  let progressSyncTimer = null;
+
+  function scheduleProgressSync() {
+    if (!getSessionToken()) return;
+    clearTimeout(progressSyncTimer);
+    progressSyncTimer = setTimeout(function () { flushProgressSync(); }, 1500);
+  }
+
+  function flushProgressSync() {
+    const token = getSessionToken();
+    if (!token) return;
+    // keepalive lets this survive a tab close (also used on beforeunload
+    // below) — best-effort either way, since localStorage already has the
+    // authoritative copy of whatever just changed.
+    fetch('/.netlify/functions/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify(collectProgressSnapshot()),
+      keepalive: true,
+    }).catch(function () {});
+  }
+
+  window.addEventListener('beforeunload', flushProgressSync);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') flushProgressSync();
+  });
+
+  // Fetches this account's saved progress and writes it into localStorage,
+  // then shows the app. Shared by the token-already-in-localStorage path
+  // (page load) and right after a fresh login/signup.
+  async function finishLogin(token, user) {
+    setSession(token, user);
+    try {
+      const res = await fetch('/.netlify/functions/progress', {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        hydrateFromProgress(data.progress);
+      }
+    } catch (err) {
+      // Network hiccup: fall through with whatever's already in localStorage
+      // rather than blocking the user from getting into the app at all.
+    }
+    showAuthenticatedApp();
+  }
+
+  async function resolveSession() {
+    const token = getSessionToken();
+    if (!token) {
+      showAuthGate();
+      return;
+    }
+    try {
+      const res = await fetch('/.netlify/functions/progress', {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      if (!res.ok) {
+        clearSessionToken();
+        showAuthGate();
+        return;
+      }
+      const data = await res.json();
+      hydrateFromProgress(data.progress);
+      showAuthenticatedApp();
+    } catch (err) {
+      showAuthGate();
+    }
+  }
+
+  function setupAuthGate() {
+    let mode = 'login';
+
+    function applyMode() {
+      authModeButtons.forEach(function (b) { b.classList.toggle('active', b.dataset.authMode === mode); });
+      authNameField.classList.toggle('hidden', mode !== 'signup');
+      authTitle.textContent = mode === 'signup' ? 'Create Account' : 'Log In';
+      authSub.textContent =
+        mode === 'signup'
+          ? 'Set up your account to start tracking your own progress.'
+          : 'Welcome back — log in to see your progress.';
+      authSubmit.textContent = mode === 'signup' ? 'Sign Up' : 'Log In';
+      authPasswordInput.autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+      authError.textContent = '';
+    }
+
+    authModeButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        mode = btn.dataset.authMode;
+        applyMode();
+      });
+    });
+
+    authForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const email = authEmailInput.value.trim();
+      const password = authPasswordInput.value;
+      const name = authNameInput.value.trim();
+
+      if (!email || !password || (mode === 'signup' && !name)) {
+        authError.textContent = 'Please fill in all fields.';
+        return;
+      }
+
+      authError.textContent = '';
+      authSubmit.disabled = true;
+      authSubmit.textContent = mode === 'signup' ? 'Creating account…' : 'Logging in…';
+
+      try {
+        const endpoint = mode === 'signup' ? 'signup' : 'login';
+        const payload = { sitePassword: getStoredPassword(), email: email, password: password };
+        if (mode === 'signup') {
+          payload.name = name;
+          payload.progressSnapshot = collectProgressSnapshot();
+        }
+
+        const res = await fetch('/.netlify/functions/' + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(function () { return {}; });
+
+        if (!res.ok || !data.ok) {
+          authError.textContent = data.error || 'Something went wrong. Please try again.';
+          return;
+        }
+
+        authForm.reset();
+        await finishLogin(data.token, data.user);
+      } catch (err) {
+        authError.textContent = 'Could not reach the server. Please try again.';
+      } finally {
+        authSubmit.disabled = false;
+        authSubmit.textContent = mode === 'signup' ? 'Sign Up' : 'Log In';
+      }
+    });
+
+    applyMode();
+  }
+
+  setupAuthGate();
+
+  function setupLogout() {
+    const btn = document.getElementById('logout-btn');
+    if (!btn) return;
+    const user = getSessionUser();
+    if (user && user.name) btn.title = 'Log out (' + user.name + ')';
+    btn.addEventListener('click', function () {
+      flushProgressSync();
+      clearSessionToken();
+      location.reload();
+    });
+  }
+
   /* ---------------- App (only runs after unlock) ---------------- */
 
   let appInitialized = false;
@@ -79,14 +327,15 @@
     appInitialized = true;
 
     setupTabs();
-    loadGrammar();
-    loadVocab();
+    setupLogout();
+    loadContent();
     setupTests();
     setupTestsModes();
     setupAddContent();
     setupSound();
     renderStreak();
     setupDailyGoal();
+    renderLeaderboard();
     setupLearnModes();
     setupLessonOverlay();
     setupTimeTracking();
@@ -110,24 +359,105 @@
         document.querySelectorAll('.panel').forEach(function (panel) {
           panel.classList.toggle('active', panel.id === 'panel-' + tab);
         });
+
+        if (tab === 'profile') {
+          renderProfile();
+          renderLeaderboard();
+        }
       });
     });
   }
 
-  /* ---- Grammar ---- */
+  /* ---- Content loading: shared baseline + this account's private additions ---- */
 
-  async function loadGrammar() {
-    const container = document.getElementById('grammar-list');
+  // Everyone reads the same shared files; on top of that, each account has
+  // its own private grammar/vocab (from Add Content) that only they see.
+  let sharedGrammarData = [];
+  let sharedVocabData = [];
+  let privateGrammarData = [];
+  let privateVocabData = [];
+
+  async function fetchSharedGrammar() {
     try {
       const res = await fetch('data/grammar.json');
-      grammarData = await res.json();
+      return await res.json();
+    } catch (err) {
+      return [];
+    }
+  }
+
+  async function fetchSharedVocab() {
+    try {
+      const res = await fetch('data/vocab.json');
+      return await res.json();
+    } catch (err) {
+      return [];
+    }
+  }
+
+  async function fetchPrivateContent() {
+    const token = getSessionToken();
+    if (!token) return { grammarTopics: [], vocabGroups: [] };
+    try {
+      const res = await fetch('/.netlify/functions/private-content', {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      if (!res.ok) return { grammarTopics: [], vocabGroups: [] };
+      return await res.json();
+    } catch (err) {
+      return { grammarTopics: [], vocabGroups: [] };
+    }
+  }
+
+  // Shared content always comes first and private content is always
+  // appended after — never merged/interleaved by name — because
+  // ROADMAP_PROGRESS_KEY is an array of booleans indexed by position in the
+  // roadmap. Any ordering that could shift an already-built section earlier
+  // would silently invalidate that account's cleared-section progress.
+  async function loadContent() {
+    const grammarContainer = document.getElementById('grammar-list');
+    const vocabContainer = document.getElementById('vocab-list');
+
+    try {
+      const [shared, sharedVoc, privateContent] = await Promise.all([
+        fetchSharedGrammar(),
+        fetchSharedVocab(),
+        fetchPrivateContent(),
+      ]);
+
+      sharedGrammarData = shared;
+      sharedVocabData = sharedVoc;
+      privateGrammarData = privateContent.grammarTopics || [];
+      privateVocabData = privateContent.vocabGroups || [];
+
+      grammarData = sharedGrammarData.concat(privateGrammarData);
+      vocabData = sharedVocabData.concat(privateVocabData);
+
       renderGrammar(grammarData);
+      renderVocab(vocabData);
       populateTopicSelect();
       updateAudioGenSummary();
       buildRoadmapSections();
     } catch (err) {
-      container.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
+      grammarContainer.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
+      vocabContainer.innerHTML = '<div class="empty-state">Could not load vocabulary content.</div>';
     }
+  }
+
+  // Called right after Add Content saves something new — updates Browse
+  // All and the topic pickers immediately. The Roadmap tab picks up new
+  // sections on next reload, same as it always required for shared content.
+  async function refreshPrivateContent() {
+    const privateContent = await fetchPrivateContent();
+    privateGrammarData = privateContent.grammarTopics || [];
+    privateVocabData = privateContent.vocabGroups || [];
+    grammarData = sharedGrammarData.concat(privateGrammarData);
+    vocabData = sharedVocabData.concat(privateVocabData);
+
+    renderGrammar(grammarData);
+    renderVocab(vocabData);
+    populateTopicSelect();
+    updateAudioGenSummary();
   }
 
   function examplesHtml(examples) {
@@ -181,20 +511,6 @@
   }
 
   /* ---- Vocabulary ---- */
-
-  async function loadVocab() {
-    const container = document.getElementById('vocab-list');
-    try {
-      const res = await fetch('data/vocab.json');
-      vocabData = await res.json();
-      renderVocab(vocabData);
-      populateTopicSelect();
-      updateAudioGenSummary();
-      buildRoadmapSections();
-    } catch (err) {
-      container.innerHTML = '<div class="empty-state">Could not load vocabulary content.</div>';
-    }
-  }
 
   function renderVocab(groups, emptyMessage) {
     const container = document.getElementById('vocab-list');
@@ -1426,13 +1742,13 @@
 
       const result = await postJsonWithRetry(
         '/.netlify/functions/transcribe-audio',
-        { password: getStoredPassword(), audioBase64: base64, encoding: encoding, sampleRateHertz: sampleRateHertz },
+        { audioBase64: base64, encoding: encoding, sampleRateHertz: sampleRateHertz },
         { initialMessage: '', onStatus: function () {} }
       );
 
       if (!result.ok) {
         if (result.status === 401) {
-          sessionStorage.removeItem(SESSION_KEY);
+          clearSessionToken();
           location.reload();
           return;
         }
@@ -1716,6 +2032,50 @@
     }
 
     renderBadges();
+    scheduleProgressSync();
+  }
+
+  // Renders the {name, streakCount} leaderboard fetched from the server —
+  // never anything more sensitive (see leaderboard.js).
+  async function renderLeaderboard() {
+    const listEl = document.getElementById('leaderboard-list');
+    if (!listEl) return;
+    const token = getSessionToken();
+    if (!token) return;
+
+    try {
+      const res = await fetch('/.netlify/functions/leaderboard', {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      if (!res.ok) {
+        listEl.innerHTML = '<div class="empty-state">Could not load the leaderboard.</div>';
+        return;
+      }
+      const data = await res.json();
+      const entries = data.entries || [];
+
+      if (!entries.length) {
+        listEl.innerHTML = '<div class="empty-state">No one on the leaderboard yet.</div>';
+        return;
+      }
+
+      listEl.innerHTML = entries
+        .map(function (e, i) {
+          return (
+            '<div class="leaderboard-row"><span class="leaderboard-rank">' +
+            (i + 1) +
+            '</span><span class="leaderboard-name">' +
+            escapeHtml(e.name) +
+            '</span><span class="leaderboard-streak">' +
+            e.streakCount +
+            (e.streakCount === 1 ? ' day' : ' days') +
+            '</span></div>'
+          );
+        })
+        .join('');
+    } catch (err) {
+      listEl.innerHTML = '<div class="empty-state">Could not load the leaderboard.</div>';
+    }
   }
 
   /* ---- Tests ---- */
@@ -1861,7 +2221,7 @@
     hideQuizError();
     document.getElementById('quiz-area').innerHTML = '';
 
-    const result = await postJsonWithRetry('/.netlify/functions/generate-quiz', Object.assign({ password: getStoredPassword() }, payload), {
+    const result = await postJsonWithRetry('/.netlify/functions/generate-quiz', payload, {
       initialMessage: 'Generating your quiz…',
       onStatus: showQuizStatus,
     });
@@ -1870,7 +2230,7 @@
 
     if (!result.ok) {
       if (result.status === 401) {
-        sessionStorage.removeItem(SESSION_KEY);
+        clearSessionToken();
         location.reload();
         return;
       }
@@ -2101,7 +2461,7 @@
 
     const result = await postJsonWithRetry(
       '/.netlify/functions/extract-content',
-      { password: getStoredPassword(), files: parts },
+      { files: parts },
       { initialMessage: 'Asking Gemini to extract content… this can take a moment.', onStatus: showExtractStatus }
     );
 
@@ -2109,7 +2469,7 @@
 
     if (!result.ok) {
       if (result.status === 401) {
-        sessionStorage.removeItem(SESSION_KEY);
+        clearSessionToken();
         location.reload();
         return;
       }
@@ -2241,25 +2601,19 @@
     saveBtn.textContent = 'Saving…';
 
     try {
-      const res = await fetch('/.netlify/functions/save-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          password: getStoredPassword(),
-          grammarTopics: grammarTopics,
-          vocabGroups: vocabGroups,
-        }),
-      });
+      const result = await postJsonWithRetry(
+        '/.netlify/functions/private-content',
+        { grammarTopics: grammarTopics, vocabGroups: vocabGroups },
+        { initialMessage: '', onStatus: function () {} }
+      );
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          sessionStorage.removeItem(SESSION_KEY);
+      if (!result.ok) {
+        if (result.status === 401) {
+          clearSessionToken();
           location.reload();
           return;
         }
-        showExtractError(data.error || 'Something went wrong saving content.');
+        showExtractError(result.error || 'Something went wrong saving content.');
         saveBtn.disabled = false;
         saveBtn.textContent = 'Save Selected to Site';
         return;
@@ -2268,9 +2622,12 @@
       const successEl = document.createElement('div');
       successEl.className = 'success-banner';
       successEl.textContent =
-        'Saved! Your site will rebuild automatically and the new content will appear here in about a minute — refresh then to see it.';
+        'Saved! This content is private to your account — it now shows in Browse All and Tests. ' +
+        'Reload the page to see it worked into your Learn roadmap.';
       area.appendChild(successEl);
       saveBtn.remove();
+
+      await refreshPrivateContent();
 
       pendingFiles = [];
       renderFileChips();
@@ -2312,7 +2669,7 @@
       try {
         res = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + getSessionToken() },
           body: JSON.stringify(body),
         });
         data = await res.json();
@@ -2416,13 +2773,13 @@
 
       const result = await postJsonWithRetry(
         '/.netlify/functions/generate-audio',
-        { password: getStoredPassword(), phrases: batch },
+        { phrases: batch },
         { initialMessage: '', onStatus: function () {} }
       );
 
       if (!result.ok) {
         if (result.status === 401) {
-          sessionStorage.removeItem(SESSION_KEY);
+          clearSessionToken();
           location.reload();
           return;
         }

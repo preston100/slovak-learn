@@ -1,4 +1,5 @@
-const { safeEqual, jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { requireSession } = require('./lib/auth');
 
 // Netlify's synchronous function payload limit is 6MB. Base64 inflates size by
 // ~33%, so we reject files that would risk crossing that ceiling well before
@@ -57,12 +58,13 @@ exports.handler = async function (event) {
     return jsonResponse(405, { error: 'Method Not Allowed' });
   }
 
-  const sitePassword = process.env.SITE_PASSWORD;
   const geminiKey = process.env.GEMINI_API_KEY;
-
-  if (!sitePassword || !geminiKey) {
+  if (!geminiKey) {
     return jsonResponse(500, { error: 'Server is not configured. Missing environment variables.' });
   }
+
+  const auth = requireSession(event);
+  if (auth.error) return auth.error;
 
   let body;
   try {
@@ -71,13 +73,7 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { password, mode, topic, filename, mimeType, content, isBase64 } = body;
-
-  // Server-side enforcement: this check cannot be bypassed by hiding the
-  // password screen client-side, because it runs here before any Gemini call.
-  if (typeof password !== 'string' || !safeEqual(password, sitePassword)) {
-    return jsonResponse(401, { error: 'Incorrect or missing site password.' });
-  }
+  const { mode, topic, filename, mimeType, content, isBase64 } = body;
 
   let parts;
 

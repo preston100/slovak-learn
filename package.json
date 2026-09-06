@@ -5,5 +5,8 @@
   "description": "Slovak learning site with Grammar, Vocabulary, and AI-generated Tests.",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
   }
 }
