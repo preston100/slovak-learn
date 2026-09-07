@@ -838,14 +838,10 @@
       audioCtx = audioCtx || new AC();
       audioGainNode = audioCtx.createGain();
       audioGainNode.gain.value = 1;
-      // Safety net only — per-file levelling does the real work, this just
-      // catches anything that would otherwise clip.
-      const comp = audioCtx.createDynamicsCompressor();
-      comp.threshold.value = -3;
-      comp.knee.value = 6;
-      comp.ratio.value = 12;
-      audioGainNode.connect(comp);
-      comp.connect(audioCtx.destination);
+      // Straight to the destination: levelling already caps every clip below
+      // clipping, so a compressor would only add time-varying gain that
+      // depends on what played just before.
+      audioGainNode.connect(audioCtx.destination);
       return audioGainNode;
     } catch (err) {
       audioCtx = null;
@@ -883,6 +879,18 @@
     return gain;
   }
 
+  // Browsers start an AudioContext suspended until the page has been
+  // interacted with. Waking it on the first interaction anywhere means it's
+  // already running by the time a speaker button is pressed — otherwise the
+  // first press could start a source on a suspended context and produce
+  // nothing, which is what made it take a couple of clicks to get sound.
+  function primeAudio() {
+    const chain = getAudioChain();
+    if (chain && audioCtx.state === 'suspended') audioCtx.resume().catch(function () {});
+  }
+  document.addEventListener('click', primeAudio, { capture: true });
+  document.addEventListener('keydown', primeAudio, { capture: true });
+
   async function playLevelled(url, token) {
     const chain = getAudioChain();
     if (!chain) return false;
@@ -891,9 +899,12 @@
       try {
         await ctx.resume();
       } catch (err) {
-        /* stays suspended; the element fallback below still plays */
+        /* handled by the state check below */
       }
     }
+    // Starting a source on a still-suspended context makes no sound at all
+    // and reports no error, so hand off to the element instead.
+    if (ctx.state !== 'running') return false;
 
     const res = await fetch(url);
     if (!res.ok) return false;
@@ -955,6 +966,24 @@
       if (myToken !== speakToken) return;
       const audioEl = new Audio(filename);
       currentAudioEl = audioEl;
+
+      // Route through the gain stage when it's usable, so falling back
+      // doesn't also mean noticeably quieter than a levelled clip. Roughly
+      // the average boost levelling applies, since there's no decoded buffer
+      // here to measure.
+      const chain = getAudioChain();
+      if (chain && audioCtx.state === 'running') {
+        try {
+          const src = audioCtx.createMediaElementSource(audioEl);
+          const g = audioCtx.createGain();
+          g.gain.value = 1.6;
+          src.connect(g);
+          g.connect(chain);
+        } catch (err) {
+          /* plays through the element's own output instead */
+        }
+      }
+
       audioEl.addEventListener('error', function () {
         if (myToken === speakToken) speakWithBrowserVoice(text);
       });
