@@ -1782,13 +1782,18 @@
       const letterPool = allLetters.map(function (x) { return x.letter; });
       const soundPool = allLetters.map(function (x) { return x.sound; });
 
-      exercises.push({
-        prompt: l.sound,
-        question: 'Which letter makes this sound?',
-        options: [l.letter].concat(distractors(letterPool, l.letter, 3)),
-        answer: l.letter,
-        explain: l.letter + ' — as in ' + l.example.sk + ' (' + l.example.en + ').',
-      });
+      // y/ý sound identical to i/í and ä is just 'e' for most speakers, so
+      // "which letter makes this sound?" would have more than one right
+      // answer. Those letters are only drilled the other way round.
+      if (!l.skipSoundDrill) {
+        exercises.push({
+          prompt: l.sound,
+          question: 'Which letter makes this sound?',
+          options: [l.letter].concat(distractors(letterPool, l.letter, 3)),
+          answer: l.letter,
+          explain: l.letter + ' — as in ' + l.example.sk + ' (' + l.example.en + ').',
+        });
+      }
       exercises.push({
         prompt: l.letter,
         question: 'What sound does this letter make?',
@@ -2100,8 +2105,6 @@
     }
 
     activeMediaStream = stream;
-    const audioTrack = stream.getAudioTracks()[0];
-    const sampleRateHertz = (audioTrack && audioTrack.getSettings && audioTrack.getSettings().sampleRate) || 48000;
 
     recordedChunks = [];
     let recorder;
@@ -2123,7 +2126,7 @@
       stream.getTracks().forEach(function (t) { t.stop(); });
       micBtn.classList.remove('listening');
       const blob = new Blob(recordedChunks, { type: format.mime });
-      transcribeRecording(blob, format.encoding, sampleRateHertz, item);
+      transcribeRecording(blob, format.encoding, item);
     };
 
     recorder.start();
@@ -2136,7 +2139,7 @@
     }, 6000);
   }
 
-  function transcribeRecording(blob, encoding, sampleRateHertz, item) {
+  function transcribeRecording(blob, encoding, item) {
     const heardEl = document.getElementById('voice-heard');
     const resultEl = document.getElementById('voice-result');
     heardEl.textContent = 'Checking what you said…';
@@ -2147,7 +2150,7 @@
 
       const result = await postJsonWithRetry(
         '/.netlify/functions/transcribe-audio',
-        { audioBase64: base64, encoding: encoding, sampleRateHertz: sampleRateHertz },
+        { audioBase64: base64, encoding: encoding, expected: item && item.sk },
         { initialMessage: '', onStatus: function () {} }
       );
 
@@ -3133,6 +3136,13 @@
     grammarData.forEach(function (t) {
       (t.examples || []).forEach(function (ex) {
         if (ex.sk) set.add(ex.sk);
+      });
+    });
+    // Alphabet example words are spoken in the letter cards and voice phase
+    // too — without these they fall back to the browser's robotic voice.
+    alphabetData.forEach(function (u) {
+      (u.letters || []).forEach(function (l) {
+        if (l.example && l.example.sk) set.add(l.example.sk);
       });
     });
     return Array.from(set);

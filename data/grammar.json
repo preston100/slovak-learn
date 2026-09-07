@@ -171,8 +171,8 @@
         "explain": "Neuter noun takes moje."
       },
       {
-        "prompt": "ona",
-        "question": "What is the possessive form?",
+        "prompt": "ona (she)",
+        "question": "What is the matching possessive?",
         "options": [
           "jej",
           "jeho",
@@ -182,8 +182,8 @@
         "explain": "Ona (she) → jej (her)."
       },
       {
-        "prompt": "oni",
-        "question": "What is the possessive form?",
+        "prompt": "oni (they)",
+        "question": "What is the matching possessive?",
         "options": [
           "jej",
           "jeho",
@@ -204,8 +204,8 @@
         "explain": "Masculine noun takes náš."
       },
       {
-        "prompt": "vy",
-        "question": "What is the possessive form?",
+        "prompt": "vy (you — formal or plural)",
+        "question": "What is the matching possessive?",
         "options": [
           "tvoj",
           "váš",
@@ -300,8 +300,8 @@
         "explain": "S/so takes the instrumental — accompaniment."
       },
       {
-        "prompt": "do",
-        "question": "Which case does this preposition trigger?",
+        "prompt": "do (to / into)",
+        "question": "Which case does this preposition take?",
         "options": [
           "genitive",
           "dative",
@@ -311,8 +311,8 @@
         "explain": "Do is one of the genitive prepositions, with bez, od, z/zo and u."
       },
       {
-        "prompt": "v / vo",
-        "question": "Which case does this preposition trigger?",
+        "prompt": "v / vo (in)",
+        "question": "Which case does this preposition take?",
         "options": [
           "locative",
           "genitive",
@@ -322,8 +322,8 @@
         "explain": "V/vo takes the locative, which is always used with a preposition."
       },
       {
-        "prompt": "The subject of a sentence",
-        "question": "Which case is it in?",
+        "prompt": "Kto? Čo? — the one doing the action",
+        "question": "Which case is the subject in?",
         "options": [
           "nominative",
           "accusative",
@@ -404,7 +404,7 @@
       },
       {
         "prompt": "why",
-        "question": "Which question word?",
+        "question": "Which Slovak question word means this?",
         "options": [
           "Prečo",
           "Kedy",
@@ -415,7 +415,7 @@
       },
       {
         "prompt": "when",
-        "question": "Which question word?",
+        "question": "Which Slovak question word means this?",
         "options": [
           "Kedy",
           "Kde",
@@ -426,7 +426,7 @@
       },
       {
         "prompt": "who",
-        "question": "Which question word?",
+        "question": "Which Slovak question word means this?",
         "options": [
           "Kto",
           "Čo",
@@ -506,8 +506,8 @@
         "explain": "Standalone \"this is\" uses the neuter toto."
       },
       {
-        "prompt": "feminine, accusative",
-        "question": "Which form of \"this\"?",
+        "prompt": "Vidím ___ ženu.",
+        "question": "I see this woman. Which form of \"this\"?",
         "options": [
           "túto",
           "táto",
@@ -517,8 +517,8 @@
         "explain": "Feminine changes from táto to túto as a direct object."
       },
       {
-        "prompt": "neuter",
-        "question": "Which form of \"this\"?",
+        "prompt": "___ auto je nové.",
+        "question": "This car is new. (auto is neuter)",
         "options": [
           "toto",
           "tento",
@@ -617,7 +617,7 @@
       },
       {
         "prompt": "píšem",
-        "question": "What does this cover in English?",
+        "question": "Which English does this single form cover?",
         "options": [
           "both \"I write\" and \"I am writing\"",
           "only \"I write\"",
@@ -1025,8 +1025,8 @@
         "explain": "Ráno, večer, v noci and the rest are used without o."
       },
       {
-        "prompt": "after \"o\"",
-        "question": "Which case does the number take?",
+        "prompt": "o siedmej, o druhej, o tretej",
+        "question": "The number after \"o\" is in which case?",
         "options": [
           "locative",
           "nominative",

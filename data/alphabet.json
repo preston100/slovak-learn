@@ -4,20 +4,121 @@
     "title": "Vowels & Length",
     "intro": "Slovak vowels are pure and consistent — each one makes the same sound every time. The acute accent (dĺžeň) does not change the sound at all, it just holds the vowel about twice as long. Length changes meaning, so it matters: sud (barrel) vs súd (court).\n\nOne relief for English speakers: y and ý sound exactly the same as i and í. The difference is only spelling.",
     "letters": [
-      { "letter": "a", "sound": "short 'a', like the a in father but clipped", "example": { "sk": "mama", "en": "mum" } },
-      { "letter": "á", "sound": "the same 'a', held twice as long", "example": { "sk": "áno", "en": "yes" } },
-      { "letter": "e", "sound": "short 'e', like the e in bed", "example": { "sk": "pes", "en": "dog" } },
-      { "letter": "é", "sound": "the same 'e', held twice as long", "example": { "sk": "pekné", "en": "nice" } },
-      { "letter": "i", "sound": "short 'i', like the ee in see but clipped", "example": { "sk": "pivo", "en": "beer" } },
-      { "letter": "í", "sound": "the same 'i', held twice as long", "example": { "sk": "víno", "en": "wine" } },
-      { "letter": "y", "sound": "identical to i — the difference is only spelling", "example": { "sk": "syn", "en": "son" } },
-      { "letter": "ý", "sound": "identical to í — long, and again only a spelling difference", "example": { "sk": "dobrý", "en": "good" } },
-      { "letter": "o", "sound": "short 'o', like the o in more but clipped", "example": { "sk": "okno", "en": "window" } },
-      { "letter": "ó", "sound": "the same 'o', held twice as long", "example": { "sk": "balón", "en": "balloon" } },
-      { "letter": "u", "sound": "short 'u', like the oo in book", "example": { "sk": "ruka", "en": "hand" } },
-      { "letter": "ú", "sound": "the same 'u', held twice as long", "example": { "sk": "ústa", "en": "mouth" } },
-      { "letter": "ä", "sound": "rare — most speakers today just say it as 'e'", "example": { "sk": "mäso", "en": "meat" } },
-      { "letter": "ô", "sound": "a glide, 'uo' — starts at u and slides into o", "example": { "sk": "kôň", "en": "horse" } }
+      {
+        "letter": "a",
+        "sound": "short 'a', like the a in father but clipped",
+        "example": {
+          "sk": "mama",
+          "en": "mum"
+        }
+      },
+      {
+        "letter": "á",
+        "sound": "long 'a' — the same vowel held about twice as long",
+        "example": {
+          "sk": "áno",
+          "en": "yes"
+        }
+      },
+      {
+        "letter": "e",
+        "sound": "short 'e', like the e in bed",
+        "example": {
+          "sk": "pes",
+          "en": "dog"
+        }
+      },
+      {
+        "letter": "é",
+        "sound": "long 'e' — the same vowel held about twice as long",
+        "example": {
+          "sk": "pekné",
+          "en": "nice"
+        }
+      },
+      {
+        "letter": "i",
+        "sound": "short 'i', like the ee in see but clipped",
+        "example": {
+          "sk": "pivo",
+          "en": "beer"
+        }
+      },
+      {
+        "letter": "í",
+        "sound": "long 'i' — the same vowel held about twice as long",
+        "example": {
+          "sk": "víno",
+          "en": "wine"
+        }
+      },
+      {
+        "letter": "y",
+        "sound": "sounds exactly like short i — the difference is only spelling",
+        "example": {
+          "sk": "syn",
+          "en": "son"
+        },
+        "skipSoundDrill": true
+      },
+      {
+        "letter": "ý",
+        "sound": "sounds exactly like long í — the difference is only spelling",
+        "example": {
+          "sk": "dobrý",
+          "en": "good"
+        },
+        "skipSoundDrill": true
+      },
+      {
+        "letter": "o",
+        "sound": "short 'o', like the o in more but clipped",
+        "example": {
+          "sk": "okno",
+          "en": "window"
+        }
+      },
+      {
+        "letter": "ó",
+        "sound": "long 'o' — the same vowel held about twice as long",
+        "example": {
+          "sk": "balón",
+          "en": "balloon"
+        }
+      },
+      {
+        "letter": "u",
+        "sound": "short 'u', like the oo in book",
+        "example": {
+          "sk": "ruka",
+          "en": "hand"
+        }
+      },
+      {
+        "letter": "ú",
+        "sound": "long 'u' — the same vowel held about twice as long",
+        "example": {
+          "sk": "ústa",
+          "en": "mouth"
+        }
+      },
+      {
+        "letter": "ä",
+        "sound": "a rare letter — most speakers today simply say it as 'e'",
+        "example": {
+          "sk": "mäso",
+          "en": "meat"
+        },
+        "skipSoundDrill": true
+      },
+      {
+        "letter": "ô",
+        "sound": "a glide, 'uo' — starts at u and slides into o",
+        "example": {
+          "sk": "kôň",
+          "en": "horse"
+        }
+      }
     ]
   },
   {
@@ -25,10 +126,38 @@
     "title": "Č, Š, Ž, Dž",
     "intro": "The little hook (mäkčeň) turns four consonants into sounds English writes with two letters. Once you know these four, a huge share of Slovak spelling stops looking strange — they are the same sounds you already use in English, just written with one letter instead of two.",
     "letters": [
-      { "letter": "č", "sound": "'ch' as in chair", "example": { "sk": "čaj", "en": "tea" } },
-      { "letter": "š", "sound": "'sh' as in shoe", "example": { "sk": "škola", "en": "school" } },
-      { "letter": "ž", "sound": "the 's' in measure or the g in genre", "example": { "sk": "žena", "en": "woman" } },
-      { "letter": "dž", "sound": "'j' as in jam", "example": { "sk": "džem", "en": "jam" } }
+      {
+        "letter": "č",
+        "sound": "'ch' as in chair",
+        "example": {
+          "sk": "čaj",
+          "en": "tea"
+        }
+      },
+      {
+        "letter": "š",
+        "sound": "'sh' as in shoe",
+        "example": {
+          "sk": "škola",
+          "en": "school"
+        }
+      },
+      {
+        "letter": "ž",
+        "sound": "the 's' in measure or the g in genre",
+        "example": {
+          "sk": "žena",
+          "en": "woman"
+        }
+      },
+      {
+        "letter": "dž",
+        "sound": "'j' as in jam",
+        "example": {
+          "sk": "džem",
+          "en": "jam"
+        }
+      }
     ]
   },
   {
@@ -36,10 +165,38 @@
     "title": "Soft Ď, Ť, Ň, Ľ",
     "intro": "These are d, t, n and l said with the middle of the tongue pressed up against the roof of the mouth. English has close cousins inside words like 'due', 'tune', 'onion' and 'million'.\n\nImportant spelling rule: d, t, n and l are pronounced soft automatically before i, í and e in native Slovak words, even when no hook is written. So deti (children) sounds like ďeti.",
     "letters": [
-      { "letter": "ď", "sound": "soft d — close to the d in 'due'", "example": { "sk": "ďakujem", "en": "thank you" } },
-      { "letter": "ť", "sound": "soft t — close to the t in 'tune'", "example": { "sk": "ťava", "en": "camel" } },
-      { "letter": "ň", "sound": "soft n — the ni in 'onion'", "example": { "sk": "deň", "en": "day" } },
-      { "letter": "ľ", "sound": "soft l — the lli in 'million'", "example": { "sk": "ľúbim", "en": "I love" } }
+      {
+        "letter": "ď",
+        "sound": "soft d — close to the d in 'due'",
+        "example": {
+          "sk": "ďakujem",
+          "en": "thank you"
+        }
+      },
+      {
+        "letter": "ť",
+        "sound": "soft t — close to the t in 'tune'",
+        "example": {
+          "sk": "ťava",
+          "en": "camel"
+        }
+      },
+      {
+        "letter": "ň",
+        "sound": "soft n — the ni in 'onion'",
+        "example": {
+          "sk": "deň",
+          "en": "day"
+        }
+      },
+      {
+        "letter": "ľ",
+        "sound": "soft l — the lli in 'million'",
+        "example": {
+          "sk": "ľúbim",
+          "en": "I love"
+        }
+      }
     ]
   },
   {
@@ -47,14 +204,70 @@
     "title": "Tricky Letters & Stress",
     "intro": "Most remaining consonants work like English: b, d, f, g, k, l, m, n, p, s, t, v, z. (Q, W and X appear only in foreign words.) These are the ones that catch English speakers out.\n\nTwo rules worth memorising now:\n\n1. Stress always falls on the first syllable of a word. No exceptions, no guessing.\n2. R and L can act as vowels — a word can have no vowel letter at all and still be perfectly pronounceable: prst (finger), vlk (wolf), and the famous tongue-twister strč prst skrz krk.",
     "letters": [
-      { "letter": "c", "sound": "'ts' as in cats — never a k sound", "example": { "sk": "cena", "en": "price" } },
-      { "letter": "j", "sound": "'y' as in yes — never the English j", "example": { "sk": "jeden", "en": "one" } },
-      { "letter": "ch", "sound": "one single letter — raspy, like Scottish loch", "example": { "sk": "chlieb", "en": "bread" } },
-      { "letter": "dz", "sound": "'ds' as in roads", "example": { "sk": "medzi", "en": "between" } },
-      { "letter": "h", "sound": "always pronounced, never silent", "example": { "sk": "hlava", "en": "head" } },
-      { "letter": "r", "sound": "rolled/tapped with the tip of the tongue", "example": { "sk": "ruka", "en": "hand" } },
-      { "letter": "ŕ", "sound": "a long syllabic r — the r itself is the vowel", "example": { "sk": "vŕba", "en": "willow" } },
-      { "letter": "ĺ", "sound": "a long syllabic l — the l itself is the vowel", "example": { "sk": "stĺp", "en": "pillar" } }
+      {
+        "letter": "c",
+        "sound": "'ts' as in cats — never a k sound",
+        "example": {
+          "sk": "cena",
+          "en": "price"
+        }
+      },
+      {
+        "letter": "j",
+        "sound": "'y' as in yes — never the English j",
+        "example": {
+          "sk": "jeden",
+          "en": "one"
+        }
+      },
+      {
+        "letter": "ch",
+        "sound": "one single letter — raspy, like Scottish loch",
+        "example": {
+          "sk": "chlieb",
+          "en": "bread"
+        }
+      },
+      {
+        "letter": "dz",
+        "sound": "'ds' as in roads",
+        "example": {
+          "sk": "medzi",
+          "en": "between"
+        }
+      },
+      {
+        "letter": "h",
+        "sound": "always pronounced, never silent",
+        "example": {
+          "sk": "hlava",
+          "en": "head"
+        }
+      },
+      {
+        "letter": "r",
+        "sound": "rolled/tapped with the tip of the tongue",
+        "example": {
+          "sk": "ruka",
+          "en": "hand"
+        }
+      },
+      {
+        "letter": "ŕ",
+        "sound": "a long syllabic r — the r itself is the vowel",
+        "example": {
+          "sk": "vŕba",
+          "en": "willow"
+        }
+      },
+      {
+        "letter": "ĺ",
+        "sound": "a long syllabic l — the l itself is the vowel",
+        "example": {
+          "sk": "stĺp",
+          "en": "pillar"
+        }
+      }
     ]
   }
 ]

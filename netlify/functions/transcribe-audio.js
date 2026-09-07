@@ -45,7 +45,7 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { audioBase64, encoding, sampleRateHertz } = body;
+  const { audioBase64, encoding, expected } = body;
 
   if (typeof audioBase64 !== 'string' || !audioBase64) {
     return jsonResponse(400, { error: 'No audio was provided.' });
@@ -65,8 +65,17 @@ exports.handler = async function (event) {
       body: JSON.stringify({
         config: {
           encoding: encoding,
-          sampleRateHertz: sampleRateHertz || 48000,
+          // Deliberately no sampleRateHertz: for Opus in WebM/Ogg the rate
+          // lives in the stream header, and passing a conflicting value
+          // (the mic often reports 44100 while Opus encodes at 48000) makes
+          // recognition badly inaccurate.
           languageCode: 'sk-SK',
+          // Short single words/phrases, not dictation.
+          model: 'latest_short',
+          // We always know which word the learner was asked to say, so bias
+          // recognition toward it instead of letting a Slovak word get
+          // mapped onto a similar-sounding English one.
+          speechContexts: expected ? [{ phrases: [String(expected).slice(0, 100)], boost: 15 }] : undefined,
         },
         audio: { content: audioBase64 },
       }),

@@ -1681,6 +1681,9 @@ main {
   text-align: left;
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
+  /* Without an explicit colour these inherit the browser's default black
+     button text, which is invisible on the dark theme's surfaces. */
+  color: var(--color-text);
   border-radius: var(--radius-sm);
   padding: 14px 18px;
   font-size: 15px;
@@ -1689,6 +1692,13 @@ main {
   transition: all 0.15s ease;
 }
 .quiz-choice-btn:hover:not(:disabled) { border-color: var(--color-accent); }
+/* Browsers grey out disabled button text; every choice is disabled once
+   answered, so keep them all legible. */
+.quiz-choice-btn:disabled { color: var(--color-text); opacity: 1; }
+.quiz-choice-btn.correct,
+.quiz-choice-btn.correct:disabled { color: var(--color-success); }
+.quiz-choice-btn.incorrect,
+.quiz-choice-btn.incorrect:disabled { color: var(--color-error); }
 .quiz-choice-btn.correct { border-color: var(--color-success); background: var(--color-success-soft); }
 .quiz-choice-btn.incorrect { border-color: var(--color-error); background: var(--color-error-soft); }
 .quiz-choice-btn:disabled { cursor: default; }
