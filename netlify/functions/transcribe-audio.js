@@ -65,10 +65,12 @@ exports.handler = async function (event) {
       body: JSON.stringify({
         config: {
           encoding: encoding,
-          // Deliberately no sampleRateHertz: for Opus in WebM/Ogg the rate
-          // lives in the stream header, and passing a conflicting value
-          // (the mic often reports 44100 while Opus encodes at 48000) makes
-          // recognition badly inaccurate.
+          // Always 48000, never the microphone's reported rate. Opus always
+          // encodes at 48kHz regardless of what the mic hardware reports, so
+          // forwarding the track's rate (commonly 44100) produced a mismatch
+          // and badly inaccurate transcription. Stating it explicitly also
+          // avoids depending on Google parsing it out of the stream header.
+          sampleRateHertz: 48000,
           languageCode: 'sk-SK',
           // No `model` here on purpose: Google's named models (latest_short
           // and friends) aren't available for sk-SK and the API hard-fails
