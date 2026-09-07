@@ -819,25 +819,83 @@
   // Prefers real, pre-generated Slovak speech (see the "Pronunciation audio"
   // tool in Add Content) and only falls back to the browser's built-in voice
   // — which often mispronounces Slovak badly — for anything not yet generated.
+  // Google's TTS output measures around -19 dB mean, which is noticeably
+  // quiet for short words on laptop speakers. A plain <audio> can't go above
+  // volume 1, so playback is routed through a gain stage instead, with a
+  // compressor to keep the boosted peaks from clipping.
+  let audioCtx = null;
+  let audioGainNode = null;
+
+  function getAudioChain() {
+    // Keyed on the gain node, not the context: the sound-effect player shares
+    // this same context and may well have created it first, in which case the
+    // chain still needs building.
+    if (audioGainNode) return audioGainNode;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try {
+      audioCtx = audioCtx || new AC();
+      audioGainNode = audioCtx.createGain();
+      audioGainNode.gain.value = 2.4;
+      const comp = audioCtx.createDynamicsCompressor();
+      comp.threshold.value = -8;
+      comp.knee.value = 6;
+      comp.ratio.value = 12;
+      audioGainNode.connect(comp);
+      comp.connect(audioCtx.destination);
+      return audioGainNode;
+    } catch (err) {
+      audioCtx = null;
+      audioGainNode = null;
+      return null;
+    }
+  }
+
+  let speakToken = 0;
+
   function speak(text) {
     if (!text) return;
+
+    // Identifies this specific request, so a rejection caused by us stopping
+    // playback for a newer click isn't mistaken for a real failure — that
+    // was firing the robot voice over the top of the audio you just asked for.
+    const myToken = ++speakToken;
 
     if (currentAudioEl) {
       currentAudioEl.pause();
       currentAudioEl = null;
     }
+    try {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    } catch (err) {
+      /* not available in this browser */
+    }
 
     const filename = audioManifest[text];
-    if (filename) {
-      const audioEl = new Audio(filename);
-      currentAudioEl = audioEl;
-      audioEl.play().catch(function () {
-        speakWithBrowserVoice(text);
-      });
+    if (!filename) {
+      speakWithBrowserVoice(text);
       return;
     }
 
-    speakWithBrowserVoice(text);
+    const audioEl = new Audio(filename);
+    currentAudioEl = audioEl;
+
+    const gain = getAudioChain();
+    if (gain) {
+      try {
+        audioCtx.createMediaElementSource(audioEl).connect(gain);
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch (err) {
+        /* routing failed — the element still plays through its own output */
+      }
+    }
+
+    function fallback() {
+      if (myToken === speakToken) speakWithBrowserVoice(text);
+    }
+
+    audioEl.addEventListener('error', fallback);
+    audioEl.play().catch(fallback);
   }
 
   document.addEventListener('click', function (e) {
@@ -846,7 +904,6 @@
   });
 
   const MUTE_KEY = 'slovencina_muted';
-  let audioCtx = null;
 
   function isMuted() {
     return localStorage.getItem(MUTE_KEY) === '1';
@@ -2057,6 +2114,41 @@
   // when the pronunciation itself was correct, so comparison is deliberately
   // lenient — it strips diacritics on both sides rather than requiring an
   // exact match, which would punish correct speech for a transcription quirk.
+  // Google's Slovak recognition is noticeably weaker than for major
+  // languages and regularly returns a near-miss ("zen" for "žena"). Marking
+  // a genuinely correct attempt wrong is worse here than being slightly
+  // generous, so small edit distances count as a match.
+  // Counts an adjacent swap as one edit rather than two, because a
+  // transposed pair ("sokla" for "skola") is the recogniser garbling the
+  // word, not the learner mispronouncing it.
+  function editDistance(a, b) {
+    const m = a.length;
+    const n = b.length;
+    const d = [];
+    for (let i = 0; i <= m; i++) {
+      d.push(new Array(n + 1).fill(0));
+      d[i][0] = i;
+    }
+    for (let j = 0; j <= n; j++) d[0][j] = j;
+
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+          d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+        }
+      }
+    }
+    return d[m][n];
+  }
+
+  function isCloseEnough(heard, target) {
+    if (!heard || !target) return false;
+    const allowed = Math.max(1, Math.floor(target.length * 0.34));
+    return editDistance(heard, target) <= allowed;
+  }
+
   function normalizeForVoiceCompare(text) {
     return text
       .toLowerCase()
@@ -2252,7 +2344,7 @@
       const transcript = result.data.transcript || '';
       const target = normalizeForVoiceCompare(item.sk);
       const norm = normalizeForVoiceCompare(transcript);
-      const isMatch = norm.length > 0 && (norm === target || norm.indexOf(target) !== -1 || target.indexOf(norm) !== -1);
+      const isMatch = norm.length > 0 && (norm === target || norm.indexOf(target) !== -1 || target.indexOf(norm) !== -1 || isCloseEnough(norm, target));
 
       heardEl.textContent = transcript ? 'Heard: “' + transcript + '”' : 'Didn’t catch that — try again next time.';
       resultEl.innerHTML = isMatch

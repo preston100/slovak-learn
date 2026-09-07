@@ -78,7 +78,7 @@ exports.handler = async function (event) {
           // We always know which word the learner was asked to say, so bias
           // recognition toward it instead of letting a Slovak word get
           // mapped onto a similar-sounding English one.
-          speechContexts: expected ? [{ phrases: [String(expected).slice(0, 100)], boost: 15 }] : undefined,
+          speechContexts: expected ? [{ phrases: [String(expected).slice(0, 100)], boost: 20 }] : undefined,
         },
         audio: { content: audioBase64 },
       }),

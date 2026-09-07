@@ -100,7 +100,11 @@ async function callCloudTTS(apiKey, text) {
       body: JSON.stringify({
         input: { text },
         voice: CLOUD_TTS_VOICE,
-        audioConfig: { audioEncoding: 'MP3' },
+        // Default output measures around -19 dB mean, which is quiet for
+        // single words. Anything generated from now on comes out louder at
+        // the source; the client also boosts playback, which covers the
+        // files generated before this.
+        audioConfig: { audioEncoding: 'MP3', volumeGainDb: 6 },
       }),
       signal: controller.signal,
     });
