@@ -70,8 +70,9 @@ exports.handler = async function (event) {
           // (the mic often reports 44100 while Opus encodes at 48000) makes
           // recognition badly inaccurate.
           languageCode: 'sk-SK',
-          // Short single words/phrases, not dictation.
-          model: 'latest_short',
+          // No `model` here on purpose: Google's named models (latest_short
+          // and friends) aren't available for sk-SK and the API hard-fails
+          // with a 400 rather than falling back to the default.
           // We always know which word the learner was asked to say, so bias
           // recognition toward it instead of letting a Slovak word get
           // mapped onto a similar-sounding English one.

@@ -1664,6 +1664,65 @@
 
   function setupLessonOverlay() {
     document.getElementById('lesson-exit-btn').addEventListener('click', exitLesson);
+
+    // Dev/preview accounts can press P to skip the item on screen, so the
+    // whole flow can be walked through quickly after an update without
+    // answering everything. Skipped items are removed from the phase total
+    // rather than counted wrong, so the score stays honest.
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'p' && e.key !== 'P') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+      if (document.getElementById('lesson-overlay').classList.contains('hidden')) return;
+      if (!isDevAccount()) return;
+      e.preventDefault();
+      skipCurrentLessonItem();
+    });
+  }
+
+  function skipCurrentLessonItem() {
+    const section = roadmapSections[lessonSectionIndex];
+    if (!section) return;
+
+    if (lessonPhase === 'learn') {
+      lessonPhase = 'practice';
+      renderLessonPhase();
+      return;
+    }
+
+    if (lessonPhase === 'voice') {
+      stopVoiceRecognition();
+      lessonVoiceTotal = Math.max(0, lessonVoiceTotal - 1);
+      voiceIndex++;
+      renderVoiceStep();
+      return;
+    }
+
+    const usesExercises = section.kind !== 'vocab';
+
+    if (lessonPhase === 'practice') {
+      lessonPracticeTotal = Math.max(0, lessonPracticeTotal - 1);
+      if (usesExercises) {
+        exerciseIndex++;
+        renderExerciseStep();
+      } else {
+        lessonQueueIndex++;
+        renderPracticeCardStep();
+      }
+      return;
+    }
+
+    if (lessonPhase === 'quiz') {
+      lessonQuizTotal = Math.max(0, lessonQuizTotal - 1);
+      if (usesExercises) {
+        exerciseIndex++;
+        renderExerciseStep();
+      } else {
+        quizIndex++;
+        renderQuizStep();
+      }
+    }
   }
 
   function startLesson(index) {
@@ -1689,6 +1748,20 @@
   function updateLessonChrome(label, stepIndex) {
     document.getElementById('lesson-phase-label').textContent = label;
     document.getElementById('lesson-progress-fill').style.width = (stepIndex / 4) * 100 + '%';
+
+    const topbar = document.querySelector('.lesson-topbar');
+    let hint = document.getElementById('dev-skip-hint');
+    if (isDevAccount()) {
+      if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'dev-skip-hint';
+        hint.className = 'dev-skip-hint';
+        hint.textContent = 'dev: press P to skip';
+        topbar.appendChild(hint);
+      }
+    } else if (hint) {
+      hint.remove();
+    }
   }
 
   function renderLessonPhase() {
@@ -3177,7 +3250,11 @@
         : (all.length - missing.length) + ' of ' + all.length + ' phrases already have audio.';
   }
 
-  const AUDIO_GEN_BATCH_SIZE = 3;
+  // Each phrase costs roughly 3s (one TTS call plus a GitHub commit), and
+  // Netlify kills a function at 10s. Three per batch measured at ~7.6s — a
+  // slow run tips over the edge and the whole batch is lost, which is why a
+  // full generation pass could silently produce nothing. Two keeps headroom.
+  const AUDIO_GEN_BATCH_SIZE = 2;
 
   async function runAudioGeneration() {
     const btn = document.getElementById('generate-audio-btn');
