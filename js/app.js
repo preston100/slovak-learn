@@ -793,13 +793,21 @@
   let audioManifest = {};
   let currentAudioEl = null;
 
+  // Tracked so a click that lands before the manifest has arrived waits for
+  // it rather than falling through to the browser's synthetic voice, which
+  // sounds nothing like the real audio.
+  let manifestPending = null;
+
   async function loadAudioManifest() {
-    try {
-      const res = await fetch('data/audio-manifest.json');
-      if (res.ok) audioManifest = await res.json();
-    } catch (err) {
-      audioManifest = {};
-    }
+    manifestPending = (async function () {
+      try {
+        const res = await fetch('data/audio-manifest.json');
+        if (res.ok) audioManifest = await res.json();
+      } catch (err) {
+        audioManifest = {};
+      }
+    })();
+    await manifestPending;
     updateAudioGenSummary();
   }
 
@@ -852,7 +860,10 @@
 
   const TARGET_RMS = 0.16;
   const MAX_NORMALISE_GAIN = 8;
+  const BUFFER_CACHE_LIMIT = 60;
   const levelCache = {};
+  const bufferCache = {};
+  const bufferOrder = [];
   let currentSource = null;
 
   // RMS rather than peak: a single transient shouldn't decide how loud a word
@@ -906,11 +917,25 @@
     // and reports no error, so hand off to the element instead.
     if (ctx.state !== 'running') return false;
 
-    const res = await fetch(url);
-    if (!res.ok) return false;
-    const bytes = await res.arrayBuffer();
-    if (token !== speakToken) return true; // superseded by a newer click
-    const buffer = await ctx.decodeAudioData(bytes);
+    // Decoded clips are cached, so replaying a word never touches the network
+    // again. Without this, every play depended on a fresh fetch succeeding —
+    // and a slow or failed one silently dropped to a different playback path
+    // at a different volume, which is exactly the kind of intermittent
+    // difference that's impossible to pin down from the outside.
+    let buffer = bufferCache[url];
+    if (!buffer) {
+      let res = await fetch(url);
+      if (!res.ok) {
+        res = await fetch(url, { cache: 'reload' }); // one retry before giving up
+        if (!res.ok) return false;
+      }
+      const bytes = await res.arrayBuffer();
+      if (token !== speakToken) return true; // superseded by a newer click
+      buffer = await ctx.decodeAudioData(bytes);
+      bufferCache[url] = buffer;
+      bufferOrder.push(url);
+      if (bufferOrder.length > BUFFER_CACHE_LIMIT) delete bufferCache[bufferOrder.shift()];
+    }
     if (token !== speakToken) return true;
 
     if (levelCache[url] === undefined) levelCache[url] = computeGain(buffer);
@@ -928,7 +953,7 @@
 
   let speakToken = 0;
 
-  function speak(text) {
+  async function speak(text) {
     if (!text) return;
 
     // Identifies this specific request, so a rejection caused by us stopping
@@ -954,7 +979,19 @@
       /* not available in this browser */
     }
 
-    const filename = audioManifest[text];
+    // A click can land before the manifest has arrived. Waiting for it means
+    // a word we have real audio for never gets spoken by the synthetic voice
+    // just because of load timing.
+    let filename = audioManifest[text];
+    if (!filename && manifestPending) {
+      try {
+        await manifestPending;
+      } catch (err) {
+        /* fall through to whatever the manifest ended up as */
+      }
+      if (myToken !== speakToken) return;
+      filename = audioManifest[text];
+    }
     if (!filename) {
       speakWithBrowserVoice(text);
       return;
