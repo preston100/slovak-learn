@@ -111,7 +111,7 @@
   // regardless of prior progress, so these two can freely look around after
   // every update instead of grinding through prerequisites. Client-side only
   // — nothing server-side trusts this, it just changes what's rendered.
-  const DEV_ACCOUNT_EMAILS = ['prestonandersen100@gmail.com'];
+  const DEV_ACCOUNT_EMAILS = ['prestonandersen100@gmail.com', 'mravikovamartina@gmail.com'];
 
   function isDevAccount() {
     const user = getSessionUser();
