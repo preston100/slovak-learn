@@ -54,9 +54,10 @@ async function transcribeWithGroq(key, audioBuffer, encoding, expected, budgetMs
   form.append('language', 'sk');
   form.append('response_format', 'verbose_json');
   form.append('temperature', '0');
-  // Whisper's prompt biases decoding toward expected vocabulary, the same
-  // job Google's speechContexts does.
-  if (expected) form.append('prompt', String(expected).slice(0, 200));
+  // Whisper's prompt is treated as preceding transcript context, so framing
+  // the target in a Slovak sentence biases both the language and the
+  // vocabulary — more effective than passing the bare word.
+  if (expected) form.append('prompt', 'Nahrávka slovenského slova: ' + String(expected).slice(0, 100) + '.');
 
   const res = await withTimeout(budgetMs, (signal) =>
     fetch(GROQ_URL, {
