@@ -2412,7 +2412,21 @@
 
     let stream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // echoCancellation is deliberately off. It's meant for calls, where the
+      // far end's voice would otherwise feed back through the mic — there's
+      // no far end here, and nothing is playing while recording. Leaving it
+      // on makes the browser open the device in communications mode, which is
+      // what tells Windows to treat this as a call and duck every other sound
+      // by 80% (its default). That ducking is why playback goes quiet right
+      // after recording a word.
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          // These two genuinely help recognition, and don't affect ducking.
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
     } catch (err) {
       heardEl.textContent = 'Microphone access was denied or is unavailable.';
       showVoiceSkipOption();
@@ -2438,7 +2452,12 @@
     };
 
     recorder.onstop = function () {
+      // Release the mic immediately and drop every reference to it — the
+      // shorter the capture session, the sooner the system stops treating
+      // this as an active call and restores normal playback volume.
       stream.getTracks().forEach(function (t) { t.stop(); });
+      activeMediaStream = null;
+      activeMediaRecorder = null;
       micBtn.classList.remove('listening');
       const blob = new Blob(recordedChunks, { type: format.mime });
       transcribeRecording(blob, format.encoding, item);
