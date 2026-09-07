@@ -2412,19 +2412,26 @@
 
     let stream;
     try {
-      // echoCancellation is deliberately off. It's meant for calls, where the
-      // far end's voice would otherwise feed back through the mic — there's
-      // no far end here, and nothing is playing while recording. Leaving it
-      // on makes the browser open the device in communications mode, which is
-      // what tells Windows to treat this as a call and duck every other sound
-      // by 80% (its default). That ducking is why playback goes quiet right
-      // after recording a word.
+      // googDucking is a real, Chrome-specific getUserMedia constraint
+      // (Windows-only): when the mic opens as a "communications device"
+      // instead of the plain default device, Windows ducks every other
+      // app's audio for the duration — that's the exact mechanism behind
+      // playback going quiet right after recording a word. Setting it false
+      // asks Chrome to open the plain device instead. It's non-standard, so
+      // Firefox/Safari just ignore it — no harm there.
+      //
+      // echoCancellation is also off: it exists for calls, where the far
+      // end's voice would feed back through the mic. There is no far end
+      // here and nothing plays while recording, and enabling it is part of
+      // what pushes Chrome toward opening the communications device in the
+      // first place.
       stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
-          // These two genuinely help recognition, and don't affect ducking.
+          // These two genuinely help recognition and aren't tied to ducking.
           noiseSuppression: true,
           autoGainControl: true,
+          googDucking: false,
         },
       });
     } catch (err) {
