@@ -641,7 +641,7 @@
         .map(function (l) {
           return (
             '<tr><td class="guide-letter">' + escapeHtml(l.letter) + '</td>' +
-            '<td>' + escapeHtml(l.sound) + '</td>' +
+            '<td><strong>' + escapeHtml(l.hint) + '</strong><br><span class="guide-en">' + escapeHtml(l.sound) + '</span></td>' +
             '<td>' + speakerButtonHtml(l.example.sk) + escapeHtml(l.example.sk) +
             ' <span class="guide-en">' + escapeHtml(l.example.en) + '</span></td></tr>'
           );
@@ -1721,6 +1721,9 @@
               return (
                 '<div class="letter-card">' +
                 '<div class="letter-glyph">' + escapeHtml(l.letter) + '</div>' +
+                // The short hint is what the drills test, so it has to be the
+                // line that stands out; the fuller description sits under it.
+                '<div class="letter-hint">' + escapeHtml(l.hint) + '</div>' +
                 '<div class="letter-sound">' + escapeHtml(l.sound) + '</div>' +
                 '<div class="letter-example">' +
                 speakerButtonHtml(l.example.sk) +
@@ -1779,28 +1782,36 @@
 
     const exercises = [];
     section.letters.forEach(function (l) {
-      const letterPool = allLetters.map(function (x) { return x.letter; });
-      const soundPool = allLetters.map(function (x) { return x.sound; });
+      const explain = l.letter + ' — ' + l.hint + ', as in ' + l.example.sk + ' (' + l.example.en + ').';
 
-      // y/ý sound identical to i/í and ä is just 'e' for most speakers, so
-      // "which letter makes this sound?" would have more than one right
-      // answer. Those letters are only drilled the other way round.
-      if (!l.skipSoundDrill) {
-        exercises.push({
-          prompt: l.sound,
-          question: 'Which letter makes this sound?',
-          options: [l.letter].concat(distractors(letterPool, l.letter, 3)),
-          answer: l.letter,
-          explain: l.letter + ' — as in ' + l.example.sk + ' (' + l.example.en + ').',
-        });
-      }
+      // Both drills start from the letter itself, which is the concrete thing
+      // a beginner is looking at. The old sound -> letter direction asked
+      // people to reverse-engineer a phonetics description ("a glide, 'uo' —
+      // starts at u and slides into o") into a letter they'd never seen,
+      // which is a linguistics exercise, not an alphabet one.
+      const hintPool = allLetters.map(function (x) { return x.hint; });
       exercises.push({
         prompt: l.letter,
         question: 'What sound does this letter make?',
-        options: [l.sound].concat(distractors(soundPool, l.sound, 3)),
-        answer: l.sound,
-        explain: l.letter + ' — as in ' + l.example.sk + ' (' + l.example.en + ').',
+        options: [l.hint].concat(distractors(hintPool, l.hint, 3)),
+        answer: l.hint,
+        explain: explain,
       });
+
+      // Spotting the letter inside a real word — the other half of actually
+      // knowing an alphabet. Distractors must genuinely not contain it.
+      const cleanWords = allLetters
+        .map(function (x) { return x.example.sk; })
+        .filter(function (w) { return w.toLowerCase().indexOf(l.letter.toLowerCase()) === -1; });
+      if (cleanWords.length >= 3) {
+        exercises.push({
+          prompt: l.letter,
+          question: 'Which word has this letter in it?',
+          options: [l.example.sk].concat(distractors(cleanWords, l.example.sk, 3)),
+          answer: l.example.sk,
+          explain: explain,
+        });
+      }
     });
     return exercises;
   }

@@ -10,7 +10,8 @@
         "example": {
           "sk": "mama",
           "en": "mum"
-        }
+        },
+        "hint": "like a in father (short)"
       },
       {
         "letter": "á",
@@ -18,7 +19,8 @@
         "example": {
           "sk": "áno",
           "en": "yes"
-        }
+        },
+        "hint": "like a in father (long)"
       },
       {
         "letter": "e",
@@ -26,7 +28,8 @@
         "example": {
           "sk": "pes",
           "en": "dog"
-        }
+        },
+        "hint": "like e in bed (short)"
       },
       {
         "letter": "é",
@@ -34,7 +37,8 @@
         "example": {
           "sk": "pekné",
           "en": "nice"
-        }
+        },
+        "hint": "like e in bed (long)"
       },
       {
         "letter": "i",
@@ -42,7 +46,8 @@
         "example": {
           "sk": "pivo",
           "en": "beer"
-        }
+        },
+        "hint": "like ee in see (short)"
       },
       {
         "letter": "í",
@@ -50,7 +55,8 @@
         "example": {
           "sk": "víno",
           "en": "wine"
-        }
+        },
+        "hint": "like ee in see (long)"
       },
       {
         "letter": "y",
@@ -59,7 +65,7 @@
           "sk": "syn",
           "en": "son"
         },
-        "skipSoundDrill": true
+        "hint": "same sound as i"
       },
       {
         "letter": "ý",
@@ -68,7 +74,7 @@
           "sk": "dobrý",
           "en": "good"
         },
-        "skipSoundDrill": true
+        "hint": "same sound as í"
       },
       {
         "letter": "o",
@@ -76,7 +82,8 @@
         "example": {
           "sk": "okno",
           "en": "window"
-        }
+        },
+        "hint": "like o in more (short)"
       },
       {
         "letter": "ó",
@@ -84,7 +91,8 @@
         "example": {
           "sk": "balón",
           "en": "balloon"
-        }
+        },
+        "hint": "like o in more (long)"
       },
       {
         "letter": "u",
@@ -92,7 +100,8 @@
         "example": {
           "sk": "ruka",
           "en": "hand"
-        }
+        },
+        "hint": "like oo in book (short)"
       },
       {
         "letter": "ú",
@@ -100,7 +109,8 @@
         "example": {
           "sk": "ústa",
           "en": "mouth"
-        }
+        },
+        "hint": "like oo in book (long)"
       },
       {
         "letter": "ä",
@@ -109,7 +119,7 @@
           "sk": "mäso",
           "en": "meat"
         },
-        "skipSoundDrill": true
+        "hint": "usually just said as 'e'"
       },
       {
         "letter": "ô",
@@ -117,7 +127,8 @@
         "example": {
           "sk": "kôň",
           "en": "horse"
-        }
+        },
+        "hint": "'uo' — u sliding into o"
       }
     ]
   },
@@ -132,7 +143,8 @@
         "example": {
           "sk": "čaj",
           "en": "tea"
-        }
+        },
+        "hint": "like ch in chair"
       },
       {
         "letter": "š",
@@ -140,7 +152,8 @@
         "example": {
           "sk": "škola",
           "en": "school"
-        }
+        },
+        "hint": "like sh in shoe"
       },
       {
         "letter": "ž",
@@ -148,7 +161,8 @@
         "example": {
           "sk": "žena",
           "en": "woman"
-        }
+        },
+        "hint": "like s in measure"
       },
       {
         "letter": "dž",
@@ -156,7 +170,8 @@
         "example": {
           "sk": "džem",
           "en": "jam"
-        }
+        },
+        "hint": "like j in jam"
       }
     ]
   },
@@ -171,7 +186,8 @@
         "example": {
           "sk": "ďakujem",
           "en": "thank you"
-        }
+        },
+        "hint": "like d in due"
       },
       {
         "letter": "ť",
@@ -179,7 +195,8 @@
         "example": {
           "sk": "ťava",
           "en": "camel"
-        }
+        },
+        "hint": "like t in tune"
       },
       {
         "letter": "ň",
@@ -187,7 +204,8 @@
         "example": {
           "sk": "deň",
           "en": "day"
-        }
+        },
+        "hint": "like ni in onion"
       },
       {
         "letter": "ľ",
@@ -195,7 +213,8 @@
         "example": {
           "sk": "ľúbim",
           "en": "I love"
-        }
+        },
+        "hint": "like lli in million"
       }
     ]
   },
@@ -210,7 +229,8 @@
         "example": {
           "sk": "cena",
           "en": "price"
-        }
+        },
+        "hint": "like ts in cats"
       },
       {
         "letter": "j",
@@ -218,7 +238,8 @@
         "example": {
           "sk": "jeden",
           "en": "one"
-        }
+        },
+        "hint": "like y in yes"
       },
       {
         "letter": "ch",
@@ -226,7 +247,8 @@
         "example": {
           "sk": "chlieb",
           "en": "bread"
-        }
+        },
+        "hint": "raspy, like Scottish loch"
       },
       {
         "letter": "dz",
@@ -234,7 +256,8 @@
         "example": {
           "sk": "medzi",
           "en": "between"
-        }
+        },
+        "hint": "like ds in roads"
       },
       {
         "letter": "h",
@@ -242,7 +265,8 @@
         "example": {
           "sk": "hlava",
           "en": "head"
-        }
+        },
+        "hint": "always said, never silent"
       },
       {
         "letter": "r",
@@ -250,7 +274,8 @@
         "example": {
           "sk": "ruka",
           "en": "hand"
-        }
+        },
+        "hint": "a rolled r"
       },
       {
         "letter": "ŕ",
@@ -258,7 +283,8 @@
         "example": {
           "sk": "vŕba",
           "en": "willow"
-        }
+        },
+        "hint": "a long rolled r"
       },
       {
         "letter": "ĺ",
@@ -266,7 +292,8 @@
         "example": {
           "sk": "stĺp",
           "en": "pillar"
-        }
+        },
+        "hint": "a long humming l"
       }
     ]
   }
