@@ -1455,6 +1455,174 @@ main {
   overflow-y: auto;
 }
 
+/* ---------- Grammar Guide: reference layout ---------- */
+.guide-category {
+  margin-bottom: 8px;
+}
+
+.guide-entry {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.guide-entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.guide-entry-head h4 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.guide-practice-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-accent);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.guide-practice-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.guide-summary {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 6px 0 0;
+}
+
+.guide-explanation {
+  white-space: pre-line;
+  font-size: 14px;
+  line-height: 1.65;
+  margin-top: 14px;
+}
+
+.guide-table-wrap {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.guide-table th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+  font-weight: 700;
+  padding: 0 12px 6px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.guide-table td {
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.guide-table tr:last-child td {
+  border-bottom: none;
+}
+
+.guide-table .guide-letter {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.guide-en {
+  color: var(--color-text-faint);
+}
+
+/* ---------- Alphabet units: letter cards ---------- */
+.letter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.letter-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.letter-glyph {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-accent);
+}
+
+.letter-sound {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  margin: 4px 0 10px;
+}
+
+.letter-example {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.letter-example .en {
+  font-weight: 400;
+  color: var(--color-text-faint);
+}
+
+/* ---------- Rule-application exercises (alphabet + grammar) ---------- */
+.exercise-prompt {
+  word-break: break-word;
+}
+
+.exercise-explain {
+  margin-top: 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 460px;
+  min-height: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.exercise-explain.visible {
+  opacity: 1;
+}
+
 .mic-btn {
   width: 88px;
   height: 88px;
@@ -1870,6 +2038,8 @@ input[type='password']:focus {
   .badges-tile,
   .badge-card,
   .leaderboard-tile,
+  .letter-card,
+  .guide-entry,
   .lesson-finish-card,
   .panel-header,
   .topbar,

@@ -1,0 +1,240 @@
+[
+  {
+    "id": "alpha-vowels-length",
+    "kind": "alphabet",
+    "ref": "vowels-length"
+  },
+  {
+    "id": "alpha-hacek-consonants",
+    "kind": "alphabet",
+    "ref": "hacek-consonants"
+  },
+  {
+    "id": "alpha-soft-consonants",
+    "kind": "alphabet",
+    "ref": "soft-consonants"
+  },
+  {
+    "id": "alpha-tricky-letters",
+    "kind": "alphabet",
+    "ref": "tricky-letters"
+  },
+  {
+    "id": "vocab-greetings-basics-0",
+    "kind": "vocab",
+    "ref": "Greetings & Basics",
+    "round": 0
+  },
+  {
+    "id": "vocab-everyday-phrases-0",
+    "kind": "vocab",
+    "ref": "Everyday Phrases",
+    "round": 0
+  },
+  {
+    "id": "vocab-everyday-phrases-1",
+    "kind": "vocab",
+    "ref": "Everyday Phrases",
+    "round": 1
+  },
+  {
+    "id": "vocab-everyday-phrases-2",
+    "kind": "vocab",
+    "ref": "Everyday Phrases",
+    "round": 2
+  },
+  {
+    "id": "gram-nouns-gender",
+    "kind": "grammar",
+    "ref": "nouns-gender"
+  },
+  {
+    "id": "vocab-family-people-0",
+    "kind": "vocab",
+    "ref": "Family & People",
+    "round": 0
+  },
+  {
+    "id": "vocab-family-people-1",
+    "kind": "vocab",
+    "ref": "Family & People",
+    "round": 1
+  },
+  {
+    "id": "gram-pronouns-possessives",
+    "kind": "grammar",
+    "ref": "pronouns-possessives"
+  },
+  {
+    "id": "gram-question-words",
+    "kind": "grammar",
+    "ref": "question-words"
+  },
+  {
+    "id": "vocab-useful-phrases-0",
+    "kind": "vocab",
+    "ref": "Useful Phrases",
+    "round": 0
+  },
+  {
+    "id": "vocab-useful-phrases-1",
+    "kind": "vocab",
+    "ref": "Useful Phrases",
+    "round": 1
+  },
+  {
+    "id": "vocab-useful-phrases-2",
+    "kind": "vocab",
+    "ref": "Useful Phrases",
+    "round": 2
+  },
+  {
+    "id": "vocab-useful-phrases-3",
+    "kind": "vocab",
+    "ref": "Useful Phrases",
+    "round": 3
+  },
+  {
+    "id": "vocab-common-verbs-0",
+    "kind": "vocab",
+    "ref": "Common Verbs",
+    "round": 0
+  },
+  {
+    "id": "vocab-common-verbs-1",
+    "kind": "vocab",
+    "ref": "Common Verbs",
+    "round": 1
+  },
+  {
+    "id": "vocab-common-verbs-2",
+    "kind": "vocab",
+    "ref": "Common Verbs",
+    "round": 2
+  },
+  {
+    "id": "vocab-common-verbs-3",
+    "kind": "vocab",
+    "ref": "Common Verbs",
+    "round": 3
+  },
+  {
+    "id": "gram-present-tense",
+    "kind": "grammar",
+    "ref": "present-tense"
+  },
+  {
+    "id": "gram-conjugation-byt-mat-ist-prist",
+    "kind": "grammar",
+    "ref": "conjugation-byt-mat-ist-prist"
+  },
+  {
+    "id": "gram-conjugation-robit-spat-hrat-citat",
+    "kind": "grammar",
+    "ref": "conjugation-robit-spat-hrat-citat"
+  },
+  {
+    "id": "gram-conjugation-hovorit-jest-chciet-pracovat",
+    "kind": "grammar",
+    "ref": "conjugation-hovorit-jest-chciet-pracovat"
+  },
+  {
+    "id": "gram-demonstratives",
+    "kind": "grammar",
+    "ref": "demonstratives"
+  },
+  {
+    "id": "vocab-food-drink-0",
+    "kind": "vocab",
+    "ref": "Food & Drink",
+    "round": 0
+  },
+  {
+    "id": "vocab-food-drink-1",
+    "kind": "vocab",
+    "ref": "Food & Drink",
+    "round": 1
+  },
+  {
+    "id": "vocab-places-things-at-home-0",
+    "kind": "vocab",
+    "ref": "Places & Things at Home",
+    "round": 0
+  },
+  {
+    "id": "vocab-places-things-at-home-1",
+    "kind": "vocab",
+    "ref": "Places & Things at Home",
+    "round": 1
+  },
+  {
+    "id": "gram-cases-overview",
+    "kind": "grammar",
+    "ref": "cases-overview"
+  },
+  {
+    "id": "vocab-adjectives-opposites-0",
+    "kind": "vocab",
+    "ref": "Adjectives & Opposites",
+    "round": 0
+  },
+  {
+    "id": "vocab-adjectives-opposites-1",
+    "kind": "vocab",
+    "ref": "Adjectives & Opposites",
+    "round": 1
+  },
+  {
+    "id": "vocab-numbers-0-20-0",
+    "kind": "vocab",
+    "ref": "Numbers 0-20",
+    "round": 0
+  },
+  {
+    "id": "vocab-numbers-0-20-1",
+    "kind": "vocab",
+    "ref": "Numbers 0-20",
+    "round": 1
+  },
+  {
+    "id": "vocab-numbers-0-20-2",
+    "kind": "vocab",
+    "ref": "Numbers 0-20",
+    "round": 2
+  },
+  {
+    "id": "vocab-time-daily-routine-0",
+    "kind": "vocab",
+    "ref": "Time & Daily Routine",
+    "round": 0
+  },
+  {
+    "id": "vocab-time-daily-routine-1",
+    "kind": "vocab",
+    "ref": "Time & Daily Routine",
+    "round": 1
+  },
+  {
+    "id": "vocab-time-daily-routine-2",
+    "kind": "vocab",
+    "ref": "Time & Daily Routine",
+    "round": 2
+  },
+  {
+    "id": "vocab-time-daily-routine-3",
+    "kind": "vocab",
+    "ref": "Time & Daily Routine",
+    "round": 3
+  },
+  {
+    "id": "vocab-time-daily-routine-4",
+    "kind": "vocab",
+    "ref": "Time & Daily Routine",
+    "round": 4
+  },
+  {
+    "id": "gram-time-daily-routine",
+    "kind": "grammar",
+    "ref": "time-daily-routine"
+  }
+]

@@ -400,6 +400,18 @@
   let sharedVocabData = [];
   let privateGrammarData = [];
   let privateVocabData = [];
+  let alphabetData = [];
+  let curriculumData = [];
+
+  async function fetchJson(path, fallback) {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return fallback;
+      return await res.json();
+    } catch (err) {
+      return fallback;
+    }
+  }
 
   async function fetchSharedGrammar() {
     try {
@@ -443,22 +455,26 @@
     const vocabContainer = document.getElementById('vocab-list');
 
     try {
-      const [shared, sharedVoc, privateContent] = await Promise.all([
+      const [shared, sharedVoc, privateContent, alphabet, curriculum] = await Promise.all([
         fetchSharedGrammar(),
         fetchSharedVocab(),
         fetchPrivateContent(),
+        fetchJson('data/alphabet.json', []),
+        fetchJson('data/curriculum.json', []),
       ]);
 
       sharedGrammarData = shared;
       sharedVocabData = sharedVoc;
       privateGrammarData = privateContent.grammarTopics || [];
       privateVocabData = privateContent.vocabGroups || [];
+      alphabetData = alphabet;
+      curriculumData = curriculum;
 
       grammarData = sharedGrammarData.concat(privateGrammarData);
       vocabData = sharedVocabData.concat(privateVocabData);
 
       renderGrammar(grammarData);
-      renderGrammar(grammarData, undefined, 'guide-grammar-list');
+      renderGrammarGuide();
       renderVocab(vocabData);
       populateTopicSelect();
       updateAudioGenSummary();
@@ -480,7 +496,7 @@
     vocabData = sharedVocabData.concat(privateVocabData);
 
     renderGrammar(grammarData);
-    renderGrammar(grammarData, undefined, 'guide-grammar-list');
+    renderGrammarGuide();
     renderVocab(vocabData);
     populateTopicSelect();
     updateAudioGenSummary();
@@ -584,14 +600,157 @@
     );
   }
 
-  function filterGuideContent(query) {
-    const q = query.trim().toLowerCase();
-    if (!q) {
-      renderGrammar(grammarData, undefined, 'guide-grammar-list');
-      return;
+  /* ---- Grammar Guide: a reference, not a second copy of the roadmap ---- */
+
+  // Categories give the guide a shape you can navigate; the roadmap's order
+  // is about what to learn next, which is a different question from "where
+  // do I look this up".
+  const GUIDE_CATEGORIES = [
+    { title: 'Nouns', ids: ['nouns-gender', 'cases-overview', 'demonstratives'] },
+    { title: 'Pronouns & Questions', ids: ['pronouns-possessives', 'question-words'] },
+    {
+      title: 'Verbs',
+      ids: [
+        'present-tense',
+        'conjugation-byt-mat-ist-prist',
+        'conjugation-robit-spat-hrat-citat',
+        'conjugation-hovorit-jest-chciet-pracovat',
+      ],
+    },
+    { title: 'Time', ids: ['time-daily-routine'] },
+  ];
+
+  function guideEntryHtml(title, summary, unitId, bodyHtml) {
+    return (
+      '<div class="guide-entry">' +
+      '<div class="guide-entry-head">' +
+      '<h4>' + escapeHtml(title) + '</h4>' +
+      (unitId ? '<button type="button" class="guide-practice-btn" data-unit-id="' + escapeHtml(unitId) + '">Practice this</button>' : '') +
+      '</div>' +
+      (summary ? '<p class="guide-summary">' + escapeHtml(summary) + '</p>' : '') +
+      bodyHtml +
+      '</div>'
+    );
+  }
+
+  function letterTableHtml(letters) {
+    return (
+      '<div class="guide-table-wrap"><table class="guide-table">' +
+      '<thead><tr><th>Letter</th><th>Sounds like</th><th>Example</th></tr></thead><tbody>' +
+      letters
+        .map(function (l) {
+          return (
+            '<tr><td class="guide-letter">' + escapeHtml(l.letter) + '</td>' +
+            '<td>' + escapeHtml(l.sound) + '</td>' +
+            '<td>' + speakerButtonHtml(l.example.sk) + escapeHtml(l.example.sk) +
+            ' <span class="guide-en">' + escapeHtml(l.example.en) + '</span></td></tr>'
+          );
+        })
+        .join('') +
+      '</tbody></table></div>'
+    );
+  }
+
+  function grammarBodyHtml(t) {
+    const examples = (t.examples || [])
+      .map(function (ex) {
+        return (
+          '<tr><td>' + speakerButtonHtml(ex.sk) + escapeHtml(ex.sk) + '</td>' +
+          '<td class="guide-en">' + escapeHtml(ex.en) + '</td></tr>'
+        );
+      })
+      .join('');
+
+    return (
+      (t.explanation ? '<div class="guide-explanation">' + escapeHtml(t.explanation) + '</div>' : '') +
+      (examples
+        ? '<div class="guide-table-wrap"><table class="guide-table"><tbody>' + examples + '</tbody></table></div>'
+        : '')
+    );
+  }
+
+  function unitIdForGrammar(id) {
+    const unit = curriculumData.find(function (u) { return u.kind === 'grammar' && u.ref === id; });
+    return unit ? unit.id : null;
+  }
+
+  function renderGrammarGuide(query) {
+    const container = document.getElementById('guide-grammar-list');
+    if (!container) return;
+
+    const q = (query || '').trim().toLowerCase();
+    const blocks = [];
+
+    // Sounds & Spelling comes from the alphabet data — the single most
+    // reference-shaped thing in the app, and absent from Browse All entirely.
+    const alphabetMatches = alphabetData.filter(function (u) {
+      if (!q) return true;
+      return (
+        u.title.toLowerCase().indexOf(q) !== -1 ||
+        (u.intro || '').toLowerCase().indexOf(q) !== -1 ||
+        u.letters.some(function (l) {
+          return l.letter.toLowerCase().indexOf(q) !== -1 || l.sound.toLowerCase().indexOf(q) !== -1 || l.example.sk.toLowerCase().indexOf(q) !== -1;
+        })
+      );
+    });
+
+    if (alphabetMatches.length) {
+      blocks.push(
+        '<div class="guide-category"><h3 class="browse-subhead">Sounds & Spelling</h3>' +
+        alphabetMatches
+          .map(function (u) {
+            return guideEntryHtml(u.title, '', 'alpha-' + u.id, letterTableHtml(u.letters));
+          })
+          .join('') +
+        '</div>'
+      );
     }
-    const matched = grammarData.filter(function (t) { return matchesGrammarQuery(t, q); });
-    renderGrammar(matched, 'No matches for “' + escapeHtml(query.trim()) + '”.', 'guide-grammar-list');
+
+    const categorised = [];
+    GUIDE_CATEGORIES.forEach(function (cat) {
+      const topics = cat.ids
+        .map(function (id) { return grammarData.find(function (t) { return t.id === id; }); })
+        .filter(Boolean)
+        .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
+      topics.forEach(function (t) { categorised.push(t.id); });
+      if (!topics.length) return;
+      blocks.push(
+        '<div class="guide-category"><h3 class="browse-subhead">' + escapeHtml(cat.title) + '</h3>' +
+        topics
+          .map(function (t) { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); })
+          .join('') +
+        '</div>'
+      );
+    });
+
+    // Anything not in a category above (e.g. topics added via Add Content).
+    const rest = grammarData
+      .filter(function (t) { return categorised.indexOf(t.id) === -1; })
+      .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
+    if (rest.length) {
+      blocks.push(
+        '<div class="guide-category"><h3 class="browse-subhead">More</h3>' +
+        rest.map(function (t) { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); }).join('') +
+        '</div>'
+      );
+    }
+
+    container.innerHTML = blocks.length
+      ? blocks.join('')
+      : '<div class="empty-state">No matches for “' + escapeHtml((query || '').trim()) + '”.</div>';
+
+    container.querySelectorAll('.guide-practice-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const idx = roadmapSections.findIndex(function (s) { return s.id === btn.dataset.unitId; });
+        if (idx === -1) return;
+        document.querySelector('[data-tab="learn"]').click();
+        startLesson(idx);
+      });
+    });
+  }
+
+  function filterGuideContent(query) {
+    renderGrammarGuide(query);
   }
 
   function filterBrowseContent(query) {
@@ -1305,69 +1464,117 @@
   let roadmapSections = [];
   const ROADMAP_PROGRESS_KEY = 'slovencina_roadmap_progress';
 
-  // Builds the single combined path the moment both grammar and vocabulary
-  // have loaded — whichever of the two finishes loading last is the one that
-  // actually triggers this, since both call it.
+  // Resolves the authored sequence in data/curriculum.json into playable
+  // sections. Each unit declares its own kind (alphabet / grammar / vocab),
+  // and the lesson engine runs activities that fit that kind rather than
+  // flashcarding everything.
   function buildRoadmapSections() {
-    if (!grammarData.length || !vocabData.length) return;
+    if (!curriculumData.length || !grammarData.length || !vocabData.length) return;
     if (roadmapSections.length) return; // already built once
 
-    const vocabSections = [];
-    vocabData.forEach(function (g) {
-      const rounds = chunkIntoRounds(g.words || [], ROUND_SIZE);
-      rounds.forEach(function (round, i) {
-        vocabSections.push({
-          type: 'vocab',
-          title: g.topic + (rounds.length > 1 ? ' · Part ' + (i + 1) : ''),
-          subtitle: round.length + ' words',
-          items: round,
-          explanation: '',
+    const sections = [];
+
+    curriculumData.forEach(function (unit) {
+      if (unit.kind === 'alphabet') {
+        const a = alphabetData.find(function (x) { return x.id === unit.ref; });
+        if (!a) return; // unresolvable ref: skip rather than show an empty lesson
+        sections.push({
+          id: unit.id,
+          kind: 'alphabet',
+          title: a.title,
+          subtitle: a.letters.length + ' letters',
+          explanation: a.intro || '',
+          letters: a.letters,
+          items: a.letters.map(function (l) { return l.example; }),
         });
+        return;
+      }
+
+      if (unit.kind === 'grammar') {
+        const t = grammarData.find(function (x) { return x.id === unit.ref; });
+        if (!t) return;
+        sections.push({
+          id: unit.id,
+          kind: 'grammar',
+          title: t.topic,
+          subtitle: t.summary || '',
+          explanation: t.explanation || '',
+          exercises: t.exercises || [],
+          items: t.examples || [],
+        });
+        return;
+      }
+
+      const g = vocabData.find(function (x) { return x.topic === unit.ref; });
+      if (!g) return;
+      const rounds = chunkIntoRounds(g.words || [], ROUND_SIZE);
+      const round = rounds[unit.round];
+      if (!round || !round.length) return;
+      sections.push({
+        id: unit.id,
+        kind: 'vocab',
+        title: g.topic + (rounds.length > 1 ? ' · Part ' + (unit.round + 1) + ' of ' + rounds.length : ''),
+        subtitle: round.length + ' words',
+        explanation: '',
+        items: round,
       });
     });
 
-    const grammarSections = grammarData.map(function (t) {
-      return {
-        type: 'grammar',
+    // Anything this account added itself via Add Content isn't in the
+    // authored curriculum, so it's appended at the end — same shared-first
+    // rule the content merge uses.
+    privateVocabData.forEach(function (g) {
+      chunkIntoRounds(g.words || [], ROUND_SIZE).forEach(function (round, i) {
+        sections.push({
+          id: 'private-vocab-' + g.topic + '-' + i,
+          kind: 'vocab',
+          title: g.topic + ' · Part ' + (i + 1),
+          subtitle: round.length + ' words',
+          explanation: '',
+          items: round,
+        });
+      });
+    });
+    privateGrammarData.forEach(function (t) {
+      sections.push({
+        id: 'private-gram-' + t.id,
+        kind: 'grammar',
         title: t.topic,
         subtitle: t.summary || '',
-        items: t.examples || [],
         explanation: t.explanation || '',
-      };
+        exercises: t.exercises || [],
+        items: t.examples || [],
+      });
     });
-
-    // Interleave one vocab section with one grammar section at a time, so
-    // grammar rules show up spread through the path near related vocabulary
-    // instead of front- or back-loaded as one big block.
-    const sections = [];
-    let vi = 0;
-    let gi = 0;
-    while (vi < vocabSections.length || gi < grammarSections.length) {
-      if (vi < vocabSections.length) sections.push(vocabSections[vi++]);
-      if (gi < grammarSections.length) sections.push(grammarSections[gi++]);
-    }
 
     roadmapSections = sections;
     renderRoadmapMap();
     renderProfile();
   }
 
+  // Progress is keyed by unit id, not array position — reordering the
+  // curriculum used to silently repoint existing checkmarks at whatever
+  // happened to land at that index.
   function loadRoadmapProgress() {
+    let raw;
     try {
-      return JSON.parse(localStorage.getItem(ROADMAP_PROGRESS_KEY) || '[]');
+      raw = JSON.parse(localStorage.getItem(ROADMAP_PROGRESS_KEY) || '{}');
     } catch (err) {
-      return [];
+      return {};
     }
+    // Legacy index-keyed arrays can't be mapped onto the new unit ids, so
+    // they're dropped once. Streak, word stats and badges are unaffected.
+    if (Array.isArray(raw)) return {};
+    return raw && typeof raw === 'object' ? raw : {};
   }
 
-  function isSectionCleared(index) {
-    const p = loadRoadmapProgress();
-    return !!p[index];
+  function isSectionCleared(id) {
+    return !!loadRoadmapProgress()[id];
   }
 
-  function setSectionCleared(index) {
+  function setSectionCleared(id) {
     const p = loadRoadmapProgress();
-    p[index] = true;
+    p[id] = true;
     localStorage.setItem(ROADMAP_PROGRESS_KEY, JSON.stringify(p));
   }
 
@@ -1416,8 +1623,8 @@
     mapEl.innerHTML =
       roadmapSections
         .map(function (section, i) {
-          const cleared = isSectionCleared(i);
-          const locked = !isDevAccount() && i > 0 && !isSectionCleared(i - 1);
+          const cleared = isSectionCleared(section.id);
+          const locked = !isDevAccount() && i > 0 && !isSectionCleared(roadmapSections[i - 1].id);
           const isCurrent = !cleared && !locked;
           const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
           const inner = cleared ? STAR_ICON : locked ? LOCK_ICON : '<span class="round-num-badge">' + (i + 1) + '</span>';
@@ -1492,37 +1699,177 @@
     else renderFinishPhase();
   }
 
+  function kindLabel(kind) {
+    if (kind === 'alphabet') return 'Alphabet';
+    if (kind === 'grammar') return 'Grammar';
+    return 'Vocabulary';
+  }
+
   function renderLearnPhase() {
     updateLessonChrome('Learn', 0);
     const section = roadmapSections[lessonSectionIndex];
     const body = document.getElementById('lesson-body');
 
-    const list = section.items
-      .map(function (it) {
-        return (
-          '<div class="lesson-learn-row"><span class="sk">' +
-          speakerButtonHtml(it.sk) +
-          escapeHtml(it.sk) +
-          '</span><span class="en">' +
-          escapeHtml(it.en) +
-          '</span></div>'
-        );
-      })
-      .join('');
+    // Alphabet units get letter cards — the letter itself, what it sounds
+    // like, and a word to hear it in. A sk/en list would teach vocabulary
+    // instead of the alphabet.
+    const content =
+      section.kind === 'alphabet'
+        ? '<div class="letter-grid">' +
+          section.letters
+            .map(function (l) {
+              return (
+                '<div class="letter-card">' +
+                '<div class="letter-glyph">' + escapeHtml(l.letter) + '</div>' +
+                '<div class="letter-sound">' + escapeHtml(l.sound) + '</div>' +
+                '<div class="letter-example">' +
+                speakerButtonHtml(l.example.sk) +
+                escapeHtml(l.example.sk) +
+                ' <span class="en">' + escapeHtml(l.example.en) + '</span>' +
+                '</div>' +
+                '</div>'
+              );
+            })
+            .join('') +
+          '</div>'
+        : '<div class="lesson-learn-list">' +
+          section.items
+            .map(function (it) {
+              return (
+                '<div class="lesson-learn-row"><span class="sk">' +
+                speakerButtonHtml(it.sk) +
+                escapeHtml(it.sk) +
+                '</span><span class="en">' +
+                escapeHtml(it.en) +
+                '</span></div>'
+              );
+            })
+            .join('') +
+          '</div>';
 
     body.innerHTML =
       '<div class="lesson-stage">' +
-      '<div class="lesson-eyebrow">' + (section.type === 'grammar' ? 'Grammar' : 'Vocabulary') + '</div>' +
+      '<div class="lesson-eyebrow">' + kindLabel(section.kind) + '</div>' +
       '<h2 class="lesson-heading">' + escapeHtml(section.title) + '</h2>' +
       (section.subtitle ? '<p class="lesson-sub">' + escapeHtml(section.subtitle) + '</p>' : '') +
       (section.explanation ? '<div class="lesson-grammar-explanation">' + escapeHtml(section.explanation) + '</div>' : '') +
-      (list ? '<div class="lesson-learn-list">' + list + '</div>' : '') +
+      (section.items.length || section.kind === 'alphabet' ? content : '') +
       '<button class="btn btn-primary" id="lesson-learn-next-btn" style="width:100%; max-width:320px;">I’m Ready — Start Practice</button>' +
       '</div>';
 
     document.getElementById('lesson-learn-next-btn').addEventListener('click', function () {
       lessonPhase = 'practice';
       renderLessonPhase();
+    });
+  }
+
+  /* ---- Exercises (alphabet + grammar): multiple choice, auto-graded ---- */
+
+  // Alphabet drills are generated from the letter data rather than authored,
+  // so they stay correct automatically if letters change. Two directions:
+  // sound -> letter, and letter -> sound.
+  function buildAlphabetExercises(section) {
+    const allLetters = [];
+    alphabetData.forEach(function (u) { (u.letters || []).forEach(function (l) { allLetters.push(l); }); });
+
+    function distractors(pool, correct, n) {
+      const others = shuffleArray(pool.filter(function (v) { return v !== correct; }));
+      return others.slice(0, n);
+    }
+
+    const exercises = [];
+    section.letters.forEach(function (l) {
+      const letterPool = allLetters.map(function (x) { return x.letter; });
+      const soundPool = allLetters.map(function (x) { return x.sound; });
+
+      exercises.push({
+        prompt: l.sound,
+        question: 'Which letter makes this sound?',
+        options: [l.letter].concat(distractors(letterPool, l.letter, 3)),
+        answer: l.letter,
+        explain: l.letter + ' — as in ' + l.example.sk + ' (' + l.example.en + ').',
+      });
+      exercises.push({
+        prompt: l.letter,
+        question: 'What sound does this letter make?',
+        options: [l.sound].concat(distractors(soundPool, l.sound, 3)),
+        answer: l.sound,
+        explain: l.letter + ' — as in ' + l.example.sk + ' (' + l.example.en + ').',
+      });
+    });
+    return exercises;
+  }
+
+  function exercisesFor(section) {
+    if (section.kind === 'alphabet') return buildAlphabetExercises(section);
+    if (section.kind === 'grammar') return (section.exercises || []).slice();
+    return [];
+  }
+
+  let exerciseQueue = [];
+  let exerciseIndex = 0;
+  let exerciseAnswered = false;
+  let exerciseScoreTarget = 'practice'; // which counter this run feeds
+
+  function renderExerciseStep() {
+    const body = document.getElementById('lesson-body');
+    const isPractice = exerciseScoreTarget === 'practice';
+
+    if (exerciseIndex >= exerciseQueue.length) {
+      lessonPhase = isPractice ? 'voice' : 'finish';
+      renderLessonPhase();
+      return;
+    }
+
+    exerciseAnswered = false;
+    const ex = exerciseQueue[exerciseIndex];
+    const options = shuffleArray(ex.options.slice());
+
+    body.innerHTML =
+      '<div class="lesson-stage">' +
+      '<div class="lesson-eyebrow">' + (isPractice ? 'Practice' : 'Quiz') + ' · ' + (exerciseIndex + 1) + ' / ' + exerciseQueue.length + '</div>' +
+      '<h2 class="lesson-heading exercise-prompt">' + escapeHtml(ex.prompt) + '</h2>' +
+      '<p class="lesson-sub">' + escapeHtml(ex.question) + '</p>' +
+      '<div class="quiz-choice-list">' +
+      options
+        .map(function (opt) {
+          return '<button type="button" class="quiz-choice-btn" data-value="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</button>';
+        })
+        .join('') +
+      '</div>' +
+      '<div class="exercise-explain" id="exercise-explain"></div>' +
+      '</div>';
+
+    body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (exerciseAnswered) return;
+        exerciseAnswered = true;
+
+        const chosen = btn.dataset.value;
+        const right = chosen === ex.answer;
+
+        body.querySelectorAll('.quiz-choice-btn').forEach(function (b) {
+          b.disabled = true;
+          if (b.dataset.value === ex.answer) b.classList.add('correct');
+          else if (b === btn) b.classList.add('incorrect');
+        });
+
+        if (right) {
+          if (isPractice) lessonPracticeCorrect++;
+          else lessonQuizCorrect++;
+        }
+        playTone(right ? 'correct' : 'incorrect');
+        incrementDailyCount();
+
+        const explainEl = document.getElementById('exercise-explain');
+        if (ex.explain) explainEl.textContent = ex.explain;
+        explainEl.classList.add('visible');
+
+        setTimeout(function () {
+          exerciseIndex++;
+          renderExerciseStep();
+        }, right ? 900 : 2200);
+      });
     });
   }
 
@@ -1533,7 +1880,20 @@
 
   function renderPracticePhase() {
     updateLessonChrome('Practice', 1);
-    lessonQueue = shuffleArray(roadmapSections[lessonSectionIndex].items.slice());
+    const section = roadmapSections[lessonSectionIndex];
+
+    // Alphabet and grammar practise by applying the rule, not by translating.
+    if (section.kind !== 'vocab') {
+      exerciseQueue = shuffleArray(exercisesFor(section)).slice(0, 10);
+      exerciseIndex = 0;
+      exerciseScoreTarget = 'practice';
+      lessonPracticeCorrect = 0;
+      lessonPracticeTotal = exerciseQueue.length;
+      renderExerciseStep();
+      return;
+    }
+
+    lessonQueue = shuffleArray(section.items.slice());
     lessonQueueIndex = 0;
     lessonPracticeCorrect = 0;
     lessonPracticeTotal = lessonQueue.length;
@@ -1853,6 +2213,19 @@
   function renderQuizPhase() {
     updateLessonChrome('Quiz', 3);
     const section = roadmapSections[lessonSectionIndex];
+
+    // Same split as practice: rule-application units get tested on the rule,
+    // not on what the example words mean.
+    if (section.kind !== 'vocab') {
+      exerciseQueue = shuffleArray(exercisesFor(section)).slice(0, 5);
+      exerciseIndex = 0;
+      exerciseScoreTarget = 'quiz';
+      lessonQuizCorrect = 0;
+      lessonQuizTotal = exerciseQueue.length;
+      renderExerciseStep();
+      return;
+    }
+
     const count = Math.min(5, section.items.length);
     quizQueue = shuffleArray(section.items.slice()).slice(0, count);
     quizIndex = 0;
@@ -1939,7 +2312,7 @@
     const cleared = pct >= ROUND_CLEAR_THRESHOLD;
     const isPerfect = totalPossible > 0 && totalRight === totalPossible;
 
-    if (cleared) setSectionCleared(lessonSectionIndex);
+    if (cleared) setSectionCleared(roadmapSections[lessonSectionIndex].id);
     recordPracticeToday();
     unlockAchievement('first-practice', 'First Practice Complete');
     checkWordCountAchievements();
@@ -2022,7 +2395,7 @@
   function renderProfile() {
     const totalSections = roadmapSections.length;
     const progress = loadRoadmapProgress();
-    const clearedCount = progress.filter(Boolean).length;
+    const clearedCount = roadmapSections.filter(function (s) { return progress[s.id]; }).length;
     const pct = totalSections > 0 ? Math.round((clearedCount / totalSections) * 100) : 0;
 
     document.getElementById('profile-pct').textContent = pct + '%';
@@ -2049,7 +2422,7 @@
 
     let nextIdx = -1;
     for (let i = 0; i < totalSections; i++) {
-      if (!progress[i]) {
+      if (!progress[roadmapSections[i].id]) {
         nextIdx = i;
         break;
       }
@@ -2068,7 +2441,7 @@
         '<div class="next-info">' +
         '<div class="next-label">Up next</div>' +
         '<div class="next-title">' + escapeHtml(section.title) + '</div>' +
-        '<div class="next-sub">' + (section.type === 'grammar' ? 'Grammar' : 'Vocabulary') + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>' +
+        '<div class="next-sub">' + kindLabel(section.kind) + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>' +
         '</div>';
       nextCard.onclick = function () {
         document.querySelector('[data-tab="learn"]').click();

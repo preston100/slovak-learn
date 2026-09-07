@@ -1,33 +1,5 @@
 [
   {
-    "id": "alphabet-pronunciation",
-    "topic": "The Slovak Alphabet & Pronunciation",
-    "summary": "Slovak spelling is very consistent once you know what each letter and accent mark sounds like — this is the foundation everything else builds on.",
-    "explanation": "Slovak uses the Latin alphabet plus extra letters built from accent marks, and almost every letter makes exactly one sound, every time — unlike English, there is very little guessing once you know the rules.\n\nVowels: a, á, ä, e, é, i, í, o, ó, u, ú, y, ý. The acute accent (á, é, í, ó, ú, ý) does not change the sound, it just holds the vowel about twice as long (dĺžeň, \"length mark\").\n\nAccent marks that DO change a consonant's sound:\n- č = \"ch\" as in chair\n- š = \"sh\" as in shoe\n- ž = the \"s\" sound in measure\n- ď, ť, ň = soft/palatalized d, t, n — said with the tongue against the back of the top teeth\n- ľ = a soft \"l\", close to the \"lli\" in million\n- dz and dž are their own single sounds (\"ds\" and the \"j\" in jam)\n\nOne rule that makes reading Slovak out loud much easier than English: stress always falls on the first syllable of a word, with no exceptions.",
-    "examples": [
-      {
-        "sk": "čaj",
-        "en": "tea (č = \"ch\")"
-      },
-      {
-        "sk": "škola",
-        "en": "school (š = \"sh\")"
-      },
-      {
-        "sk": "muž",
-        "en": "man (ž = the \"s\" in measure)"
-      },
-      {
-        "sk": "dievča",
-        "en": "girl (soft ď)"
-      },
-      {
-        "sk": "ľúbim",
-        "en": "I love (soft ľ + long ú)"
-      }
-    ]
-  },
-  {
     "id": "nouns-gender",
     "topic": "Noun Gender & Plurals",
     "summary": "Every Slovak noun is masculine, feminine, or neuter, and each gender pluralizes differently.",
@@ -48,6 +20,96 @@
       {
         "sk": "hrady / ženy / mestá",
         "en": "castles / women / towns (plurals)"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "žena",
+        "question": "Which gender is this noun?",
+        "options": [
+          "masculine",
+          "feminine",
+          "neuter"
+        ],
+        "answer": "feminine",
+        "explain": "Ends in -a, the typical feminine ending."
+      },
+      {
+        "prompt": "hrad",
+        "question": "Which gender is this noun?",
+        "options": [
+          "masculine",
+          "feminine",
+          "neuter"
+        ],
+        "answer": "masculine",
+        "explain": "Ends in a consonant — the typical masculine pattern."
+      },
+      {
+        "prompt": "mesto",
+        "question": "Which gender is this noun?",
+        "options": [
+          "masculine",
+          "feminine",
+          "neuter"
+        ],
+        "answer": "neuter",
+        "explain": "Ends in -o, the typical neuter ending."
+      },
+      {
+        "prompt": "radosť",
+        "question": "Which gender is this noun?",
+        "options": [
+          "masculine",
+          "feminine",
+          "neuter"
+        ],
+        "answer": "feminine",
+        "explain": "A soft consonant plus -osť is a feminine pattern."
+      },
+      {
+        "prompt": "srdce",
+        "question": "Which gender is this noun?",
+        "options": [
+          "masculine",
+          "feminine",
+          "neuter"
+        ],
+        "answer": "neuter",
+        "explain": "Ends in -e — neuter."
+      },
+      {
+        "prompt": "hrad",
+        "question": "What is the plural?",
+        "options": [
+          "hrady",
+          "hrada",
+          "hradi"
+        ],
+        "answer": "hrady",
+        "explain": "Masculine inanimate nouns take -y in the plural."
+      },
+      {
+        "prompt": "žena",
+        "question": "What is the plural?",
+        "options": [
+          "ženy",
+          "žená",
+          "ženi"
+        ],
+        "answer": "ženy",
+        "explain": "Feminine -a nouns take -y in the plural."
+      },
+      {
+        "prompt": "okno",
+        "question": "What is the plural?",
+        "options": [
+          "okná",
+          "okny",
+          "okne"
+        ],
+        "answer": "okná",
+        "explain": "Neuter -o nouns take -a in the plural."
       }
     ]
   },
@@ -72,6 +134,85 @@
       {
         "sk": "To je náš byt.",
         "en": "That is our apartment."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "To je ___ dom.",
+        "question": "Which form of \"my\"? (dom is masculine)",
+        "options": [
+          "môj",
+          "moja",
+          "moje"
+        ],
+        "answer": "môj",
+        "explain": "Masculine noun takes the masculine possessive môj."
+      },
+      {
+        "prompt": "To je ___ kniha.",
+        "question": "Which form of \"my\"? (kniha is feminine)",
+        "options": [
+          "môj",
+          "moja",
+          "moje"
+        ],
+        "answer": "moja",
+        "explain": "Feminine noun takes moja."
+      },
+      {
+        "prompt": "To je ___ auto.",
+        "question": "Which form of \"my\"? (auto is neuter)",
+        "options": [
+          "môj",
+          "moja",
+          "moje"
+        ],
+        "answer": "moje",
+        "explain": "Neuter noun takes moje."
+      },
+      {
+        "prompt": "ona",
+        "question": "What is the possessive form?",
+        "options": [
+          "jej",
+          "jeho",
+          "ich"
+        ],
+        "answer": "jej",
+        "explain": "Ona (she) → jej (her)."
+      },
+      {
+        "prompt": "oni",
+        "question": "What is the possessive form?",
+        "options": [
+          "jej",
+          "jeho",
+          "ich"
+        ],
+        "answer": "ich",
+        "explain": "Oni (they) → ich (their)."
+      },
+      {
+        "prompt": "To je ___ byt.",
+        "question": "Which form of \"our\"? (byt is masculine)",
+        "options": [
+          "náš",
+          "naša",
+          "naše"
+        ],
+        "answer": "náš",
+        "explain": "Masculine noun takes náš."
+      },
+      {
+        "prompt": "vy",
+        "question": "What is the possessive form?",
+        "options": [
+          "tvoj",
+          "váš",
+          "ich"
+        ],
+        "answer": "váš",
+        "explain": "Vy (formal or plural you) → váš."
       }
     ]
   },
@@ -101,6 +242,96 @@
         "sk": "Idem so psom.",
         "en": "I'm going with the dog. (instrumental)"
       }
+    ],
+    "exercises": [
+      {
+        "prompt": "Vidím psa.",
+        "question": "Which case is psa in?",
+        "options": [
+          "nominative",
+          "accusative",
+          "dative"
+        ],
+        "answer": "accusative",
+        "explain": "It is the direct object of vidím."
+      },
+      {
+        "prompt": "Idem k psovi.",
+        "question": "Which case does k trigger?",
+        "options": [
+          "dative",
+          "genitive",
+          "locative"
+        ],
+        "answer": "dative",
+        "explain": "K/ku always takes the dative."
+      },
+      {
+        "prompt": "Hovorím o psovi.",
+        "question": "Which case does o trigger?",
+        "options": [
+          "locative",
+          "instrumental",
+          "accusative"
+        ],
+        "answer": "locative",
+        "explain": "O takes the locative — location or topic."
+      },
+      {
+        "prompt": "Idem bez psa.",
+        "question": "Which case does bez trigger?",
+        "options": [
+          "genitive",
+          "dative",
+          "nominative"
+        ],
+        "answer": "genitive",
+        "explain": "Bez (without) takes the genitive — absence."
+      },
+      {
+        "prompt": "Idem so psom.",
+        "question": "Which case does so trigger?",
+        "options": [
+          "instrumental",
+          "locative",
+          "genitive"
+        ],
+        "answer": "instrumental",
+        "explain": "S/so takes the instrumental — accompaniment."
+      },
+      {
+        "prompt": "do",
+        "question": "Which case does this preposition trigger?",
+        "options": [
+          "genitive",
+          "dative",
+          "accusative"
+        ],
+        "answer": "genitive",
+        "explain": "Do is one of the genitive prepositions, with bez, od, z/zo and u."
+      },
+      {
+        "prompt": "v / vo",
+        "question": "Which case does this preposition trigger?",
+        "options": [
+          "locative",
+          "genitive",
+          "instrumental"
+        ],
+        "answer": "locative",
+        "explain": "V/vo takes the locative, which is always used with a preposition."
+      },
+      {
+        "prompt": "The subject of a sentence",
+        "question": "Which case is it in?",
+        "options": [
+          "nominative",
+          "accusative",
+          "dative"
+        ],
+        "answer": "nominative",
+        "explain": "Nominative is the base form — answers Kto? Čo?"
+      }
     ]
   },
   {
@@ -124,6 +355,85 @@
       {
         "sk": "Koľko to stojí?",
         "en": "How much does it cost?"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "___ robíš?",
+        "question": "What are you doing?",
+        "options": [
+          "Čo",
+          "Kto",
+          "Kde"
+        ],
+        "answer": "Čo",
+        "explain": "Čo = what."
+      },
+      {
+        "prompt": "___ bývaš?",
+        "question": "Where do you live?",
+        "options": [
+          "Kde",
+          "Kam",
+          "Kedy"
+        ],
+        "answer": "Kde",
+        "explain": "Kde = where something is, with no motion."
+      },
+      {
+        "prompt": "___ ideš?",
+        "question": "Where are you going?",
+        "options": [
+          "Kam",
+          "Kde",
+          "Ako"
+        ],
+        "answer": "Kam",
+        "explain": "Motion uses kam, not kde."
+      },
+      {
+        "prompt": "___ to stojí?",
+        "question": "How much does it cost?",
+        "options": [
+          "Koľko",
+          "Ako",
+          "Prečo"
+        ],
+        "answer": "Koľko",
+        "explain": "Koľko = how much / how many."
+      },
+      {
+        "prompt": "why",
+        "question": "Which question word?",
+        "options": [
+          "Prečo",
+          "Kedy",
+          "Ako"
+        ],
+        "answer": "Prečo",
+        "explain": "Prečo = why."
+      },
+      {
+        "prompt": "when",
+        "question": "Which question word?",
+        "options": [
+          "Kedy",
+          "Kde",
+          "Kto"
+        ],
+        "answer": "Kedy",
+        "explain": "Kedy = when."
+      },
+      {
+        "prompt": "who",
+        "question": "Which question word?",
+        "options": [
+          "Kto",
+          "Čo",
+          "Ako"
+        ],
+        "answer": "Kto",
+        "explain": "Kto = who."
       }
     ]
   },
@@ -149,6 +459,74 @@
         "sk": "Toto je moja izba.",
         "en": "This is my room. (neuter)"
       }
+    ],
+    "exercises": [
+      {
+        "prompt": "___ muž je môj otec.",
+        "question": "This man is my father. (subject)",
+        "options": [
+          "Tento",
+          "Tohto",
+          "Táto"
+        ],
+        "answer": "Tento",
+        "explain": "Masculine subject takes the nominative tento."
+      },
+      {
+        "prompt": "Vidím ___ muža.",
+        "question": "I see this man. (object)",
+        "options": [
+          "tohto",
+          "tento",
+          "toto"
+        ],
+        "answer": "tohto",
+        "explain": "Masculine animate direct object takes the accusative tohto."
+      },
+      {
+        "prompt": "___ žena je moja mama.",
+        "question": "This woman is my mom.",
+        "options": [
+          "Táto",
+          "Túto",
+          "Toto"
+        ],
+        "answer": "Táto",
+        "explain": "Feminine subject takes táto."
+      },
+      {
+        "prompt": "___ je moja izba.",
+        "question": "This is my room.",
+        "options": [
+          "Toto",
+          "Tento",
+          "Táto"
+        ],
+        "answer": "Toto",
+        "explain": "Standalone \"this is\" uses the neuter toto."
+      },
+      {
+        "prompt": "feminine, accusative",
+        "question": "Which form of \"this\"?",
+        "options": [
+          "túto",
+          "táto",
+          "tohto"
+        ],
+        "answer": "túto",
+        "explain": "Feminine changes from táto to túto as a direct object."
+      },
+      {
+        "prompt": "neuter",
+        "question": "Which form of \"this\"?",
+        "options": [
+          "toto",
+          "tento",
+          "táto"
+        ],
+        "answer": "toto",
+        "explain": "Neuter is toto in both nominative and accusative."
+      }
     ]
   },
   {
@@ -168,6 +546,85 @@
       {
         "sk": "Oni robia večeru.",
         "en": "They are making dinner."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ja ___ domácu úlohu. (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robím",
+          "robíš",
+          "robia"
+        ],
+        "answer": "robím",
+        "explain": "Ja takes -ím."
+      },
+      {
+        "prompt": "Ty ___? (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robíš",
+          "robím",
+          "robíme"
+        ],
+        "answer": "robíš",
+        "explain": "Ty takes -íš."
+      },
+      {
+        "prompt": "On ___ večeru. (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robí",
+          "robím",
+          "robia"
+        ],
+        "answer": "robí",
+        "explain": "On/ona/ono takes -í."
+      },
+      {
+        "prompt": "My ___ domácu úlohu. (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robíme",
+          "robíte",
+          "robia"
+        ],
+        "answer": "robíme",
+        "explain": "My takes -íme."
+      },
+      {
+        "prompt": "Vy ___? (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robíte",
+          "robíme",
+          "robíš"
+        ],
+        "answer": "robíte",
+        "explain": "Vy takes -íte."
+      },
+      {
+        "prompt": "Oni ___ večeru. (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robia",
+          "robí",
+          "robíte"
+        ],
+        "answer": "robia",
+        "explain": "Oni takes -ia."
+      },
+      {
+        "prompt": "píšem",
+        "question": "What does this cover in English?",
+        "options": [
+          "both \"I write\" and \"I am writing\"",
+          "only \"I write\"",
+          "only \"I am writing\""
+        ],
+        "answer": "both \"I write\" and \"I am writing\"",
+        "explain": "Slovak has one present tense covering both English forms."
       }
     ]
   },
@@ -193,6 +650,96 @@
         "sk": "Prídem zajtra.",
         "en": "I'll come tomorrow."
       }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ja ___ doma. (byť)",
+        "question": "Which form?",
+        "options": [
+          "som",
+          "si",
+          "je"
+        ],
+        "answer": "som",
+        "explain": "Byť: ja som."
+      },
+      {
+        "prompt": "Oni ___ doma. (byť)",
+        "question": "Which form?",
+        "options": [
+          "sú",
+          "sme",
+          "ste"
+        ],
+        "answer": "sú",
+        "explain": "Byť: oni sú."
+      },
+      {
+        "prompt": "My ___ doma. (byť)",
+        "question": "Which form?",
+        "options": [
+          "sme",
+          "ste",
+          "sú"
+        ],
+        "answer": "sme",
+        "explain": "Byť: my sme."
+      },
+      {
+        "prompt": "Ja ___ čas. (mať)",
+        "question": "Which form?",
+        "options": [
+          "mám",
+          "máš",
+          "majú"
+        ],
+        "answer": "mám",
+        "explain": "Mať: ja mám."
+      },
+      {
+        "prompt": "Oni ___ čas. (mať)",
+        "question": "Which form?",
+        "options": [
+          "majú",
+          "má",
+          "máme"
+        ],
+        "answer": "majú",
+        "explain": "Mať: oni majú."
+      },
+      {
+        "prompt": "Ja ___ domov. (ísť)",
+        "question": "Which form?",
+        "options": [
+          "idem",
+          "ideš",
+          "idú"
+        ],
+        "answer": "idem",
+        "explain": "Ísť: ja idem."
+      },
+      {
+        "prompt": "Oni ___ domov. (ísť)",
+        "question": "Which form?",
+        "options": [
+          "idú",
+          "ideme",
+          "idete"
+        ],
+        "answer": "idú",
+        "explain": "Ísť: oni idú."
+      },
+      {
+        "prompt": "Ja ___ zajtra. (prísť)",
+        "question": "Which form?",
+        "options": [
+          "prídem",
+          "prídeš",
+          "prídu"
+        ],
+        "answer": "prídem",
+        "explain": "Prísť: ja prídem."
+      }
     ]
   },
   {
@@ -217,6 +764,85 @@
         "sk": "Čítam knihu.",
         "en": "I'm reading a book."
       }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ja ___ dobre. (spať)",
+        "question": "Which form?",
+        "options": [
+          "spím",
+          "spíš",
+          "spia"
+        ],
+        "answer": "spím",
+        "explain": "Spať: ja spím."
+      },
+      {
+        "prompt": "Oni ___ dobre. (spať)",
+        "question": "Which form?",
+        "options": [
+          "spia",
+          "spí",
+          "spíme"
+        ],
+        "answer": "spia",
+        "explain": "Spať: oni spia."
+      },
+      {
+        "prompt": "My ___ futbal. (hrať)",
+        "question": "Which form?",
+        "options": [
+          "hráme",
+          "hrám",
+          "hrajú"
+        ],
+        "answer": "hráme",
+        "explain": "Hrať: my hráme."
+      },
+      {
+        "prompt": "Oni ___ futbal. (hrať)",
+        "question": "Which form?",
+        "options": [
+          "hrajú",
+          "hrá",
+          "hráte"
+        ],
+        "answer": "hrajú",
+        "explain": "Hrať: oni hrajú."
+      },
+      {
+        "prompt": "Ja ___ knihu. (čítať)",
+        "question": "Which form?",
+        "options": [
+          "čítam",
+          "čítaš",
+          "čítajú"
+        ],
+        "answer": "čítam",
+        "explain": "Čítať: ja čítam."
+      },
+      {
+        "prompt": "Oni ___ knihu. (čítať)",
+        "question": "Which form?",
+        "options": [
+          "čítajú",
+          "číta",
+          "čítame"
+        ],
+        "answer": "čítajú",
+        "explain": "Čítať: oni čítajú."
+      },
+      {
+        "prompt": "Ty ___? (robiť)",
+        "question": "Which form?",
+        "options": [
+          "robíš",
+          "robím",
+          "robia"
+        ],
+        "answer": "robíš",
+        "explain": "Robiť: ty robíš."
+      }
     ]
   },
   {
@@ -240,6 +866,96 @@
       {
         "sk": "Pracujem doma.",
         "en": "I work from home."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ja ___ po slovensky. (hovoriť)",
+        "question": "Which form?",
+        "options": [
+          "hovorím",
+          "hovoríš",
+          "hovoria"
+        ],
+        "answer": "hovorím",
+        "explain": "Hovoriť: ja hovorím."
+      },
+      {
+        "prompt": "Oni ___ po slovensky. (hovoriť)",
+        "question": "Which form?",
+        "options": [
+          "hovoria",
+          "hovorí",
+          "hovoríme"
+        ],
+        "answer": "hovoria",
+        "explain": "Hovoriť: oni hovoria."
+      },
+      {
+        "prompt": "Ja ___ obed. (jesť)",
+        "question": "Which form?",
+        "options": [
+          "jem",
+          "ješ",
+          "jedia"
+        ],
+        "answer": "jem",
+        "explain": "Jesť: ja jem."
+      },
+      {
+        "prompt": "Oni ___ obed. (jesť)",
+        "question": "Which form?",
+        "options": [
+          "jedia",
+          "je",
+          "jeme"
+        ],
+        "answer": "jedia",
+        "explain": "Jesť: oni jedia."
+      },
+      {
+        "prompt": "Ja ___ kávu. (chcieť)",
+        "question": "Which form?",
+        "options": [
+          "chcem",
+          "chceš",
+          "chcú"
+        ],
+        "answer": "chcem",
+        "explain": "Chcieť: ja chcem."
+      },
+      {
+        "prompt": "Oni ___ kávu. (chcieť)",
+        "question": "Which form?",
+        "options": [
+          "chcú",
+          "chce",
+          "chceme"
+        ],
+        "answer": "chcú",
+        "explain": "Chcieť: oni chcú."
+      },
+      {
+        "prompt": "Ja ___ doma. (pracovať)",
+        "question": "Which form?",
+        "options": [
+          "pracujem",
+          "pracuješ",
+          "pracujú"
+        ],
+        "answer": "pracujem",
+        "explain": "Pracovať: ja pracujem."
+      },
+      {
+        "prompt": "Oni ___ doma. (pracovať)",
+        "question": "Which form?",
+        "options": [
+          "pracujú",
+          "pracuje",
+          "pracujeme"
+        ],
+        "answer": "pracujú",
+        "explain": "Pracovať: oni pracujú."
       }
     ]
   },
@@ -273,29 +989,84 @@
         "sk": "V noci spím.",
         "en": "At night I sleep."
       }
-    ]
-  },
-  {
-    "id": "expressing-time",
-    "topic": "Expressing Time",
-    "summary": "Learn how to ask and state time in Slovak using 'o' and the locative case.",
-    "explanation": "To say 'at what time' in Slovak, use the preposition 'o' followed by the ordinal number in the locative case (e.g., o jednej, o druhej).",
-    "examples": [
+    ],
+    "exercises": [
       {
-        "sk": "Ráno vstávam o siedmej.",
-        "en": "I get up at seven."
+        "prompt": "Vstávam ___ siedmej.",
+        "question": "I get up at seven.",
+        "options": [
+          "o",
+          "v",
+          "na"
+        ],
+        "answer": "o",
+        "explain": "Use o plus the locative to say \"at\" an hour."
       },
       {
-        "sk": "Raňajkujem o pol ôsmej.",
-        "en": "I have breakfast at 7:30."
+        "prompt": "pol ôsmej",
+        "question": "What time is this?",
+        "options": [
+          "half past seven",
+          "half past eight",
+          "eight o’clock"
+        ],
+        "answer": "half past seven",
+        "explain": "Pol means half-way TO that hour, so pol ôsmej is 7:30."
       },
       {
-        "sk": "Pracujem od ôsmej.",
-        "en": "I work at 8:00."
+        "prompt": "Večer pozerám televíziu.",
+        "question": "Does večer need \"o\" in front?",
+        "options": [
+          "No — parts of the day stand alone",
+          "Yes, always",
+          "Only in questions"
+        ],
+        "answer": "No — parts of the day stand alone",
+        "explain": "Ráno, večer, v noci and the rest are used without o."
       },
       {
-        "sk": "Na obed jem o dvanástej.",
-        "en": "I have lunch at 12:00."
+        "prompt": "after \"o\"",
+        "question": "Which case does the number take?",
+        "options": [
+          "locative",
+          "nominative",
+          "accusative"
+        ],
+        "answer": "locative",
+        "explain": "O jednej, o druhej, o tretej — all locative."
+      },
+      {
+        "prompt": "Na obed jem ___ dvanástej.",
+        "question": "I have lunch at twelve.",
+        "options": [
+          "o",
+          "do",
+          "po"
+        ],
+        "answer": "o",
+        "explain": "Again o plus the locative for a clock time."
+      },
+      {
+        "prompt": "Pracujem ___ ôsmej.",
+        "question": "I work from eight.",
+        "options": [
+          "od",
+          "o",
+          "do"
+        ],
+        "answer": "od",
+        "explain": "Od means \"from\" a starting time."
+      },
+      {
+        "prompt": "v noci",
+        "question": "What does this mean?",
+        "options": [
+          "at night",
+          "in the morning",
+          "in the evening"
+        ],
+        "answer": "at night",
+        "explain": "V noci is the night part of the day."
       }
     ]
   }
