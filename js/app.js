@@ -107,6 +107,17 @@
     }
   }
 
+  // Dev/preview accounts: every roadmap and practice round shows unlocked,
+  // regardless of prior progress, so these two can freely look around after
+  // every update instead of grinding through prerequisites. Client-side only
+  // — nothing server-side trusts this, it just changes what's rendered.
+  const DEV_ACCOUNT_EMAILS = ['prestonandersen100@gmail.com'];
+
+  function isDevAccount() {
+    const user = getSessionUser();
+    return !!(user && DEV_ACCOUNT_EMAILS.indexOf((user.email || '').toLowerCase()) !== -1);
+  }
+
   function showAuthGate() {
     authGateEl.classList.remove('hidden');
   }
@@ -447,6 +458,7 @@
       vocabData = sharedVocabData.concat(privateVocabData);
 
       renderGrammar(grammarData);
+      renderGrammar(grammarData, undefined, 'guide-grammar-list');
       renderVocab(vocabData);
       populateTopicSelect();
       updateAudioGenSummary();
@@ -468,6 +480,7 @@
     vocabData = sharedVocabData.concat(privateVocabData);
 
     renderGrammar(grammarData);
+    renderGrammar(grammarData, undefined, 'guide-grammar-list');
     renderVocab(vocabData);
     populateTopicSelect();
     updateAudioGenSummary();
@@ -488,8 +501,8 @@
       .join('');
   }
 
-  function renderGrammar(topics, emptyMessage) {
-    const container = document.getElementById('grammar-list');
+  function renderGrammar(topics, emptyMessage, containerId) {
+    const container = document.getElementById(containerId || 'grammar-list');
     if (!topics.length) {
       container.innerHTML = '<div class="empty-state">' + (emptyMessage || 'No grammar topics yet.') + '</div>';
       return;
@@ -560,6 +573,27 @@
 
   // Filters the already-loaded grammar/vocab arrays client-side and re-renders
   // both lists — no server round-trip, since everything's already in memory.
+  function matchesGrammarQuery(t, q) {
+    return (
+      (t.topic || '').toLowerCase().indexOf(q) !== -1 ||
+      (t.summary || '').toLowerCase().indexOf(q) !== -1 ||
+      (t.explanation || '').toLowerCase().indexOf(q) !== -1 ||
+      (t.examples || []).some(function (ex) {
+        return (ex.sk || '').toLowerCase().indexOf(q) !== -1 || (ex.en || '').toLowerCase().indexOf(q) !== -1;
+      })
+    );
+  }
+
+  function filterGuideContent(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      renderGrammar(grammarData, undefined, 'guide-grammar-list');
+      return;
+    }
+    const matched = grammarData.filter(function (t) { return matchesGrammarQuery(t, q); });
+    renderGrammar(matched, 'No matches for “' + escapeHtml(query.trim()) + '”.', 'guide-grammar-list');
+  }
+
   function filterBrowseContent(query) {
     const q = query.trim().toLowerCase();
     if (!q) {
@@ -568,16 +602,7 @@
       return;
     }
 
-    const matchedGrammar = grammarData.filter(function (t) {
-      return (
-        (t.topic || '').toLowerCase().indexOf(q) !== -1 ||
-        (t.summary || '').toLowerCase().indexOf(q) !== -1 ||
-        (t.explanation || '').toLowerCase().indexOf(q) !== -1 ||
-        (t.examples || []).some(function (ex) {
-          return (ex.sk || '').toLowerCase().indexOf(q) !== -1 || (ex.en || '').toLowerCase().indexOf(q) !== -1;
-        })
-      );
-    });
+    const matchedGrammar = grammarData.filter(function (t) { return matchesGrammarQuery(t, q); });
 
     const matchedVocab = vocabData
       .map(function (g) {
@@ -986,7 +1011,7 @@
       rounds
         .map(function (round, i) {
           const cleared = isRoundCleared(topic, i);
-          const locked = i > 0 && !isRoundCleared(topic, i - 1);
+          const locked = !isDevAccount() && i > 0 && !isRoundCleared(topic, i - 1);
           const isCurrent = !cleared && !locked;
           const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
 
@@ -1366,6 +1391,13 @@
         filterBrowseContent(e.target.value);
       });
     }
+
+    const guideSearchInput = document.getElementById('guide-search-input');
+    if (guideSearchInput) {
+      guideSearchInput.addEventListener('input', function (e) {
+        filterGuideContent(e.target.value);
+      });
+    }
   }
 
   function renderRoadmapMap() {
@@ -1385,7 +1417,7 @@
       roadmapSections
         .map(function (section, i) {
           const cleared = isSectionCleared(i);
-          const locked = i > 0 && !isSectionCleared(i - 1);
+          const locked = !isDevAccount() && i > 0 && !isSectionCleared(i - 1);
           const isCurrent = !cleared && !locked;
           const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
           const inner = cleared ? STAR_ICON : locked ? LOCK_ICON : '<span class="round-num-badge">' + (i + 1) + '</span>';

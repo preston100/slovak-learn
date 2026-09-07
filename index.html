@@ -91,6 +91,7 @@
         <nav class="tabs" role="tablist" aria-label="Sections">
           <button class="tab-btn active" data-tab="profile" role="tab" aria-selected="true">Profile</button>
           <button class="tab-btn" data-tab="learn" role="tab" aria-selected="false">Learn</button>
+          <button class="tab-btn" data-tab="guide" role="tab" aria-selected="false">Grammar Guide</button>
           <button class="tab-btn" data-tab="tests" role="tab" aria-selected="false">Tests</button>
           <button class="tab-btn" data-tab="add-content" role="tab" aria-selected="false">Add Content</button>
         </nav>
@@ -184,6 +185,17 @@
           <h3 class="browse-subhead">Vocabulary</h3>
           <div id="vocab-list"></div>
         </div>
+      </section>
+
+      <!-- Grammar Guide panel: a plain browsable reference, no roadmap/gamification -->
+      <section id="panel-guide" class="panel">
+        <div class="panel-header">
+          <h2>Grammar Guide</h2>
+          <p>Every grammar rule in one place, for looking things up — not tied to your progress.</p>
+        </div>
+
+        <input type="text" id="guide-search-input" class="browse-search-input" placeholder="Search grammar…" autocomplete="off" />
+        <div id="guide-grammar-list" class="grammar-list"></div>
       </section>
 
       <!-- Tests panel -->

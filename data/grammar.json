@@ -1,5 +1,33 @@
 [
   {
+    "id": "alphabet-pronunciation",
+    "topic": "The Slovak Alphabet & Pronunciation",
+    "summary": "Slovak spelling is very consistent once you know what each letter and accent mark sounds like — this is the foundation everything else builds on.",
+    "explanation": "Slovak uses the Latin alphabet plus extra letters built from accent marks, and almost every letter makes exactly one sound, every time — unlike English, there is very little guessing once you know the rules.\n\nVowels: a, á, ä, e, é, i, í, o, ó, u, ú, y, ý. The acute accent (á, é, í, ó, ú, ý) does not change the sound, it just holds the vowel about twice as long (dĺžeň, \"length mark\").\n\nAccent marks that DO change a consonant's sound:\n- č = \"ch\" as in chair\n- š = \"sh\" as in shoe\n- ž = the \"s\" sound in measure\n- ď, ť, ň = soft/palatalized d, t, n — said with the tongue against the back of the top teeth\n- ľ = a soft \"l\", close to the \"lli\" in million\n- dz and dž are their own single sounds (\"ds\" and the \"j\" in jam)\n\nOne rule that makes reading Slovak out loud much easier than English: stress always falls on the first syllable of a word, with no exceptions.",
+    "examples": [
+      {
+        "sk": "čaj",
+        "en": "tea (č = \"ch\")"
+      },
+      {
+        "sk": "škola",
+        "en": "school (š = \"sh\")"
+      },
+      {
+        "sk": "muž",
+        "en": "man (ž = the \"s\" in measure)"
+      },
+      {
+        "sk": "dievča",
+        "en": "girl (soft ď)"
+      },
+      {
+        "sk": "ľúbim",
+        "en": "I love (soft ľ + long ú)"
+      }
+    ]
+  },
+  {
     "id": "nouns-gender",
     "topic": "Noun Gender & Plurals",
     "summary": "Every Slovak noun is masculine, feminine, or neuter, and each gender pluralizes differently.",
@@ -20,6 +48,30 @@
       {
         "sk": "hrady / ženy / mestá",
         "en": "castles / women / towns (plurals)"
+      }
+    ]
+  },
+  {
+    "id": "pronouns-possessives",
+    "topic": "Pronouns & Possessives",
+    "summary": "Personal pronouns (I, you, he...) and their matching possessive forms (my, your, his...).",
+    "explanation": "Slovak possessives (like English \"my\" or \"your\") change form to match the gender of the noun they describe, which is why several pronouns below have three possessive forms — masculine / feminine / neuter.\n\nPronoun → Possessive:\nJa (I) → môj / moja / moje (my)\nTy (you, informal singular) → tvoj / tvoja / tvoje (your)\nOn (he) → jeho (his)\nOna (she) → jej (her)\nOno (it) → jeho (its)\nMy (we) → náš / naša / naše (our)\nVy (you, formal or plural) → váš / vaša / vaše (your)\nOni / Ony (they) → ich (their)",
+    "examples": [
+      {
+        "sk": "To je môj dom.",
+        "en": "That is my house. (masculine noun: dom)"
+      },
+      {
+        "sk": "To je moja kniha.",
+        "en": "That is my book. (feminine noun: kniha)"
+      },
+      {
+        "sk": "To je jeho auto.",
+        "en": "That is his car."
+      },
+      {
+        "sk": "To je náš byt.",
+        "en": "That is our apartment."
       }
     ]
   },
@@ -48,30 +100,6 @@
       {
         "sk": "Idem so psom.",
         "en": "I'm going with the dog. (instrumental)"
-      }
-    ]
-  },
-  {
-    "id": "pronouns-possessives",
-    "topic": "Pronouns & Possessives",
-    "summary": "Personal pronouns (I, you, he...) and their matching possessive forms (my, your, his...).",
-    "explanation": "Slovak possessives (like English \"my\" or \"your\") change form to match the gender of the noun they describe, which is why several pronouns below have three possessive forms — masculine / feminine / neuter.\n\nPronoun → Possessive:\nJa (I) → môj / moja / moje (my)\nTy (you, informal singular) → tvoj / tvoja / tvoje (your)\nOn (he) → jeho (his)\nOna (she) → jej (her)\nOno (it) → jeho (its)\nMy (we) → náš / naša / naše (our)\nVy (you, formal or plural) → váš / vaša / vaše (your)\nOni / Ony (they) → ich (their)",
-    "examples": [
-      {
-        "sk": "To je môj dom.",
-        "en": "That is my house. (masculine noun: dom)"
-      },
-      {
-        "sk": "To je moja kniha.",
-        "en": "That is my book. (feminine noun: kniha)"
-      },
-      {
-        "sk": "To je jeho auto.",
-        "en": "That is his car."
-      },
-      {
-        "sk": "To je náš byt.",
-        "en": "That is our apartment."
       }
     ]
   },
