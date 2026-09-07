@@ -819,10 +819,11 @@
   // Prefers real, pre-generated Slovak speech (see the "Pronunciation audio"
   // tool in Add Content) and only falls back to the browser's built-in voice
   // — which often mispronounces Slovak badly — for anything not yet generated.
-  // Google's TTS output measures around -19 dB mean, which is noticeably
-  // quiet for short words on laptop speakers. A plain <audio> can't go above
-  // volume 1, so playback is routed through a gain stage instead, with a
-  // compressor to keep the boosted peaks from clipping.
+  // The generated files aren't just quiet, they're inconsistent: measured
+  // across the library they range from about -16.7 dB to -23.2 dB mean, which
+  // is why some words sound fine and others almost inaudible. A flat boost
+  // preserves that spread, so each clip is measured after decoding and
+  // levelled to a common target instead.
   let audioCtx = null;
   let audioGainNode = null;
 
@@ -836,9 +837,11 @@
     try {
       audioCtx = audioCtx || new AC();
       audioGainNode = audioCtx.createGain();
-      audioGainNode.gain.value = 2.4;
+      audioGainNode.gain.value = 1;
+      // Safety net only — per-file levelling does the real work, this just
+      // catches anything that would otherwise clip.
       const comp = audioCtx.createDynamicsCompressor();
-      comp.threshold.value = -8;
+      comp.threshold.value = -3;
       comp.knee.value = 6;
       comp.ratio.value = 12;
       audioGainNode.connect(comp);
@@ -851,6 +854,67 @@
     }
   }
 
+  const TARGET_RMS = 0.16;
+  const MAX_NORMALISE_GAIN = 8;
+  const levelCache = {};
+  let currentSource = null;
+
+  // RMS rather than peak: a single transient shouldn't decide how loud a word
+  // sounds. Silence is excluded so short clips with long lead-ins aren't
+  // over-boosted, and the result is capped so a near-silent file doesn't get
+  // amplified into hiss.
+  function computeGain(buffer) {
+    const d = buffer.getChannelData(0);
+    let sum = 0;
+    let n = 0;
+    let peak = 0;
+    for (let i = 0; i < d.length; i++) {
+      const v = d[i] < 0 ? -d[i] : d[i];
+      if (v > peak) peak = v;
+      if (v > 0.005) {
+        sum += d[i] * d[i];
+        n++;
+      }
+    }
+    if (!n || peak <= 0.001) return 1;
+    const rms = Math.sqrt(sum / n);
+    let gain = Math.min(MAX_NORMALISE_GAIN, TARGET_RMS / rms);
+    if (peak * gain > 0.95) gain = 0.95 / peak;
+    return gain;
+  }
+
+  async function playLevelled(url, token) {
+    const chain = getAudioChain();
+    if (!chain) return false;
+    const ctx = audioCtx;
+    if (ctx.state === 'suspended') {
+      try {
+        await ctx.resume();
+      } catch (err) {
+        /* stays suspended; the element fallback below still plays */
+      }
+    }
+
+    const res = await fetch(url);
+    if (!res.ok) return false;
+    const bytes = await res.arrayBuffer();
+    if (token !== speakToken) return true; // superseded by a newer click
+    const buffer = await ctx.decodeAudioData(bytes);
+    if (token !== speakToken) return true;
+
+    if (levelCache[url] === undefined) levelCache[url] = computeGain(buffer);
+
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const perFile = ctx.createGain();
+    perFile.gain.value = levelCache[url];
+    src.connect(perFile);
+    perFile.connect(chain);
+    src.start();
+    currentSource = src;
+    return true;
+  }
+
   let speakToken = 0;
 
   function speak(text) {
@@ -861,6 +925,14 @@
     // was firing the robot voice over the top of the audio you just asked for.
     const myToken = ++speakToken;
 
+    if (currentSource) {
+      try {
+        currentSource.stop();
+      } catch (err) {
+        /* already finished */
+      }
+      currentSource = null;
+    }
     if (currentAudioEl) {
       currentAudioEl.pause();
       currentAudioEl = null;
@@ -877,25 +949,26 @@
       return;
     }
 
-    const audioEl = new Audio(filename);
-    currentAudioEl = audioEl;
-
-    const gain = getAudioChain();
-    if (gain) {
-      try {
-        audioCtx.createMediaElementSource(audioEl).connect(gain);
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-      } catch (err) {
-        /* routing failed — the element still plays through its own output */
-      }
-    }
-
     function fallback() {
-      if (myToken === speakToken) speakWithBrowserVoice(text);
+      // A failure only matters if this is still the request the user is
+      // waiting on — being interrupted by a newer click isn't an error.
+      if (myToken !== speakToken) return;
+      const audioEl = new Audio(filename);
+      currentAudioEl = audioEl;
+      audioEl.addEventListener('error', function () {
+        if (myToken === speakToken) speakWithBrowserVoice(text);
+      });
+      audioEl.play().catch(function () {
+        if (myToken === speakToken) speakWithBrowserVoice(text);
+      });
     }
 
-    audioEl.addEventListener('error', fallback);
-    audioEl.play().catch(fallback);
+    playLevelled(filename, myToken).then(
+      function (ok) {
+        if (!ok) fallback();
+      },
+      fallback
+    );
   }
 
   document.addEventListener('click', function (e) {
