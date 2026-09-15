@@ -1371,8 +1371,26 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 32px 24px 60px;
+}
+
+/* No justify-content:center on .lesson-body on purpose. On a flex container
+   taller than its content, `center` centers by pushing the overflow equally
+   above AND below — but overflow-y can only ever scroll to reveal what's
+   below, so the excess pushed above the top edge is permanently unreachable
+   at ANY scroll position, not just an unscrolled one. That's why a long
+   letter grid always showed its first row cut off, even immediately after a
+   fresh render with scrollTop firmly at 0.
+   margin:auto on the direct child is the fix: it centers the child by
+   absorbing free space above and below, exactly like justify-content:center
+   does for one item — but when there's no free space because the content is
+   taller than the container, auto margins simply resolve to 0 instead of
+   going negative, so the child starts flush at the top and everything stays
+   inside the scrollable area. This is plain flexbox behavior with no
+   dependency on newer alignment keywords. */
+.lesson-body > * {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .lesson-stage {

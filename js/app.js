@@ -1308,10 +1308,23 @@
     return (group && group.words) || [];
   }
 
+  // Balanced, not greedy: filling full-size rounds and dumping whatever's
+  // left into a final round can leave that last round absurdly small — 17
+  // words at size 8 used to produce 8, 8, 1, so a whole lesson consisted of
+  // exactly one word. Choosing the round count first and then spreading the
+  // words evenly across it means every round in a group is within one word
+  // of every other.
   function chunkIntoRounds(words, size) {
+    if (!words.length) return [];
+    const numRounds = Math.max(1, Math.round(words.length / size));
+    const base = Math.floor(words.length / numRounds);
+    const extra = words.length % numRounds; // first `extra` rounds get one more
     const rounds = [];
-    for (let i = 0; i < words.length; i += size) {
-      rounds.push(words.slice(i, i + size));
+    let i = 0;
+    for (let r = 0; r < numRounds; r++) {
+      const thisSize = base + (r < extra ? 1 : 0);
+      rounds.push(words.slice(i, i + thisSize));
+      i += thisSize;
     }
     return rounds;
   }
