@@ -2127,6 +2127,154 @@ input[type='password']:focus {
   }
 }
 
+/* ==========================================================================
+   Motion — entrance animation for every major transition point: tabs,
+   mode switches, lesson screens, full-screen overlays, and dynamically-
+   rendered lists. Two keyframes cover all of it: `fade-in` (already used by
+   .panel.active) for content appearing in place, and `pop-in` for
+   full-screen "a new page just opened" moments (the gates, the lesson
+   overlay), which gets a touch of scale so it reads as arriving rather than
+   just appearing. Reduced-motion is respected at the end of this block —
+   add new animated selectors to BOTH the rule below and that override.
+   ========================================================================== */
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Full-screen moments: the site's own "pages". .lesson-overlay has no
+   separate hidden/shown display pair of its own — like everything else, it
+   relies on the global `.hidden { display: none !important; }` utility, and
+   removing that class takes it through a real display:none -> flex
+   transition each time a lesson opens, which is what lets this animation
+   correctly replay on every single visit, not just the first. */
+.lesson-overlay,
+.gate-card {
+  animation: pop-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Mode-switch panels (Roadmap/Browse All, AI Quiz/Practice/Review) — same
+   .hidden mechanism, so the same reasoning applies: toggling the class
+   replays the animation every time, with no JS changes needed anywhere. */
+#roadmap-view,
+#learn-browse,
+#tests-quiz-mode,
+#tests-practice-mode,
+#tests-review-mode {
+  animation: fade-in 0.3s ease;
+}
+
+/* Lesson screens: Learn/Practice/Voice/Quiz all rebuild .lesson-stage from
+   scratch via innerHTML on every single step, so it's a genuinely new DOM
+   node each time — this one rule animates every card, every question, every
+   phase change in the whole lesson flow with zero JS coordination. */
+.lesson-stage,
+.lesson-finish-card {
+  animation: fade-in 0.3s ease;
+}
+
+/* Dynamically-built lists: also freshly-created elements each render. */
+.quiz-question,
+.review-section {
+  animation: fade-in 0.3s ease;
+}
+
+/* A light stagger on the first screenful of items in scannable grids —
+   deliberately NOT applied to .quiz-choice-list, since making someone wait
+   through a stagger before they can tap an answer is a usability cost, not
+   a polish win. */
+.badge-grid .badge-card,
+.round-map .round-node,
+.letter-grid .letter-card {
+  animation: fade-in 0.35s ease backwards;
+}
+/* .round-node.current already pulses continuously to mark "do this one
+   next" (node-pulse, defined earlier in this file) — without this override,
+   the rule above would silently replace that pulse with a one-time fade-in,
+   since both set the `animation` shorthand at equal selector specificity and
+   this block comes later in the file. Explicit three-class selector here
+   settles it unambiguously: current nodes get both, everything else just
+   fades in. */
+.round-map .round-node.current {
+  animation: fade-in 0.35s ease backwards, node-pulse 1.8s ease-in-out infinite;
+}
+.badge-grid .badge-card:nth-child(1), .round-map .round-node:nth-child(1), .letter-grid .letter-card:nth-child(1) { animation-delay: 0ms; }
+.badge-grid .badge-card:nth-child(2), .round-map .round-node:nth-child(2), .letter-grid .letter-card:nth-child(2) { animation-delay: 30ms; }
+.badge-grid .badge-card:nth-child(3), .round-map .round-node:nth-child(3), .letter-grid .letter-card:nth-child(3) { animation-delay: 60ms; }
+.badge-grid .badge-card:nth-child(4), .round-map .round-node:nth-child(4), .letter-grid .letter-card:nth-child(4) { animation-delay: 90ms; }
+.badge-grid .badge-card:nth-child(5), .round-map .round-node:nth-child(5), .letter-grid .letter-card:nth-child(5) { animation-delay: 120ms; }
+.badge-grid .badge-card:nth-child(6), .round-map .round-node:nth-child(6), .letter-grid .letter-card:nth-child(6) { animation-delay: 150ms; }
+.badge-grid .badge-card:nth-child(7), .round-map .round-node:nth-child(7), .letter-grid .letter-card:nth-child(7) { animation-delay: 180ms; }
+.badge-grid .badge-card:nth-child(8), .round-map .round-node:nth-child(8), .letter-grid .letter-card:nth-child(8) { animation-delay: 210ms; }
+.badge-grid .badge-card:nth-child(n+9), .round-map .round-node:nth-child(n+9), .letter-grid .letter-card:nth-child(n+9) { animation-delay: 240ms; }
+
+.leaderboard-row {
+  animation: fade-in 0.3s ease backwards;
+}
+.leaderboard-row:nth-child(1) { animation-delay: 0ms; }
+.leaderboard-row:nth-child(2) { animation-delay: 40ms; }
+.leaderboard-row:nth-child(3) { animation-delay: 80ms; }
+.leaderboard-row:nth-child(n+4) { animation-delay: 120ms; }
+
+/* Universal hover-lift for anything clickable, in both themes — previously
+   only the dark theme's exercise cards had this; it now applies everywhere,
+   so the whole app feels equally "alive" to interact with regardless of
+   theme. Kept subtle (2px, not the dark-mode exercise cards' 4px) since
+   these are much smaller, more numerous targets. */
+.btn:not(:disabled),
+.icon-btn,
+.mode-card,
+.badge-card:not(.locked),
+.guide-entry,
+.leaderboard-tile,
+.round-node:not(.locked) {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.btn:not(:disabled):hover,
+.icon-btn:hover,
+.mode-card:hover,
+.badge-card:not(.locked):hover,
+.guide-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-overlay,
+  .gate-card,
+  #roadmap-view,
+  #learn-browse,
+  #tests-quiz-mode,
+  #tests-practice-mode,
+  #tests-review-mode,
+  .lesson-stage,
+  .lesson-finish-card,
+  .quiz-question,
+  .review-section,
+  .badge-grid .badge-card,
+  .round-map .round-node,
+  .round-map .round-node.current,
+  .letter-grid .letter-card,
+  .leaderboard-row,
+  .panel.active {
+    animation: none;
+  }
+  .btn:not(:disabled):hover,
+  .icon-btn:hover,
+  .mode-card:hover,
+  .badge-card:not(.locked):hover,
+  .guide-entry:hover {
+    transform: none;
+  }
+}
+
 @media (max-width: 640px) {
   .topbar-inner {
     flex-direction: column;
