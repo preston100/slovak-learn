@@ -2028,6 +2028,10 @@
       (section.items.length || section.kind === 'alphabet' ? content : '') +
       '<button class="btn btn-primary" id="lesson-learn-next-btn" style="width:100%; max-width:320px;">I’m Ready — Start Practice</button>' +
       '</div>';
+    // Without this, a long letter grid left scrolled down from a previous
+    // unit (or this same phase re-rendering) starts the next screen
+    // mid-scroll, cutting off the top of the new content.
+    body.scrollTop = 0;
 
     document.getElementById('lesson-learn-next-btn').addEventListener('click', function () {
       lessonPhase = 'practice';
@@ -2124,6 +2128,7 @@
       '</div>' +
       '<div class="exercise-explain" id="exercise-explain"></div>' +
       '</div>';
+    body.scrollTop = 0;
 
     body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -2178,7 +2183,11 @@
       return;
     }
 
-    lessonQueue = shuffleArray(section.items.slice());
+    // Natural order, not shuffled: this is a first pass through brand-new
+    // content, and content that's inherently sequential (numbers, days)
+    // should be learned in that sequence, not jumbled — long-term recall
+    // once it's known is already the Review tab's job, not this one's.
+    lessonQueue = section.items.slice();
     lessonQueueIndex = 0;
     lessonPracticeCorrect = 0;
     lessonPracticeTotal = lessonQueue.length;
@@ -2211,6 +2220,7 @@
       '</div>' +
       '</div>' +
       '</div>';
+    body.scrollTop = 0;
 
     document.getElementById('lesson-reveal-btn').addEventListener('click', function () {
       document.getElementById('lesson-practice-answer').textContent = item.en;
@@ -2334,6 +2344,7 @@
         '<p class="lesson-sub">Microphone recording isn’t supported here — this phase is skipped and won’t count against you.</p>' +
         '<button class="btn btn-primary" id="lesson-voice-skip-btn">Continue to Quiz</button>' +
         '</div>';
+      body.scrollTop = 0;
       document.getElementById('lesson-voice-skip-btn').addEventListener('click', function () {
         lessonVoiceTotal = 0;
         lessonVoiceCorrect = 0;
@@ -2344,7 +2355,9 @@
     }
 
     // Capped at 5 items so this phase stays quick even for a big section.
-    voiceQueue = shuffleArray(roadmapSections[lessonSectionIndex].items.slice()).slice(0, 5);
+    // Natural order, matching how the Learn/Practice steps just presented
+    // this same content.
+    voiceQueue = roadmapSections[lessonSectionIndex].items.slice(0, 5);
     voiceIndex = 0;
     lessonVoiceCorrect = 0;
     lessonVoiceTotal = voiceQueue.length;
@@ -2374,6 +2387,7 @@
       '<div id="voice-result"></div>' +
       '<div id="voice-skip-wrap"></div>' +
       '</div>';
+    body.scrollTop = 0;
 
     document.getElementById('lesson-mic-btn').addEventListener('click', function () {
       toggleVoiceRecording(item);
@@ -2571,7 +2585,10 @@
     }
 
     const count = Math.min(5, section.items.length);
-    quizQueue = shuffleArray(section.items.slice()).slice(0, count);
+    // Natural order for the same reason as Practice: this is a first pass
+    // through the section, and sequential content (numbers, days) should
+    // stay in the order it was just taught.
+    quizQueue = section.items.slice(0, count);
     quizIndex = 0;
     lessonQuizCorrect = 0;
     lessonQuizTotal = quizQueue.length;
@@ -2619,6 +2636,7 @@
         .join('') +
       '</div>' +
       '</div>';
+    body.scrollTop = 0;
 
     body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
       btn.addEventListener('click', function () { gradeQuizChoice(btn); });
@@ -2676,6 +2694,7 @@
       '<button class="btn btn-secondary" id="lesson-done-btn">Back to Roadmap</button>' +
       '</div>' +
       '</div>';
+    body.scrollTop = 0;
 
     if (isPerfect) {
       launchConfetti(document.getElementById('lesson-finish-card'));
