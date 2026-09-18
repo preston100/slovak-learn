@@ -1,9 +1,9 @@
 [
   {
     "id": "nouns-gender",
-    "topic": "Noun Gender & Plurals",
-    "summary": "Every Slovak noun is masculine, feminine, or neuter, and each gender pluralizes differently.",
-    "explanation": "Slovak nouns belong to one of three grammatical genders: masculine (mužský rod), feminine (ženský rod), or neuter (stredný rod). Gender is usually predictable from the ending of the word in its dictionary (nominative singular) form:\n\n- Masculine nouns typically end in a consonant (hrad, strom, pes).\n- Feminine nouns typically end in -a, -ia, or a soft consonant + osť (žena, ulica, práca, radosť).\n- Neuter nouns typically end in -o, -e, -ie, or -or (mesto, srdce, jedlo, okno).\n\nGender matters because it controls adjective agreement, pronoun choice, and which declension pattern (vzor) a noun follows — including how it forms its plural:\n\n- Masculine animate (living things): plural usually ends in -i or -ia (chlapi, priatelia).\n- Masculine inanimate: plural usually ends in -y or -e (hrady, stromy).\n- Feminine (-a nouns): plural usually ends in -y (ženy, ulice).\n- Neuter (-o nouns): plural usually ends in -a (okná, mestá).",
+    "topic": "Noun Gender",
+    "summary": "Every Slovak noun is masculine, feminine, or neuter — usually predictable from its ending.",
+    "explanation": "Slovak nouns belong to one of three grammatical genders: masculine (mužský rod), feminine (ženský rod), or neuter (stredný rod). Gender is usually predictable from the ending of the word in its dictionary (nominative singular) form:\n\n- Masculine nouns typically end in a consonant (hrad, strom, pes).\n- Feminine nouns typically end in -a, -ia, or a soft consonant + osť (žena, ulica, práca, radosť).\n- Neuter nouns typically end in -o, -e, -ie, or -or (mesto, srdce, jedlo, okno).\n\nGender matters because it controls adjective agreement, pronoun choice, and which declension pattern (vzor) a noun follows.",
     "examples": [
       {
         "sk": "ten hrad",
@@ -16,10 +16,6 @@
       {
         "sk": "to mesto",
         "en": "that town (neuter)"
-      },
-      {
-        "sk": "hrady / ženy / mestá",
-        "en": "castles / women / towns (plurals)"
       }
     ],
     "exercises": [
@@ -79,6 +75,43 @@
         "explain": "Ends in -e — neuter."
       },
       {
+        "prompt": "muž",
+        "question": "Which gender is this noun?",
+        "options": [
+          "masculine",
+          "feminine",
+          "neuter"
+        ],
+        "answer": "masculine",
+        "explain": "Ends in a consonant — masculine."
+      }
+    ]
+  },
+  {
+    "id": "nouns-plurals",
+    "topic": "Noun Plurals",
+    "summary": "Each gender pluralizes differently — and masculine also depends on whether the noun is animate.",
+    "explanation": "Slovak plurals depend on gender and, for masculine nouns, whether the noun is animate (a living thing) or inanimate:\n\n- Masculine animate: plural usually ends in -i or -ia (chlap → chlapi, muž → muži).\n- Masculine inanimate: plural usually ends in -y or -e (hrad → hrady, strom → stromy).\n- Feminine (-a nouns): plural usually ends in -y (žena → ženy, ulica → ulice).\n- Neuter (-o nouns): plural usually ends in -a (mesto → mestá, okno → okná, auto → autá).",
+    "examples": [
+      {
+        "sk": "hrady",
+        "en": "castles (masculine inanimate plural)"
+      },
+      {
+        "sk": "muži",
+        "en": "men (masculine animate plural)"
+      },
+      {
+        "sk": "ženy",
+        "en": "women (feminine plural)"
+      },
+      {
+        "sk": "mestá",
+        "en": "towns (neuter plural)"
+      }
+    ],
+    "exercises": [
+      {
         "prompt": "hrad",
         "question": "What is the plural?",
         "options": [
@@ -110,6 +143,50 @@
         ],
         "answer": "okná",
         "explain": "Neuter -o nouns take -a in the plural."
+      },
+      {
+        "prompt": "muž",
+        "question": "What is the plural? (a living person)",
+        "options": [
+          "muži",
+          "muža",
+          "mužovia"
+        ],
+        "answer": "muži",
+        "explain": "Masculine animate nouns take -i, unlike inanimate hrad → hrady."
+      },
+      {
+        "prompt": "chlapec",
+        "question": "What is the plural? (a living person)",
+        "options": [
+          "chlapci",
+          "chlapca",
+          "chlapcy"
+        ],
+        "answer": "chlapci",
+        "explain": "Masculine animate again takes -i."
+      },
+      {
+        "prompt": "dcéra",
+        "question": "What is the plural?",
+        "options": [
+          "dcéry",
+          "dcérá",
+          "dcéri"
+        ],
+        "answer": "dcéry",
+        "explain": "Feminine -a nouns take -y."
+      },
+      {
+        "prompt": "auto",
+        "question": "What is the plural?",
+        "options": [
+          "autá",
+          "auty",
+          "aute"
+        ],
+        "answer": "autá",
+        "explain": "Neuter -o nouns take -a."
       }
     ]
   },
@@ -1067,6 +1144,220 @@
         ],
         "answer": "at night",
         "explain": "V noci is the night part of the day."
+      }
+    ]
+  },
+  {
+    "id": "verb-to-be",
+    "topic": "The Verb \"To Be\" (Byť)",
+    "summary": "Byť (to be) is the single most common verb in Slovak — full present-tense conjugation.",
+    "explanation": "Byť (to be) is irregular and used constantly — for identity, description, and location:\n\nja som — I am\nty si — you are (informal singular)\non/ona/ono je — he/she/it is\nmy sme — we are\nvy ste — you are (formal singular, or plural)\noni/ony sú — they are\n\nUnlike English, Slovak usually drops the subject pronoun once the verb ending already shows who's doing the action — \"Som unavený\" (I'm tired) is normal, complete Slovak, not \"Ja som unavený.\" The pronoun only gets added for emphasis or contrast.",
+    "examples": [
+      {
+        "sk": "Som Peter.",
+        "en": "I am Peter."
+      },
+      {
+        "sk": "Si unavený?",
+        "en": "Are you tired?"
+      },
+      {
+        "sk": "Je to dobré.",
+        "en": "It is good."
+      },
+      {
+        "sk": "Sme doma.",
+        "en": "We are home."
+      },
+      {
+        "sk": "Ste v poriadku?",
+        "en": "Are you (formal) okay?"
+      },
+      {
+        "sk": "Sú šťastní.",
+        "en": "They are happy."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ja ___ Peter. (byť)",
+        "question": "Which form?",
+        "options": [
+          "som",
+          "si",
+          "je"
+        ],
+        "answer": "som",
+        "explain": "Byť: ja som."
+      },
+      {
+        "prompt": "Ty ___ unavený? (byť)",
+        "question": "Which form?",
+        "options": [
+          "si",
+          "som",
+          "je"
+        ],
+        "answer": "si",
+        "explain": "Byť: ty si."
+      },
+      {
+        "prompt": "On ___ doma. (byť)",
+        "question": "Which form?",
+        "options": [
+          "je",
+          "si",
+          "sú"
+        ],
+        "answer": "je",
+        "explain": "Byť: on/ona/ono je."
+      },
+      {
+        "prompt": "My ___ pripravení. (byť)",
+        "question": "Which form?",
+        "options": [
+          "sme",
+          "ste",
+          "sú"
+        ],
+        "answer": "sme",
+        "explain": "Byť: my sme."
+      },
+      {
+        "prompt": "Vy ___ v poriadku? (byť)",
+        "question": "Which form?",
+        "options": [
+          "ste",
+          "sme",
+          "sú"
+        ],
+        "answer": "ste",
+        "explain": "Byť: vy ste."
+      },
+      {
+        "prompt": "Oni ___ šťastní. (byť)",
+        "question": "Which form?",
+        "options": [
+          "sú",
+          "sme",
+          "je"
+        ],
+        "answer": "sú",
+        "explain": "Byť: oni sú."
+      },
+      {
+        "prompt": "Som unavený.",
+        "question": "Why is there no separate word for \"I\" here?",
+        "options": [
+          "The verb ending (-om) already shows who — the pronoun gets dropped",
+          "It is a mistake",
+          "Only questions drop pronouns"
+        ],
+        "answer": "The verb ending (-om) already shows who — the pronoun gets dropped",
+        "explain": "Slovak verb endings already encode the subject, so the pronoun is usually optional."
+      }
+    ]
+  },
+  {
+    "id": "personal-pronouns",
+    "topic": "Personal Pronouns & Formal/Informal \"You\"",
+    "summary": "The basic I/you/he/she/it/we/you/they pronouns, and when to use ty vs. vy.",
+    "explanation": "Ja — I\nTy — you (informal, one person you know well)\nOn — he\nOna — she\nOno — it\nMy — we\nVy — you (formal singular, or any plural \"you\")\nOni — they (masculine or mixed groups)\nOny — they (all-feminine or all-neuter groups)\n\nThe biggest trap for English speakers: Slovak has two words for \"you.\" Ty is only for one person you're close to — family, friends, kids, people your own age. Vy is for a single stranger, an elder, a boss, or a teacher, and it's also just the normal word for \"you\" whenever you're talking to more than one person, formal or not. When you're unsure with someone new, start with vy.",
+    "examples": [
+      {
+        "sk": "Ja som z Ameriky.",
+        "en": "I am from America."
+      },
+      {
+        "sk": "Ako sa máš?",
+        "en": "How are you? (to a friend — ty)"
+      },
+      {
+        "sk": "Ako sa máte?",
+        "en": "How are you? (formal, or to a group — vy)"
+      },
+      {
+        "sk": "Ona je moja sestra.",
+        "en": "She is my sister."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Talking to your grandmother, or a stranger",
+        "question": "Which \"you\" do you use?",
+        "options": [
+          "Vy",
+          "Ty",
+          "Ono"
+        ],
+        "answer": "Vy",
+        "explain": "Elders and people you don’t know well get the formal vy."
+      },
+      {
+        "prompt": "Talking to your best friend",
+        "question": "Which \"you\" do you use?",
+        "options": [
+          "Ty",
+          "Vy",
+          "My"
+        ],
+        "answer": "Ty",
+        "explain": "Ty is for people you’re close to."
+      },
+      {
+        "prompt": "___ som z Ameriky.",
+        "question": "I am from America.",
+        "options": [
+          "Ja",
+          "Ty",
+          "On"
+        ],
+        "answer": "Ja",
+        "explain": "Ja = I."
+      },
+      {
+        "prompt": "ona",
+        "question": "This pronoun refers to...",
+        "options": [
+          "a female person",
+          "a male person",
+          "a group"
+        ],
+        "answer": "a female person",
+        "explain": "Ona = she."
+      },
+      {
+        "prompt": "Talking to three friends at once",
+        "question": "Which \"you\" fits, even though it’s informal?",
+        "options": [
+          "Vy",
+          "Ty",
+          "On"
+        ],
+        "answer": "Vy",
+        "explain": "Vy also covers plural \"you,\" regardless of formality."
+      },
+      {
+        "prompt": "my",
+        "question": "Which English pronoun is this?",
+        "options": [
+          "we",
+          "they",
+          "you (plural)"
+        ],
+        "answer": "we",
+        "explain": "My = we."
+      },
+      {
+        "prompt": "oni",
+        "question": "Which English pronoun is this?",
+        "options": [
+          "they (masculine/mixed group)",
+          "we",
+          "you (formal)"
+        ],
+        "answer": "they (masculine/mixed group)",
+        "explain": "Oni = they, for masculine or mixed-gender groups."
       }
     ]
   }

@@ -92,6 +92,11 @@
     "ref": "nouns-gender"
   },
   {
+    "id": "gram-verb-to-be",
+    "kind": "grammar",
+    "ref": "verb-to-be"
+  },
+  {
     "id": "vocab-family-people-0",
     "kind": "vocab",
     "ref": "Family & People",
@@ -114,6 +119,16 @@
     "kind": "vocab",
     "ref": "Family & People",
     "round": 3
+  },
+  {
+    "id": "gram-personal-pronouns",
+    "kind": "grammar",
+    "ref": "personal-pronouns"
+  },
+  {
+    "id": "gram-demonstratives",
+    "kind": "grammar",
+    "ref": "demonstratives"
   },
   {
     "id": "gram-pronouns-possessives",
@@ -254,9 +269,9 @@
     "ref": "conjugation-hovorit-jest-chciet-pracovat"
   },
   {
-    "id": "gram-demonstratives",
+    "id": "gram-nouns-plurals",
     "kind": "grammar",
-    "ref": "demonstratives"
+    "ref": "nouns-plurals"
   },
   {
     "id": "gram-cases-overview",
