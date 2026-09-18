@@ -146,6 +146,7 @@
       longestStreak: Number(localStorage.getItem(LONGEST_STREAK_KEY) || '0'),
       streakLastDate: localStorage.getItem(STREAK_DATE_KEY) || null,
       vocabStats: loadVocabStats(),
+      masteredWords: loadMasteredWords(),
       achievements: getEarnedAchievements(),
       roundProgress: loadRoundProgress(),
       roadmapProgress: loadRoadmapProgress(),
@@ -171,6 +172,7 @@
     if (progress.streakLastDate) localStorage.setItem(STREAK_DATE_KEY, progress.streakLastDate);
     else localStorage.removeItem(STREAK_DATE_KEY);
     localStorage.setItem(VOCAB_STATS_KEY, JSON.stringify(progress.vocabStats || {}));
+    localStorage.setItem(MASTERED_KEY, JSON.stringify(progress.masteredWords || {}));
     localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(progress.achievements || []));
     localStorage.setItem(ROUND_PROGRESS_KEY, JSON.stringify(progress.roundProgress || {}));
     localStorage.setItem(ROADMAP_PROGRESS_KEY, JSON.stringify(progress.roadmapProgress || []));
@@ -1277,6 +1279,157 @@
     localStorage.setItem(VOCAB_STATS_KEY, JSON.stringify(stats));
   }
 
+  /* ---- Hear any word in a sentence ---- */
+
+  // Sentences are generated once per word and then kept, so the same word
+  // doesn't cost a round-trip (or a slightly different sentence) every time.
+  const SENTENCES_KEY = 'slovencina_word_sentences';
+  // Audio for a generated sentence isn't in the pre-built manifest and isn't
+  // worth committing to the repo, so it's fetched on demand and held for the
+  // rest of the session only.
+  const sentenceAudioCache = {};
+
+  function loadSentenceCache() {
+    try {
+      return JSON.parse(localStorage.getItem(SENTENCES_KEY) || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function cacheSentence(sk, entry) {
+    const all = loadSentenceCache();
+    all[sk] = entry;
+    try {
+      localStorage.setItem(SENTENCES_KEY, JSON.stringify(all));
+    } catch (err) {
+      /* storage full — the sentence still works for this session */
+    }
+  }
+
+  function sentenceUiHtml(word) {
+    return (
+      '<div class="sentence-block">' +
+      '<button type="button" class="sentence-btn" data-sk="' + escapeHtml(word.sk) + '" data-en="' + escapeHtml(word.en || '') + '">' +
+      'Hear it in a sentence' +
+      '</button>' +
+      '<div class="sentence-slot"></div>' +
+      '</div>'
+    );
+  }
+
+  function renderSentenceInto(slot, sk, entry) {
+    slot.innerHTML =
+      '<div class="sentence-result">' +
+      '<div class="sentence-sk">' + speakerButtonHtml(entry.sentence) + escapeHtml(entry.sentence) + '</div>' +
+      (entry.translation ? '<div class="sentence-en">' + escapeHtml(entry.translation) + '</div>' : '') +
+      '</div>';
+    // The speaker button in here points at a generated sentence, which has no
+    // pre-generated clip in the manifest — route it to the on-demand voice
+    // instead of letting it fall through to the robotic browser one.
+    const btn = slot.querySelector('.speak-btn');
+    if (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        speakSentence(entry.sentence);
+      });
+    }
+  }
+
+  async function speakSentence(text) {
+    try {
+      if (!sentenceAudioCache[text]) {
+        const token = getSessionToken();
+        const res = await fetch('/.netlify/functions/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ text: text }),
+        });
+        if (!res.ok) throw new Error('tts failed');
+        const data = await res.json();
+        sentenceAudioCache[text] = data.audioBase64;
+      }
+      const audio = new Audio('data:audio/mp3;base64,' + sentenceAudioCache[text]);
+      audio.play().catch(function () {});
+    } catch (err) {
+      // Real Slovak audio didn't come back — the browser voice is worse, but
+      // better than the button doing nothing.
+      speakWithBrowserVoice(text);
+    }
+  }
+
+  async function handleSentenceClick(btn) {
+    const sk = btn.dataset.sk;
+    const en = btn.dataset.en || '';
+    const slot = btn.parentElement.querySelector('.sentence-slot');
+    if (!slot) return;
+
+    const cached = loadSentenceCache()[sk];
+    if (cached && cached.sentence) {
+      renderSentenceInto(slot, sk, cached);
+      speakSentence(cached.sentence);
+      return;
+    }
+
+    btn.disabled = true;
+    slot.innerHTML = '<div class="sentence-loading">Writing a sentence…</div>';
+
+    try {
+      const token = getSessionToken();
+      const res = await fetch('/.netlify/functions/word-sentence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ sk: sk, en: en }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.sentence) throw new Error(data.error || 'No sentence.');
+
+      const entry = { sentence: data.sentence, translation: data.translation || '' };
+      cacheSentence(sk, entry);
+      renderSentenceInto(slot, sk, entry);
+      speakSentence(entry.sentence);
+    } catch (err) {
+      slot.innerHTML = '<div class="sentence-error">Couldn’t write a sentence just now. Try again in a moment.</div>';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // Delegated once, so every practice/review card rendered anywhere in the app
+  // gets this without each renderer having to wire up its own listener.
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest ? e.target.closest('.sentence-btn') : null;
+    if (btn) handleSentenceClick(btn);
+  });
+
+  /* ---- Mastered words ---- */
+
+  // Deliberately separate from vocab stats: a word lands in vocab stats the
+  // first time it's practised at all, which is "seen", not "known". Mastery is
+  // only awarded by getting the word right on a checkpoint test, days or weeks
+  // after first meeting it — that's the number worth showing on the Profile.
+  const MASTERED_KEY = 'slovencina_mastered_words';
+
+  function loadMasteredWords() {
+    try {
+      return JSON.parse(localStorage.getItem(MASTERED_KEY) || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function markWordMastered(sk) {
+    if (!sk) return;
+    const mastered = loadMasteredWords();
+    if (mastered[sk]) return;
+    mastered[sk] = true;
+    localStorage.setItem(MASTERED_KEY, JSON.stringify(mastered));
+  }
+
+  function masteredWordCount() {
+    return Object.keys(loadMasteredWords()).length;
+  }
+
   // Toggles the Tests tab between the AI-generated quiz and the free-practice
   // round picker (this used to be Vocabulary's own tab; it lives here now).
   function setupTestsModes() {
@@ -1517,6 +1670,7 @@
       '<button class="btn-grade missed" id="practice-missed-btn">Missed it</button>' +
       '<button class="btn-grade got-it" id="practice-gotit-btn">Got it</button>' +
       '</div>' +
+      '<div class="hidden" id="practice-sentence-wrap">' + sentenceUiHtml(word) + '</div>' +
       '</div>';
 
     document.getElementById('back-to-rounds-btn').addEventListener('click', goBackToRounds);
@@ -1526,6 +1680,7 @@
       document.getElementById('practice-answer').textContent = word.en;
       document.getElementById('practice-reveal-btn').classList.add('hidden');
       document.getElementById('practice-grade-row').classList.remove('hidden');
+      document.getElementById('practice-sentence-wrap').classList.remove('hidden');
     });
 
     document.getElementById('practice-missed-btn').addEventListener('click', function () {
@@ -1623,12 +1778,14 @@
       '<button class="btn-grade missed" id="review-missed-btn">Missed it</button>' +
       '<button class="btn-grade got-it" id="review-gotit-btn">Got it</button>' +
       '</div>' +
+      '<div class="hidden" id="review-sentence-wrap">' + sentenceUiHtml(word) + '</div>' +
       '</div>';
 
     document.getElementById('review-reveal-btn').addEventListener('click', function () {
       document.getElementById('review-answer').textContent = word.en;
       document.getElementById('review-reveal-btn').classList.add('hidden');
       document.getElementById('review-grade-row').classList.remove('hidden');
+      document.getElementById('review-sentence-wrap').classList.remove('hidden');
     });
     document.getElementById('review-missed-btn').addEventListener('click', function () { gradeReviewCard(word, false); });
     document.getElementById('review-gotit-btn').addEventListener('click', function () { gradeReviewCard(word, true); });
@@ -1763,9 +1920,78 @@
       });
     });
 
-    roadmapSections = sections;
+    roadmapSections = withCheckpoints(sections);
     renderRoadmapMap();
     renderProfile();
+  }
+
+  /* ---- Checkpoint tests ---- */
+
+  const CHECKPOINT_EVERY = 10;
+  const CHECKPOINT_MAX_QUESTIONS = 12;
+  // Gentler than a normal section's 80%. A checkpoint spans ten sections of
+  // material, and its real job is measuring what's mastered — gating the rest
+  // of the course behind a near-perfect score would make it a wall instead.
+  const CHECKPOINT_CLEAR_THRESHOLD = 0.7;
+  // Below this there aren't enough distinct words to make a test worth sitting.
+  const CHECKPOINT_MIN_WORDS = 4;
+
+  // Grammar sections are excluded on purpose: their items are example
+  // sentences, and a checkpoint measures words known, not sentences seen.
+  function testableWordsIn(section) {
+    if (section.kind === 'vocab' || section.kind === 'alphabet') return section.items || [];
+    return [];
+  }
+
+  // Drops a test in after every 10 sections, covering the words from those
+  // 10. It sits in the path like any other section, so it also gates
+  // progression — you clear the checkpoint to carry on.
+  function withCheckpoints(sections) {
+    const out = [];
+    let sinceLast = [];
+    let checkpointNum = 0;
+
+    function poolFrom(group) {
+      const seen = {};
+      const pool = [];
+      group.forEach(function (s) {
+        testableWordsIn(s).forEach(function (w) {
+          if (w && w.sk && w.en && !seen[w.sk]) {
+            seen[w.sk] = true;
+            pool.push(w);
+          }
+        });
+      });
+      return pool;
+    }
+
+    function pushCheckpoint(group, isFinal) {
+      const pool = poolFrom(group);
+      if (pool.length < CHECKPOINT_MIN_WORDS) return;
+      checkpointNum++;
+      out.push({
+        id: 'checkpoint-' + checkpointNum,
+        kind: 'checkpoint',
+        title: isFinal ? 'Final Checkpoint' : 'Checkpoint Test ' + checkpointNum,
+        subtitle: 'Words from the last ' + group.length + ' sections',
+        explanation: '',
+        items: pool,
+      });
+    }
+
+    sections.forEach(function (section) {
+      out.push(section);
+      sinceLast.push(section);
+      if (sinceLast.length < CHECKPOINT_EVERY) return;
+      pushCheckpoint(sinceLast, false);
+      sinceLast = [];
+    });
+
+    // Without this the last stretch of the course would never be tested, so
+    // its words could never be mastered at all.
+    if (sinceLast.length) pushCheckpoint(sinceLast, true);
+
+    return out;
   }
 
   // Progress is keyed by unit id, not array position — reordering the
@@ -1835,6 +2061,8 @@
       '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
     const STAR_ICON =
       '<svg class="round-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"/></svg>';
+    const TROPHY_ICON =
+      '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>';
 
     mapEl.innerHTML =
       roadmapSections
@@ -1842,8 +2070,16 @@
           const cleared = isSectionCleared(section.id);
           const locked = !isDevAccount() && i > 0 && !isSectionCleared(roadmapSections[i - 1].id);
           const isCurrent = !cleared && !locked;
-          const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
-          const inner = cleared ? STAR_ICON : locked ? LOCK_ICON : '<span class="round-num-badge">' + (i + 1) + '</span>';
+          const isCheckpoint = section.kind === 'checkpoint';
+          const stateClass =
+            (cleared ? 'cleared' : locked ? 'locked' : 'current') + (isCheckpoint ? ' checkpoint' : '');
+          const inner = cleared
+            ? STAR_ICON
+            : locked
+            ? LOCK_ICON
+            : isCheckpoint
+            ? TROPHY_ICON
+            : '<span class="round-num-badge">' + (i + 1) + '</span>';
 
           return (
             '<div class="round-row ' + LANES[i % LANES.length] + '">' +
@@ -1877,6 +2113,10 @@
   let lessonVoiceTotal = 0;
   let lessonQuizCorrect = 0;
   let lessonQuizTotal = 0;
+  let checkpointMastered = 0;
+  // Words pulled in from the review queue for extra practice inside a normal
+  // section, keyed by sk — they're graded, but kept out of the section score.
+  let lessonReviewExtras = {};
 
   function setupLessonOverlay() {
     document.getElementById('lesson-exit-btn').addEventListener('click', exitLesson);
@@ -1915,7 +2155,7 @@
       return;
     }
 
-    const usesExercises = section.kind !== 'vocab';
+    const usesExercises = section.kind !== 'vocab' && section.kind !== 'checkpoint';
 
     if (lessonPhase === 'practice') {
       lessonPracticeTotal = Math.max(0, lessonPracticeTotal - 1);
@@ -1943,7 +2183,11 @@
 
   function startLesson(index) {
     lessonSectionIndex = index;
-    lessonPhase = 'learn';
+    // A checkpoint has nothing to teach — it's purely a test of what should
+    // already be known, so it skips straight past Learn/Practice/Voice.
+    const section = roadmapSections[index];
+    lessonPhase = section && section.kind === 'checkpoint' ? 'quiz' : 'learn';
+    checkpointMastered = 0;
     lessonPracticeCorrect = 0;
     lessonPracticeTotal = 0;
     lessonVoiceCorrect = 0;
@@ -1991,6 +2235,7 @@
   function kindLabel(kind) {
     if (kind === 'alphabet') return 'Alphabet';
     if (kind === 'grammar') return 'Grammar';
+    if (kind === 'checkpoint') return 'Checkpoint';
     return 'Vocabulary';
   }
 
@@ -2188,9 +2433,15 @@
   let lessonCardGraded = false;
   let lessonCurrentPracticeItem = null;
 
+  // Up to this many previously-missed words get folded into a normal
+  // section's practice, so hard words come back around while you're working
+  // through the course instead of only if you visit Revise deliberately.
+  const REVIEW_EXTRAS_PER_SECTION = 3;
+
   function renderPracticePhase() {
     updateLessonChrome('Practice', 1);
     const section = roadmapSections[lessonSectionIndex];
+    lessonReviewExtras = {};
 
     // Alphabet and grammar practise by applying the rule, not by translating.
     if (section.kind !== 'vocab') {
@@ -2210,7 +2461,21 @@
     lessonQueue = section.items.slice();
     lessonQueueIndex = 0;
     lessonPracticeCorrect = 0;
+    // Only this section's own words count towards clearing it. The review
+    // extras appended below are still graded and still update word stats, but
+    // failing an old word shouldn't block progress on a new section.
     lessonPracticeTotal = lessonQueue.length;
+
+    const inSection = {};
+    section.items.forEach(function (w) { inSection[w.sk] = true; });
+    getDueReviewWords()
+      .filter(function (w) { return !inSection[w.sk]; })
+      .slice(0, REVIEW_EXTRAS_PER_SECTION)
+      .forEach(function (w) {
+        lessonReviewExtras[w.sk] = true;
+        lessonQueue.push(w);
+      });
+
     renderPracticeCardStep();
   }
 
@@ -2226,11 +2491,13 @@
     lessonCardGraded = false;
     const item = lessonQueue[lessonQueueIndex];
     lessonCurrentPracticeItem = item;
+    const isExtra = !!lessonReviewExtras[item.sk];
 
     body.innerHTML =
       '<div class="lesson-stage">' +
       '<div class="lesson-eyebrow">Practice · ' + (lessonQueueIndex + 1) + ' / ' + lessonQueue.length + '</div>' +
       '<div class="practice-card" id="lesson-practice-card" style="max-width:460px;">' +
+      (isExtra ? '<div class="review-tag">Hard word · revision</div>' : '') +
       '<div class="practice-word">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</div>' +
       '<div class="practice-answer" id="lesson-practice-answer"></div>' +
       '<button class="btn btn-secondary" id="lesson-reveal-btn">Show Answer</button>' +
@@ -2238,6 +2505,7 @@
       '<button class="btn-grade missed" id="lesson-missed-btn">Missed it</button>' +
       '<button class="btn-grade got-it" id="lesson-gotit-btn">Got it</button>' +
       '</div>' +
+      '<div class="hidden" id="lesson-sentence-wrap">' + sentenceUiHtml(item) + '</div>' +
       '</div>' +
       '</div>';
     body.scrollTop = 0;
@@ -2246,6 +2514,9 @@
       document.getElementById('lesson-practice-answer').textContent = item.en;
       document.getElementById('lesson-reveal-btn').classList.add('hidden');
       document.getElementById('lesson-grade-row').classList.remove('hidden');
+      // Offered after the answer is out, so it can't be used as a hint before
+      // you've committed to remembering the word.
+      document.getElementById('lesson-sentence-wrap').classList.remove('hidden');
     });
     document.getElementById('lesson-missed-btn').addEventListener('click', function () { gradeLessonPracticeCard(false); });
     document.getElementById('lesson-gotit-btn').addEventListener('click', function () { gradeLessonPracticeCard(true); });
@@ -2267,7 +2538,8 @@
       incrementDailyCount();
     }
 
-    if (gotIt) lessonPracticeCorrect++;
+    const isExtra = lessonCurrentPracticeItem && lessonReviewExtras[lessonCurrentPracticeItem.sk];
+    if (gotIt && !isExtra) lessonPracticeCorrect++;
     playTone(gotIt ? 'correct' : 'incorrect');
 
     const card = document.getElementById('lesson-practice-card');
@@ -2589,8 +2861,21 @@
   let quizAnswered = false;
 
   function renderQuizPhase() {
-    updateLessonChrome('Quiz', 3);
     const section = roadmapSections[lessonSectionIndex];
+
+    // Checkpoints test a pool drawn from the previous ten sections, shuffled,
+    // and every word answered right here counts as mastered.
+    if (section.kind === 'checkpoint') {
+      quizQueue = shuffleArray(section.items.slice()).slice(0, CHECKPOINT_MAX_QUESTIONS);
+      quizIndex = 0;
+      lessonQuizCorrect = 0;
+      lessonQuizTotal = quizQueue.length;
+      checkpointMastered = 0;
+      renderQuizStep();
+      return;
+    }
+
+    updateLessonChrome('Quiz', 3);
 
     // Same split as practice: rule-application units get tested on the rule,
     // not on what the example words mean.
@@ -2627,6 +2912,11 @@
     quizAnswered = false;
     const correct = quizQueue[quizIndex];
     const section = roadmapSections[lessonSectionIndex];
+    const isCheckpoint = section.kind === 'checkpoint';
+
+    // A checkpoint has no Learn/Practice/Voice phases to fill the bar, so it
+    // tracks its own progress through the questions instead.
+    if (isCheckpoint) updateLessonChrome('Checkpoint', 4 * (quizIndex / Math.max(1, quizQueue.length)));
 
     let distractorPool = section.items.filter(function (it) { return it.en !== correct.en; });
     if (distractorPool.length < 3) {
@@ -2639,7 +2929,7 @@
 
     body.innerHTML =
       '<div class="lesson-stage">' +
-      '<div class="lesson-eyebrow">Quiz · ' + (quizIndex + 1) + ' / ' + quizQueue.length + '</div>' +
+      '<div class="lesson-eyebrow">' + (isCheckpoint ? 'Checkpoint' : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + quizQueue.length + '</div>' +
       '<h2 class="lesson-heading">' + speakerButtonHtml(correct.sk) + escapeHtml(correct.sk) + '</h2>' +
       '<p class="lesson-sub">What does this mean?</p>' +
       '<div class="quiz-choice-list">' +
@@ -2679,6 +2969,26 @@
     if (isCorrect) lessonQuizCorrect++;
     playTone(isCorrect ? 'correct' : 'incorrect');
 
+    // Checkpoint answers are the only thing that awards mastery. A word missed
+    // here is demonstrably not known, so it goes back into the review queue
+    // instead — that's what feeds "hard words" everywhere else.
+    const section = roadmapSections[lessonSectionIndex];
+    if (section && section.kind === 'checkpoint') {
+      const word = quizQueue[quizIndex];
+      if (word && word.sk) {
+        if (isCorrect) {
+          if (!loadMasteredWords()[word.sk]) checkpointMastered++;
+          markWordMastered(word.sk);
+        } else {
+          const stats = loadVocabStats();
+          const entry = stats[word.sk] || { misses: 0 };
+          entry.misses = entry.misses + 1;
+          stats[word.sk] = entry;
+          saveVocabStats(stats);
+        }
+      }
+    }
+
     setTimeout(function () {
       quizIndex++;
       renderQuizStep();
@@ -2691,7 +3001,9 @@
     const totalRight = lessonPracticeCorrect + lessonVoiceCorrect + lessonQuizCorrect;
     const totalPossible = lessonPracticeTotal + lessonVoiceTotal + lessonQuizTotal;
     const pct = totalPossible > 0 ? totalRight / totalPossible : 0;
-    const cleared = pct >= ROUND_CLEAR_THRESHOLD;
+    const threshold =
+      roadmapSections[lessonSectionIndex].kind === 'checkpoint' ? CHECKPOINT_CLEAR_THRESHOLD : ROUND_CLEAR_THRESHOLD;
+    const cleared = pct >= threshold;
     const isPerfect = totalPossible > 0 && totalRight === totalPossible;
 
     if (cleared) setSectionCleared(roadmapSections[lessonSectionIndex].id);
@@ -2700,14 +3012,25 @@
     checkWordCountAchievements();
 
     const hasNext = lessonSectionIndex + 1 < roadmapSections.length;
+    const isCheckpoint = roadmapSections[lessonSectionIndex].kind === 'checkpoint';
     const summaryClass = isPerfect ? 'perfect' : cleared ? 'cleared' : 'not-cleared';
-    const message = isPerfect ? 'Perfect!' : cleared ? 'Section cleared!' : 'Not quite — try this section again.';
+    const message = isCheckpoint
+      ? (cleared ? 'Checkpoint passed!' : 'Not quite — the words you missed are waiting in Revise.')
+      : isPerfect ? 'Perfect!' : cleared ? 'Section cleared!' : 'Not quite — try this section again.';
+    const masteredLine = isCheckpoint
+      ? '<p class="finish-mastered">' +
+        (checkpointMastered
+          ? checkpointMastered + (checkpointMastered === 1 ? ' new word mastered' : ' new words mastered')
+          : 'No new words mastered this time') +
+        ' · ' + masteredWordCount() + ' total</p>'
+      : '';
 
     const body = document.getElementById('lesson-body');
     body.innerHTML =
       '<div class="lesson-finish-card ' + summaryClass + '" id="lesson-finish-card">' +
       '<div class="score-big">' + Math.round(pct * 100) + '%</div>' +
       '<p>' + message + '</p>' +
+      masteredLine +
       '<div class="round-summary-actions">' +
       (cleared && hasNext ? '<button class="btn btn-primary" id="lesson-next-section-btn">Next Section</button>' : '') +
       '<button class="btn ' + (cleared && hasNext ? 'btn-secondary' : 'btn-primary') + '" id="lesson-retry-btn">Retry This Section</button>' +
@@ -2775,6 +3098,31 @@
 
   const RING_CIRCUMFERENCE = 2 * Math.PI * 52;
 
+  // Revising was previously only reachable by knowing to look under Tests.
+  // This surfaces it on the Profile whenever there's actually something to
+  // revise, and hides itself when there isn't.
+  function renderReviseCard() {
+    const card = document.getElementById('profile-revise-card');
+    if (!card) return;
+
+    const due = getDueReviewWords().length;
+    card.classList.toggle('hidden', due === 0);
+    if (!due) return;
+
+    card.innerHTML =
+      '<div class="next-info">' +
+      '<div class="next-label">Revise</div>' +
+      '<div class="next-title">' + due + (due === 1 ? ' hard word' : ' hard words') + ' to go over</div>' +
+      '<div class="next-sub">Words you’ve missed — hear each one in a sentence too</div>' +
+      '</div>' +
+      '<span class="next-cta">Revise →</span>';
+
+    card.onclick = function () {
+      document.querySelector('[data-tab="tests"]').click();
+      document.querySelector('[data-tests-mode="review"]').click();
+    };
+  }
+
   // Playful time-of-day greeting using the name on the account, refreshed
   // every time the Profile panel renders (on load, and again if you're still
   // on it when the hour rolls over).
@@ -2813,8 +3161,7 @@
     document.getElementById('profile-ring-fill').style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - pct / 100));
     document.getElementById('stat-sections').textContent = clearedCount + ' / ' + totalSections;
 
-    const stats = loadVocabStats();
-    document.getElementById('stat-words').textContent = String(Object.keys(stats).length);
+    document.getElementById('stat-words').textContent = String(masteredWordCount());
 
     const minutes = Math.round(getTotalTimeSpentMs() / 60000);
     document.getElementById('stat-time').textContent =
@@ -2830,6 +3177,7 @@
     if (dailyLabel) dailyLabel.textContent = dailyCount + ' / ' + dailyTarget + ' today';
 
     updateReviewCountBadge();
+    renderReviseCard();
 
     let nextIdx = -1;
     for (let i = 0; i < totalSections; i++) {

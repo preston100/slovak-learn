@@ -32,6 +32,7 @@ const DEFAULT_PROGRESS = {
   longestStreak: 0,
   streakLastDate: null,
   vocabStats: {},
+  masteredWords: {},
   achievements: [],
   roundProgress: {},
   roadmapProgress: [],
