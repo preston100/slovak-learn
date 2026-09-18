@@ -420,11 +420,16 @@ main {
 /* Dev-account easter egg — perched on the corner of the greeting card. */
 .profile-mascot {
   position: absolute;
-  top: -30px;
+  top: -46px;
   right: 16px;
-  width: 88px;
-  height: 74px;
+  width: 92px;
+  height: 92px;
   animation: mascot-bob 3.2s ease-in-out infinite;
+}
+.profile-mascot img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 @keyframes mascot-bob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
@@ -437,9 +442,9 @@ main {
 }
 @media (max-width: 480px) {
   .profile-mascot {
-    width: 66px;
-    height: 55px;
-    top: -22px;
+    width: 68px;
+    height: 68px;
+    top: -34px;
     right: 10px;
   }
 }

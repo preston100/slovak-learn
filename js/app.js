@@ -2784,7 +2784,12 @@
 
     // Just for the two of you.
     const mascot = document.getElementById('profile-mascot');
-    if (mascot) mascot.classList.toggle('hidden', !isDevAccount());
+    if (mascot) {
+      const show = isDevAccount();
+      mascot.classList.toggle('hidden', !show);
+      const img = document.getElementById('profile-mascot-img');
+      if (show && img && !img.getAttribute('src')) img.src = 'img/elephant.png';
+    }
 
     const user = getSessionUser();
     const name = user && user.name ? user.name.split(' ')[0] : '';
