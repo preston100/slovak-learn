@@ -22,12 +22,15 @@ exports.handler = async function (event) {
         progress.get(blob.key, { type: 'json' }),
       ]);
       // Only name + streak are ever exposed here — never email, password
-      // hash, or per-word stats.
-      return { name: (user && user.name) || 'Unknown', streakCount: (userProgress && userProgress.streakCount) || 0 };
+      // hash, or per-word stats. Ranked on longestStreak (the best streak
+      // this account has ever hit), not streakCount (today's live streak,
+      // which resets to 0 or 1 the moment someone misses a day) — otherwise
+      // the board would reshuffle every time anyone had an off day.
+      return { name: (user && user.name) || 'Unknown', bestStreak: (userProgress && userProgress.longestStreak) || 0 };
     })
   );
 
-  entries.sort((a, b) => b.streakCount - a.streakCount);
+  entries.sort((a, b) => b.bestStreak - a.bestStreak);
 
   return jsonResponse(200, { ok: true, entries });
 };

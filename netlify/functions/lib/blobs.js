@@ -29,6 +29,7 @@ function contentStore() {
 
 const DEFAULT_PROGRESS = {
   streakCount: 0,
+  longestStreak: 0,
   streakLastDate: null,
   vocabStats: {},
   achievements: [],

@@ -143,6 +143,7 @@
 
     return {
       streakCount: Number(localStorage.getItem(STREAK_COUNT_KEY) || '0'),
+      longestStreak: Number(localStorage.getItem(LONGEST_STREAK_KEY) || '0'),
       streakLastDate: localStorage.getItem(STREAK_DATE_KEY) || null,
       vocabStats: loadVocabStats(),
       achievements: getEarnedAchievements(),
@@ -161,7 +162,12 @@
   // account's leftover data.
   function hydrateFromProgress(progress) {
     if (!progress) return;
-    localStorage.setItem(STREAK_COUNT_KEY, String(progress.streakCount || 0));
+    const streakCount = progress.streakCount || 0;
+    // longestStreak didn't exist before this account may have already built
+    // a streak, so back-fill it from the current streak rather than showing
+    // an existing streak-holder as 0 on the leaderboard until their next practice.
+    localStorage.setItem(STREAK_COUNT_KEY, String(streakCount));
+    localStorage.setItem(LONGEST_STREAK_KEY, String(Math.max(progress.longestStreak || 0, streakCount)));
     if (progress.streakLastDate) localStorage.setItem(STREAK_DATE_KEY, progress.streakLastDate);
     else localStorage.removeItem(STREAK_DATE_KEY);
     localStorage.setItem(VOCAB_STATS_KEY, JSON.stringify(progress.vocabStats || {}));
@@ -219,6 +225,10 @@
       if (res.ok) {
         const data = await res.json();
         hydrateFromProgress(data.progress);
+        // Backfilling longestStreak in hydrateFromProgress only touches
+        // localStorage — push it back so the leaderboard picks it up too,
+        // not just this browser.
+        scheduleProgressSync();
       }
     } catch (err) {
       // Network hiccup: fall through with whatever's already in localStorage
@@ -244,6 +254,7 @@
       }
       const data = await res.json();
       hydrateFromProgress(data.progress);
+      scheduleProgressSync();
       showAuthenticatedApp();
     } catch (err) {
       showAuthGate();
@@ -1103,6 +1114,7 @@
 
   const STREAK_COUNT_KEY = 'slovencina_streak_count';
   const STREAK_DATE_KEY = 'slovencina_streak_last_date';
+  const LONGEST_STREAK_KEY = 'slovencina_longest_streak';
 
   function todayStr() {
     return new Date().toISOString().slice(0, 10);
@@ -1129,6 +1141,8 @@
 
     localStorage.setItem(STREAK_COUNT_KEY, String(count));
     localStorage.setItem(STREAK_DATE_KEY, today);
+    const longest = Number(localStorage.getItem(LONGEST_STREAK_KEY) || '0');
+    if (count > longest) localStorage.setItem(LONGEST_STREAK_KEY, String(count));
     renderStreak();
 
     if (count === 3) unlockAchievement('streak-3', '3-Day Streak!');
@@ -2847,7 +2861,8 @@
     scheduleProgressSync();
   }
 
-  // Renders the {name, streakCount} leaderboard fetched from the server —
+  // Renders the {name, bestStreak} leaderboard fetched from the server —
+  // ranked on each account's best-ever streak, not today's live one, and
   // never anything more sensitive (see leaderboard.js).
   async function renderLeaderboard() {
     const listEl = document.getElementById('leaderboard-list');
@@ -2879,8 +2894,8 @@
             '</span><span class="leaderboard-name">' +
             escapeHtml(e.name) +
             '</span><span class="leaderboard-streak">' +
-            e.streakCount +
-            (e.streakCount === 1 ? ' day' : ' days') +
+            e.bestStreak +
+            (e.bestStreak === 1 ? ' day' : ' days') +
             '</span></div>'
           );
         })
