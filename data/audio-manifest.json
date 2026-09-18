@@ -337,5 +337,7 @@
   "Silný": "audio/3036bb398dfc5dfd.mp3",
   "Slabý": "audio/7841b00307af3132.mp3",
   "Ťažký": "audio/365453069e6527dd.mp3",
-  "Ľahký": "audio/fa407380e2f64e1d.mp3"
+  "Ľahký": "audio/fa407380e2f64e1d.mp3",
+  "Dlhý": "audio/ea2b2fcea95db169.mp3",
+  "Krátky": "audio/4d2581094797133d.mp3"
 }
