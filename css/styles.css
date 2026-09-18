@@ -414,6 +414,34 @@ main {
   margin-bottom: 28px;
   padding: 18px 22px;
   border-radius: var(--radius-lg);
+  position: relative;
+}
+
+/* Dev-account easter egg — perched on the corner of the greeting card. */
+.profile-mascot {
+  position: absolute;
+  top: -34px;
+  right: 20px;
+  width: 76px;
+  height: 70px;
+  animation: mascot-bob 3.2s ease-in-out infinite;
+}
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-mascot {
+    animation: none;
+  }
+}
+@media (max-width: 480px) {
+  .profile-mascot {
+    width: 58px;
+    height: 54px;
+    top: -26px;
+    right: 12px;
+  }
 }
 
 .panel-header h2 {

@@ -2781,6 +2781,11 @@
   function renderGreeting() {
     const el = document.getElementById('profile-greeting');
     if (!el) return;
+
+    // Just for the two of you.
+    const mascot = document.getElementById('profile-mascot');
+    if (mascot) mascot.classList.toggle('hidden', !isDevAccount());
+
     const user = getSessionUser();
     const name = user && user.name ? user.name.split(' ')[0] : '';
     const hour = new Date().getHours();
