@@ -1,8 +1,8 @@
 [
   {
-    "id": "vowels-length",
-    "title": "Vowels & Length",
-    "intro": "Slovak vowels are pure and consistent — each one makes the same sound every time. The acute accent (dĺžeň) does not change the sound at all, it just holds the vowel about twice as long. Length changes meaning, so it matters: sud (barrel) vs súd (court).\n\nOne relief for English speakers: y and ý sound exactly the same as i and í. The difference is only spelling.",
+    "id": "vowels-a",
+    "title": "Vowels: A, Á",
+    "intro": "The short/long pair a and á. The acute accent (dĺžeň) doesn't change the sound — it just holds the vowel about twice as long, and length changes meaning: sud (barrel) vs súd (court).",
     "letters": [
       {
         "letter": "a",
@@ -21,7 +21,14 @@
           "en": "yes"
         },
         "hint": "like a in father (long)"
-      },
+      }
+    ]
+  },
+  {
+    "id": "vowels-e",
+    "title": "Vowels: E, É",
+    "intro": "The short/long pair e and é.",
+    "letters": [
       {
         "letter": "e",
         "sound": "short 'e', like the e in bed",
@@ -39,7 +46,14 @@
           "en": "nice"
         },
         "hint": "like e in bed (long)"
-      },
+      }
+    ]
+  },
+  {
+    "id": "vowels-iy",
+    "title": "Vowels: I, Í, Y, Ý",
+    "intro": "The i/í pair, plus y and ý — which sound exactly the same as i and í. The difference between i and y is only spelling, never pronunciation.",
+    "letters": [
       {
         "letter": "i",
         "sound": "short 'i', like the ee in see but clipped",
@@ -75,7 +89,14 @@
           "en": "good"
         },
         "hint": "same sound as í"
-      },
+      }
+    ]
+  },
+  {
+    "id": "vowels-o",
+    "title": "Vowels: O, Ó",
+    "intro": "The short/long pair o and ó.",
+    "letters": [
       {
         "letter": "o",
         "sound": "short 'o', like the o in more but clipped",
@@ -93,7 +114,14 @@
           "en": "balloon"
         },
         "hint": "like o in more (long)"
-      },
+      }
+    ]
+  },
+  {
+    "id": "vowels-u",
+    "title": "Vowels: U, Ú",
+    "intro": "The short/long pair u and ú.",
+    "letters": [
       {
         "letter": "u",
         "sound": "short 'u', like the oo in book",
@@ -111,7 +139,14 @@
           "en": "mouth"
         },
         "hint": "like oo in book (long)"
-      },
+      }
+    ]
+  },
+  {
+    "id": "vowels-rare",
+    "title": "Vowels: Ä, Ô",
+    "intro": "Two rarer vowels. Ä is mostly just said as 'e' by modern speakers. Ô is a glide, 'uo' — it starts at u and slides into o.",
+    "letters": [
       {
         "letter": "ä",
         "sound": "a rare letter — most speakers today simply say it as 'e'",

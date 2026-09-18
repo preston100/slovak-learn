@@ -1,8 +1,33 @@
 [
   {
-    "id": "alpha-vowels-length",
+    "id": "alpha-vowels-a",
     "kind": "alphabet",
-    "ref": "vowels-length"
+    "ref": "vowels-a"
+  },
+  {
+    "id": "alpha-vowels-e",
+    "kind": "alphabet",
+    "ref": "vowels-e"
+  },
+  {
+    "id": "alpha-vowels-iy",
+    "kind": "alphabet",
+    "ref": "vowels-iy"
+  },
+  {
+    "id": "alpha-vowels-o",
+    "kind": "alphabet",
+    "ref": "vowels-o"
+  },
+  {
+    "id": "alpha-vowels-u",
+    "kind": "alphabet",
+    "ref": "vowels-u"
+  },
+  {
+    "id": "alpha-vowels-rare",
+    "kind": "alphabet",
+    "ref": "vowels-rare"
   },
   {
     "id": "alpha-hacek-consonants",
@@ -38,6 +63,12 @@
     "round": 1
   },
   {
+    "id": "vocab-everyday-phrases-2",
+    "kind": "vocab",
+    "ref": "Everyday Phrases",
+    "round": 2
+  },
+  {
     "id": "vocab-numbers-0-20-0",
     "kind": "vocab",
     "ref": "Numbers 0-20",
@@ -71,6 +102,18 @@
     "kind": "vocab",
     "ref": "Family & People",
     "round": 1
+  },
+  {
+    "id": "vocab-family-people-2",
+    "kind": "vocab",
+    "ref": "Family & People",
+    "round": 2
+  },
+  {
+    "id": "vocab-family-people-3",
+    "kind": "vocab",
+    "ref": "Family & People",
+    "round": 3
   },
   {
     "id": "gram-pronouns-possessives",
@@ -119,6 +162,18 @@
     "round": 1
   },
   {
+    "id": "vocab-food-drink-2",
+    "kind": "vocab",
+    "ref": "Food & Drink",
+    "round": 2
+  },
+  {
+    "id": "vocab-food-drink-3",
+    "kind": "vocab",
+    "ref": "Food & Drink",
+    "round": 3
+  },
+  {
     "id": "vocab-places-things-at-home-0",
     "kind": "vocab",
     "ref": "Places & Things at Home",
@@ -131,6 +186,12 @@
     "round": 1
   },
   {
+    "id": "vocab-places-things-at-home-2",
+    "kind": "vocab",
+    "ref": "Places & Things at Home",
+    "round": 2
+  },
+  {
     "id": "vocab-adjectives-opposites-0",
     "kind": "vocab",
     "ref": "Adjectives & Opposites",
@@ -141,6 +202,12 @@
     "kind": "vocab",
     "ref": "Adjectives & Opposites",
     "round": 1
+  },
+  {
+    "id": "vocab-adjectives-opposites-2",
+    "kind": "vocab",
+    "ref": "Adjectives & Opposites",
+    "round": 2
   },
   {
     "id": "vocab-common-verbs-0",
@@ -225,6 +292,12 @@
     "kind": "vocab",
     "ref": "Time & Daily Routine",
     "round": 4
+  },
+  {
+    "id": "vocab-time-daily-routine-5",
+    "kind": "vocab",
+    "ref": "Time & Daily Routine",
+    "round": 5
   },
   {
     "id": "gram-time-daily-routine",
