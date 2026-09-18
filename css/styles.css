@@ -1543,17 +1543,50 @@ main {
   color: var(--color-accent-hover);
 }
 
-.guide-summary {
+/* The one-line takeaway, pulled out as a highlight instead of sitting as
+   more paragraph text — the thing you actually want to see first. */
+.guide-highlight {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 10px 0 0;
+}
+
+/* Full explanation is real, useful text, but it's the least scannable part
+   of an entry — tucked behind a toggle keeps the card from reading as a
+   wall of text, while the table/highlight above stay visible up front. */
+.guide-explanation-toggle {
+  margin-top: 14px;
+}
+.guide-explanation-toggle summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--color-text-muted);
-  margin: 6px 0 0;
+  list-style: none;
+}
+.guide-explanation-toggle summary::-webkit-details-marker {
+  display: none;
+}
+.guide-explanation-toggle summary::before {
+  content: '+ ';
+  color: var(--color-accent);
+}
+.guide-explanation-toggle[open] summary::before {
+  content: '\2212 ';
+}
+.guide-explanation-toggle summary:hover {
+  color: var(--color-text);
 }
 
 .guide-explanation {
   white-space: pre-line;
   font-size: 14px;
   line-height: 1.65;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .guide-table-wrap {

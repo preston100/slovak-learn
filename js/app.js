@@ -611,25 +611,7 @@
     );
   }
 
-  /* ---- Grammar Guide: a reference, not a second copy of the roadmap ---- */
-
-  // Categories give the guide a shape you can navigate; the roadmap's order
-  // is about what to learn next, which is a different question from "where
-  // do I look this up".
-  const GUIDE_CATEGORIES = [
-    { title: 'Nouns', ids: ['nouns-gender', 'cases-overview', 'demonstratives'] },
-    { title: 'Pronouns & Questions', ids: ['pronouns-possessives', 'question-words'] },
-    {
-      title: 'Verbs',
-      ids: [
-        'present-tense',
-        'conjugation-byt-mat-ist-prist',
-        'conjugation-robit-spat-hrat-citat',
-        'conjugation-hovorit-jest-chciet-pracovat',
-      ],
-    },
-    { title: 'Time', ids: ['time-daily-routine'] },
-  ];
+  /* ---- Grammar Guide: same order you learn it in, laid out to scan ---- */
 
   function guideEntryHtml(title, summary, unitId, bodyHtml) {
     return (
@@ -638,7 +620,7 @@
       '<h4>' + escapeHtml(title) + '</h4>' +
       (unitId ? '<button type="button" class="guide-practice-btn" data-unit-id="' + escapeHtml(unitId) + '">Practice this</button>' : '') +
       '</div>' +
-      (summary ? '<p class="guide-summary">' + escapeHtml(summary) + '</p>' : '') +
+      (summary ? '<p class="guide-highlight">' + escapeHtml(summary) + '</p>' : '') +
       bodyHtml +
       '</div>'
     );
@@ -673,9 +655,12 @@
       .join('');
 
     return (
-      (t.explanation ? '<div class="guide-explanation">' + escapeHtml(t.explanation) + '</div>' : '') +
       (examples
         ? '<div class="guide-table-wrap"><table class="guide-table"><tbody>' + examples + '</tbody></table></div>'
+        : '') +
+      (t.explanation
+        ? '<details class="guide-explanation-toggle"><summary>Full explanation</summary>' +
+          '<div class="guide-explanation">' + escapeHtml(t.explanation) + '</div></details>'
         : '')
     );
   }
@@ -717,26 +702,34 @@
       );
     }
 
-    const categorised = [];
-    GUIDE_CATEGORIES.forEach(function (cat) {
-      const topics = cat.ids
-        .map(function (id) { return grammarData.find(function (t) { return t.id === id; }); })
-        .filter(Boolean)
-        .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
-      topics.forEach(function (t) { categorised.push(t.id); });
-      if (!topics.length) return;
+    // Everything past the alphabet follows curriculum.json's order — the
+    // same sequence the roadmap teaches it in — instead of being regrouped
+    // into separate grammatical categories, so looking something up here
+    // means scrolling to roughly where you learned it, not hunting through
+    // an unrelated filing scheme.
+    const orderedIds = [];
+    curriculumData.forEach(function (u) {
+      if (u.kind === 'grammar' && orderedIds.indexOf(u.ref) === -1) orderedIds.push(u.ref);
+    });
+    const ordered = orderedIds
+      .map(function (id) { return grammarData.find(function (t) { return t.id === id; }); })
+      .filter(Boolean)
+      .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
+
+    if (ordered.length) {
       blocks.push(
-        '<div class="guide-category"><h3 class="browse-subhead">' + escapeHtml(cat.title) + '</h3>' +
-        topics
+        '<div class="guide-category"><h3 class="browse-subhead">Grammar</h3>' +
+        ordered
           .map(function (t) { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); })
           .join('') +
         '</div>'
       );
-    });
+    }
 
-    // Anything not in a category above (e.g. topics added via Add Content).
+    // Anything not part of the authored curriculum (e.g. topics added via
+    // Add Content) has no natural position in that sequence, so it goes last.
     const rest = grammarData
-      .filter(function (t) { return categorised.indexOf(t.id) === -1; })
+      .filter(function (t) { return orderedIds.indexOf(t.id) === -1; })
       .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
     if (rest.length) {
       blocks.push(
