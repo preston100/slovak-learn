@@ -2768,7 +2768,25 @@
 
   const RING_CIRCUMFERENCE = 2 * Math.PI * 52;
 
+  // Playful time-of-day greeting using the name on the account, refreshed
+  // every time the Profile panel renders (on load, and again if you're still
+  // on it when the hour rolls over).
+  function renderGreeting() {
+    const el = document.getElementById('profile-greeting');
+    if (!el) return;
+    const user = getSessionUser();
+    const name = user && user.name ? user.name.split(' ')[0] : '';
+    const hour = new Date().getHours();
+    let line;
+    if (hour >= 5 && hour < 12) line = 'Good morning';
+    else if (hour >= 12 && hour < 17) line = 'Good afternoon';
+    else if (hour >= 17 && hour < 22) line = 'Good evening';
+    else line = 'Hey, night owl';
+    el.textContent = name ? line + ', ' + name : line;
+  }
+
   function renderProfile() {
+    renderGreeting();
     const totalSections = roadmapSections.length;
     const progress = loadRoadmapProgress();
     const clearedCount = roadmapSections.filter(function (s) { return progress[s.id]; }).length;

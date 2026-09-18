@@ -192,10 +192,6 @@ button {
   transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
 }
 
-.btn:active {
-  transform: translateY(1px);
-}
-
 .btn-primary {
   background: var(--color-accent);
   color: white;
@@ -416,6 +412,8 @@ main {
 
 .panel-header {
   margin-bottom: 28px;
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
 }
 
 .panel-header h2 {
@@ -426,6 +424,18 @@ main {
 .panel-header p {
   color: var(--color-text-muted);
   font-size: 15px;
+}
+
+.panel-header p.profile-greeting {
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.profile-greeting:empty {
+  display: none;
 }
 
 /* ---------- Grammar cards ---------- */
@@ -2234,16 +2244,56 @@ input[type='password']:focus {
 .badge-card:not(.locked),
 .guide-entry,
 .leaderboard-tile,
-.round-node:not(.locked) {
+.round-node:not(.locked),
+.tab-btn,
+.content-mode-btn,
+.quiz-choice-btn:not(:disabled),
+.btn-grade,
+.file-drop,
+.speak-btn,
+.mic-btn,
+.profile-next-card,
+.daily-goal-label {
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 .btn:not(:disabled):hover,
 .icon-btn:hover,
 .mode-card:hover,
 .badge-card:not(.locked):hover,
-.guide-entry:hover {
+.guide-entry:hover,
+.tab-btn:hover,
+.content-mode-btn:hover,
+.quiz-choice-btn:not(:disabled):hover,
+.btn-grade:hover,
+.speak-btn:hover,
+.profile-next-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+/* Press feedback — every clickable element in the app snaps down slightly on
+   the actual tap/click, not just lifts on hover. Hover means nothing on a
+   touchscreen, and this is a phone-first app, so the press state is what
+   actually reads as "alive" for most real use. Placed after the hover rules
+   above so a real click (hover + active at once on desktop) resolves to the
+   press transform, not the lift. */
+.btn:not(:disabled):active,
+.icon-btn:active,
+.mode-card:active,
+.badge-card:not(.locked):active,
+.guide-entry:active,
+.round-node:not(.locked):active,
+.tab-btn:active,
+.content-mode-btn:active,
+.quiz-choice-btn:not(:disabled):active,
+.btn-grade:active,
+.file-drop:active,
+.speak-btn:active,
+.mic-btn:active,
+.profile-next-card:active,
+.daily-goal-label:active {
+  transform: scale(0.96);
+  box-shadow: var(--shadow-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2270,7 +2320,28 @@ input[type='password']:focus {
   .icon-btn:hover,
   .mode-card:hover,
   .badge-card:not(.locked):hover,
-  .guide-entry:hover {
+  .guide-entry:hover,
+  .tab-btn:hover,
+  .content-mode-btn:hover,
+  .quiz-choice-btn:not(:disabled):hover,
+  .btn-grade:hover,
+  .speak-btn:hover,
+  .profile-next-card:hover,
+  .btn:not(:disabled):active,
+  .icon-btn:active,
+  .mode-card:active,
+  .badge-card:not(.locked):active,
+  .guide-entry:active,
+  .round-node:not(.locked):active,
+  .tab-btn:active,
+  .content-mode-btn:active,
+  .quiz-choice-btn:not(:disabled):active,
+  .btn-grade:active,
+  .file-drop:active,
+  .speak-btn:active,
+  .mic-btn:active,
+  .profile-next-card:active,
+  .daily-goal-label:active {
     transform: none;
   }
 }
