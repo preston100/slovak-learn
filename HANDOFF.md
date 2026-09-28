@@ -30,6 +30,27 @@ Nobody sees anything until they enter the correct 4-digit code on the lock scree
 
 The site is live and working. Grammar and Vocabulary are plain files on the site itself, so they can never "go down." Tests and Add Content depend on Google's free Gemini API, which is now much more resilient to hiccups than it was, but can't be made 100% failure-proof since it's a free third-party service outside my control — if it ever fails now, it should be a rare, short-lived blip rather than a broken feature.
 
+## Teacher's review, round 2 (September 2026)
+
+Changes from "Slovak – notes 2" (section numbers are the roadmap numbers at the time, checkpoints included):
+
+- **Visual**: every grammar section now has a table (conjugations, pronoun sets, possessive forms…), with the changing ending highlighted. Explanations support **bold**, *italic* and bullet lists. Authored in `data/grammar.json` as a `tables` field plus light markup in `explanation`.
+- **Greetings (10)**: one `ahoj` (hi) and one `prepáčte` (sorry / excuse me); "bye" is now `čau / maj sa`.
+- **Everyday phrases (12)**: `Dovidenia` marked as goodbye (formal).
+- **Family, food, adjectives, places, time**: no capital letters on single words.
+- **Pronouns (25)**: pronouns are normally dropped unless stressed, with her example sentences.
+- **"This" (26)**: accusative forms (tohto, túto) removed; just tento / táto / toto.
+- **Possessives (27)**: explains that môj / moja / moje follows the gender of the owned noun, with a full table.
+- **Question words (28)**: moved to after the verb conjugation sections.
+- **Useful phrases (30)**: one `Na zdravie!` covering both meanings.
+- **Food / fruit / places (34–40)**: Fruit is its own topic; Places and Things at Home are split; bus stop / elevator glossed "at the bus stop", "in the elevator".
+- **Common verbs (47–48)**: infinitives only, no first-person forms in brackets.
+- **Present tense + key verbs (49–52)**: the three patterns (-ám / -ím / -em) in a table, clearer conjugation tables, more examples.
+- **Six cases (54)**: removed from the Learn path (still readable in the Grammar Guide).
+- **Time (60–61)**: repeated numbers and duplicate time words removed.
+
+Word progress (stats and mastered words) is carried over automatically for words whose spelling only changed in capitalisation or lost a bracketed extra. New and reworded phrases need audio: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself.

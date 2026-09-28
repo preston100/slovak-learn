@@ -485,6 +485,7 @@
 
       grammarData = sharedGrammarData.concat(privateGrammarData);
       vocabData = sharedVocabData.concat(privateVocabData);
+      migrateRenamedWordKeys();
 
       renderGrammar(grammarData);
       renderGrammarGuide();
@@ -530,6 +531,89 @@
       .join('');
   }
 
+  /* ---- Grammar text: light markup + tables ---- */
+
+  // Grammar text is authored with a little markup so the key point of a
+  // section stands out instead of sitting in a plain paragraph: **bold**,
+  // *italic*, "- " bullet lines, and blank lines between paragraphs. Escaped
+  // first, so nothing in the content (or anything Add Content saved) can
+  // inject HTML.
+  function inlineMarkupHtml(str) {
+    return escapeHtml(str)
+      .replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function richTextHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .split(/\n\s*\n/)
+      .map(function (block) {
+        let html = '';
+        let para = [];
+        let items = [];
+        function flushPara() {
+          if (para.length) html += '<p>' + para.map(inlineMarkupHtml).join('<br>') + '</p>';
+          para = [];
+        }
+        function flushList() {
+          if (items.length) {
+            html += '<ul>' + items.map(function (it) { return '<li>' + inlineMarkupHtml(it) + '</li>'; }).join('') + '</ul>';
+          }
+          items = [];
+        }
+        block.split('\n').forEach(function (line) {
+          const bullet = /^\s*[-•*]\s+(.*)$/.exec(line);
+          if (bullet) {
+            flushPara();
+            items.push(bullet[1]);
+          } else if (line.trim()) {
+            flushList();
+            para.push(line);
+          }
+        });
+        flushPara();
+        flushList();
+        return html;
+      })
+      .join('');
+  }
+
+  // Conjugations, pronoun sets and the like read far better as a grid than
+  // as "ja som — ty si — on je…" run together on one line. Cells take the
+  // same inline markup, so e.g. the changing ending can be bolded.
+  function grammarTablesHtml(tables) {
+    return (tables || [])
+      .map(function (tbl) {
+        const head = (tbl.head || []).length
+          ? '<thead><tr>' + tbl.head.map(function (h) { return '<th>' + inlineMarkupHtml(h) + '</th>'; }).join('') + '</tr></thead>'
+          : '';
+        const body = (tbl.rows || [])
+          .map(function (row) {
+            return '<tr>' + row.map(function (cell) { return '<td>' + inlineMarkupHtml(cell) + '</td>'; }).join('') + '</tr>';
+          })
+          .join('');
+        return (
+          '<div class="grammar-table-block">' +
+          (tbl.title ? '<div class="grammar-table-title">' + inlineMarkupHtml(tbl.title) + '</div>' : '') +
+          '<div class="guide-table-wrap"><table class="guide-table grammar-table">' + head + '<tbody>' + body + '</tbody></table></div>' +
+          '</div>'
+        );
+      })
+      .join('');
+  }
+
+  function grammarTablesText(tables) {
+    return (tables || [])
+      .map(function (tbl) {
+        const cells = [tbl.title || ''].concat(tbl.head || []);
+        (tbl.rows || []).forEach(function (row) { cells.push.apply(cells, row); });
+        return cells.join(' ');
+      })
+      .join(' ');
+  }
+
   function renderGrammar(topics, emptyMessage, containerId) {
     const container = document.getElementById(containerId || 'grammar-list');
     if (!topics.length) {
@@ -554,9 +638,10 @@
           '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>' +
           '</summary>' +
           '<div class="grammar-card-body">' +
-          '<div class="explanation">' +
-          escapeHtml(t.explanation || '') +
+          '<div class="explanation rich-text">' +
+          richTextHtml(t.explanation || '') +
           '</div>' +
+          grammarTablesHtml(t.tables) +
           (examples ? '<div class="example-list">' + examples + '</div>' : '') +
           '</div>' +
           '</details>'
@@ -603,10 +688,12 @@
   // Filters the already-loaded grammar/vocab arrays client-side and re-renders
   // both lists — no server round-trip, since everything's already in memory.
   function matchesGrammarQuery(t, q) {
+    // Markup asterisks are stripped so "robím" still finds "rob**ím**".
     return (
       (t.topic || '').toLowerCase().indexOf(q) !== -1 ||
       (t.summary || '').toLowerCase().indexOf(q) !== -1 ||
-      (t.explanation || '').toLowerCase().indexOf(q) !== -1 ||
+      (t.explanation || '').replace(/\*/g, '').toLowerCase().indexOf(q) !== -1 ||
+      grammarTablesText(t.tables).replace(/\*/g, '').toLowerCase().indexOf(q) !== -1 ||
       (t.examples || []).some(function (ex) {
         return (ex.sk || '').toLowerCase().indexOf(q) !== -1 || (ex.en || '').toLowerCase().indexOf(q) !== -1;
       })
@@ -656,13 +743,16 @@
       })
       .join('');
 
+    // The topic's own tables go first and stay visible — they're the part
+    // you come back to look up — with the prose still behind its toggle.
     return (
+      grammarTablesHtml(t.tables) +
       (examples
         ? '<div class="guide-table-wrap"><table class="guide-table"><tbody>' + examples + '</tbody></table></div>'
         : '') +
       (t.explanation
         ? '<details class="guide-explanation-toggle"><summary>Full explanation</summary>' +
-          '<div class="guide-explanation">' + escapeHtml(t.explanation) + '</div></details>'
+          '<div class="guide-explanation rich-text">' + richTextHtml(t.explanation) + '</div></details>'
         : '')
     );
   }
@@ -1430,6 +1520,62 @@
     return Object.keys(loadMasteredWords()).length;
   }
 
+  // Word stats and mastery are keyed by the Slovak text, so correcting a
+  // word ("Muž" → "muž", "chodiť (chodím)" → "chodiť") would otherwise
+  // quietly wipe that word's progress. Any saved key that no longer matches
+  // a word, but matches one once case and bracketed extras are ignored, is
+  // moved onto the corrected word.
+  function wordMatchKey(sk) {
+    return String(sk).replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  function migrateRenamedWordKeys() {
+    const current = {};
+    vocabData.forEach(function (g) {
+      (g.words || []).forEach(function (w) { if (w.sk) current[w.sk] = true; });
+    });
+    const byMatchKey = {};
+    Object.keys(current).forEach(function (sk) {
+      const k = wordMatchKey(sk);
+      // Two live words sharing a match key (e.g. "ahoj" and "Ahoj") make it
+      // ambiguous where an old key belongs, so those are left alone.
+      byMatchKey[k] = k in byMatchKey && byMatchKey[k] !== sk ? null : sk;
+    });
+    // Checkpoints also record alphabet example words. They're live keys in
+    // their own right and must never be folded into a vocab word.
+    alphabetData.forEach(function (u) {
+      (u.letters || []).forEach(function (l) { if (l.example && l.example.sk) current[l.example.sk] = true; });
+    });
+    grammarData.forEach(function (t) {
+      (t.examples || []).forEach(function (ex) { if (ex.sk) current[ex.sk] = true; });
+    });
+
+    function remap(store, merge) {
+      let changed = false;
+      Object.keys(store).forEach(function (key) {
+        if (current[key]) return;
+        const target = byMatchKey[wordMatchKey(key)];
+        if (!target) return;
+        store[target] = target in store ? merge(store[target], store[key]) : store[key];
+        delete store[key];
+        changed = true;
+      });
+      return changed;
+    }
+
+    const stats = loadVocabStats();
+    const statsChanged = remap(stats, function (a, b) {
+      return { misses: Math.max((a && a.misses) || 0, (b && b.misses) || 0) };
+    });
+    if (statsChanged) saveVocabStats(stats);
+
+    const mastered = loadMasteredWords();
+    const masteredChanged = remap(mastered, function () { return true; });
+    if (masteredChanged) localStorage.setItem(MASTERED_KEY, JSON.stringify(mastered));
+
+    if (statsChanged || masteredChanged) scheduleProgressSync();
+  }
+
   // Toggles the Tests tab between the AI-generated quiz and the free-practice
   // round picker (this used to be Vocabulary's own tab; it lives here now).
   function setupTestsModes() {
@@ -1872,6 +2018,7 @@
           title: t.topic,
           subtitle: t.summary || '',
           explanation: t.explanation || '',
+          tables: t.tables || [],
           exercises: t.exercises || [],
           items: t.examples || [],
         });
@@ -1915,6 +2062,7 @@
         title: t.topic,
         subtitle: t.summary || '',
         explanation: t.explanation || '',
+        tables: t.tables || [],
         exercises: t.exercises || [],
         items: t.examples || [],
       });
@@ -2289,7 +2437,8 @@
       '<div class="lesson-eyebrow">' + kindLabel(section.kind) + '</div>' +
       '<h2 class="lesson-heading">' + escapeHtml(section.title) + '</h2>' +
       (section.subtitle ? '<p class="lesson-sub">' + escapeHtml(section.subtitle) + '</p>' : '') +
-      (section.explanation ? '<div class="lesson-grammar-explanation">' + escapeHtml(section.explanation) + '</div>' : '') +
+      (section.explanation ? '<div class="lesson-grammar-explanation rich-text">' + richTextHtml(section.explanation) + '</div>' : '') +
+      (section.tables && section.tables.length ? '<div class="lesson-grammar-tables">' + grammarTablesHtml(section.tables) + '</div>' : '') +
       (section.items.length || section.kind === 'alphabet' ? content : '') +
       '<button class="btn btn-primary" id="lesson-learn-next-btn" style="width:100%; max-width:320px;">I’m Ready — Start Practice</button>' +
       '</div>';

@@ -529,10 +529,13 @@ main {
 }
 
 .grammar-card-body .explanation {
-  white-space: pre-line;
   font-size: 14.5px;
   color: var(--color-text);
   margin-bottom: 16px;
+}
+
+.grammar-card-body .grammar-table-block + .example-list {
+  margin-top: 16px;
 }
 
 .example-list {
@@ -784,6 +787,18 @@ main {
   font-weight: 700;
   color: var(--color-text-muted);
   white-space: nowrap;
+}
+
+/* On a phone a long title on the outer lanes ran past the screen edge and
+   made the whole page scroll sideways — wrap it inside its 120px instead. */
+@media (max-width: 600px) {
+  .round-node .round-label {
+    white-space: normal;
+    line-height: 1.3;
+  }
+  .round-row {
+    margin-bottom: 44px;
+  }
 }
 
 .round-node.cleared {
@@ -1627,7 +1642,6 @@ main {
 }
 
 .lesson-grammar-explanation {
-  white-space: pre-line;
   font-size: 14.5px;
   line-height: 1.65;
   text-align: left;
@@ -1740,10 +1754,81 @@ main {
 }
 
 .guide-explanation {
-  white-space: pre-line;
   font-size: 14px;
   line-height: 1.65;
   margin-top: 10px;
+}
+
+/* ---------- Grammar text: paragraphs, bullets, emphasis ---------- */
+.rich-text p {
+  margin: 0 0 10px;
+}
+.rich-text ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+.rich-text li {
+  margin-bottom: 4px;
+}
+.rich-text > :last-child {
+  margin-bottom: 0;
+}
+.rich-text strong {
+  font-weight: 700;
+}
+.rich-text em {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Grammar tables (conjugations, pronoun sets…) ---------- */
+.grammar-table-block {
+  width: 100%;
+  text-align: left;
+}
+
+.grammar-table-title {
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.grammar-table-title + .guide-table-wrap {
+  margin-top: 6px;
+}
+
+/* Headers here are Slovak verbs and words, so no forced uppercase — it
+   would flatten the diacritics that are the whole point of the table. */
+.guide-table.grammar-table th {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  vertical-align: bottom;
+}
+
+.grammar-table td:first-child {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* Bold inside a table marks the part that changes (an ending, a form),
+   so it gets the accent colour to pop out of the grid. */
+.grammar-table strong {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.lesson-grammar-tables {
+  width: 100%;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2px 20px 16px;
+  margin-bottom: 24px;
 }
 
 .guide-table-wrap {

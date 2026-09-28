@@ -3,7 +3,7 @@
     "id": "nouns-gender",
     "topic": "Noun Gender",
     "summary": "Every Slovak noun is masculine, feminine, or neuter — usually predictable from its ending.",
-    "explanation": "Slovak nouns belong to one of three grammatical genders: masculine (mužský rod), feminine (ženský rod), or neuter (stredný rod). Gender is usually predictable from the ending of the word in its dictionary (nominative singular) form:\n\n- Masculine nouns typically end in a consonant (hrad, strom, pes).\n- Feminine nouns typically end in -a, -ia, or a soft consonant + osť (žena, ulica, práca, radosť).\n- Neuter nouns typically end in -o, -e, -ie, or -or (mesto, srdce, jedlo, okno).\n\nGender matters because it controls adjective agreement, pronoun choice, and which declension pattern (vzor) a noun follows.",
+    "explanation": "Every Slovak noun is **masculine**, **feminine** or **neuter**. You can usually tell which from the **last letter** of the dictionary form (see the table).\n\nWhy it matters: the words around a noun — *this*, *my*, adjectives — **change to match its gender**. That's why you'll see gender come up again in the next few sections.",
     "examples": [
       {
         "sk": "ten hrad",
@@ -85,13 +85,39 @@
         "answer": "masculine",
         "explain": "Ends in a consonant — masculine."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "Gender",
+          "Usually ends in",
+          "Examples"
+        ],
+        "rows": [
+          [
+            "masculine",
+            "a **consonant**",
+            "hrad, strom, pes, muž"
+          ],
+          [
+            "feminine",
+            "**-a** or **-osť**",
+            "žena, ulica, kniha, radosť"
+          ],
+          [
+            "neuter",
+            "**-o**, **-e** or **-ie**",
+            "mesto, okno, srdce, námestie"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "nouns-plurals",
     "topic": "Noun Plurals",
     "summary": "Each gender pluralizes differently — and masculine also depends on whether the noun is animate.",
-    "explanation": "Slovak plurals depend on gender and, for masculine nouns, whether the noun is animate (a living thing) or inanimate:\n\n- Masculine animate: plural usually ends in -i or -ia (chlap → chlapi, muž → muži).\n- Masculine inanimate: plural usually ends in -y or -e (hrad → hrady, strom → stromy).\n- Feminine (-a nouns): plural usually ends in -y (žena → ženy, ulica → ulice).\n- Neuter (-o nouns): plural usually ends in -a (mesto → mestá, okno → okná, auto → autá).",
+    "explanation": "The plural ending depends on the noun's **gender** — and for masculine nouns, on whether it's **alive** (a person or animal) or **a thing**.\n\nThe **bold** part in the table is the plural ending.",
     "examples": [
       {
         "sk": "hrady",
@@ -188,29 +214,68 @@
         "answer": "autá",
         "explain": "Neuter -o nouns take -a."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "Singular",
+          "Plural"
+        ],
+        "rows": [
+          [
+            "masculine — people, animals",
+            "muž, chlap, chlapec",
+            "muž**i**, chlap**i**, chlapc**i**"
+          ],
+          [
+            "masculine — things",
+            "hrad, strom",
+            "hrad**y**, strom**y**"
+          ],
+          [
+            "feminine",
+            "žena, kniha, ulica",
+            "žen**y**, knih**y**, ulic**e**"
+          ],
+          [
+            "neuter",
+            "mesto, okno, auto",
+            "mest**á**, okn**á**, aut**á**"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "pronouns-possessives",
-    "topic": "Pronouns & Possessives",
-    "summary": "Personal pronouns (I, you, he...) and their matching possessive forms (my, your, his...).",
-    "explanation": "Slovak possessives (like English \"my\" or \"your\") change form to match the gender of the noun they describe, which is why several pronouns below have three possessive forms — masculine / feminine / neuter.\n\nPronoun → Possessive:\nJa (I) → môj / moja / moje (my)\nTy (you, informal singular) → tvoj / tvoja / tvoje (your)\nOn (he) → jeho (his)\nOna (she) → jej (her)\nOno (it) → jeho (its)\nMy (we) → náš / naša / naše (our)\nVy (you, formal or plural) → váš / vaša / vaše (your)\nOni / Ony (they) → ich (their)",
+    "topic": "Possessives: My, Your, His…",
+    "summary": "môj / moja / moje — \"my\" changes to match the gender of the thing you own.",
+    "explanation": "\"My\", \"your\", \"our\" change to match the **gender of the thing that is owned** — **not** the person who owns it.\n\nQuick reminder of the genders:\n- **masculine** — usually ends in a consonant: *dom, brat, otec*\n- **feminine** — usually ends in **-a**: *kniha, sestra, mama*\n- **neuter** — usually ends in **-o** or **-e**: *auto, mesto, more*\n\nSo one person says *môj brat*, *moja sestra* and *moje auto*. It's the same owner (me), but *brat*, *sestra* and *auto* have different genders, so \"my\" changes.\n\nNotice the pattern: the feminine form ends in **-a** and the neuter form in **-e**, just like the nouns.\n\n**jeho** (his / its), **jej** (her) and **ich** (their) **never change**: *jeho brat, jeho sestra, jeho auto*.",
     "examples": [
       {
         "sk": "To je môj dom.",
-        "en": "That is my house. (masculine noun: dom)"
+        "en": "That is my house. (dom is masculine)"
       },
       {
         "sk": "To je moja kniha.",
-        "en": "That is my book. (feminine noun: kniha)"
+        "en": "That is my book. (kniha is feminine)"
+      },
+      {
+        "sk": "To je moje auto.",
+        "en": "That is my car. (auto is neuter)"
+      },
+      {
+        "sk": "To je náš byt.",
+        "en": "That is our apartment."
       },
       {
         "sk": "To je jeho auto.",
         "en": "That is his car."
       },
       {
-        "sk": "To je náš byt.",
-        "en": "That is our apartment."
+        "sk": "To je jej brat.",
+        "en": "That is her brother."
       }
     ],
     "exercises": [
@@ -290,6 +355,82 @@
         ],
         "answer": "váš",
         "explain": "Vy (formal or plural you) → váš."
+      },
+      {
+        "prompt": "jeho brat, jeho sestra, jeho auto",
+        "question": "Why does jeho stay the same?",
+        "options": [
+          "jeho, jej and ich never change",
+          "It is a mistake",
+          "Because all three nouns are masculine"
+        ],
+        "answer": "jeho, jej and ich never change",
+        "explain": "Only môj, tvoj, náš and váš change with gender."
+      },
+      {
+        "prompt": "To je ___ sestra.",
+        "question": "Which form of \"my\"? (sestra is feminine)",
+        "options": [
+          "moja",
+          "môj",
+          "moje"
+        ],
+        "answer": "moja",
+        "explain": "Feminine noun, so moja."
+      }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "masculine\n(brat)",
+          "feminine\n(sestra)",
+          "neuter\n(auto)"
+        ],
+        "rows": [
+          [
+            "my (ja)",
+            "môj",
+            "moj**a**",
+            "moj**e**"
+          ],
+          [
+            "your (ty)",
+            "tvoj",
+            "tvoj**a**",
+            "tvoj**e**"
+          ],
+          [
+            "his / its (on, ono)",
+            "jeho",
+            "jeho",
+            "jeho"
+          ],
+          [
+            "her (ona)",
+            "jej",
+            "jej",
+            "jej"
+          ],
+          [
+            "our (my)",
+            "náš",
+            "naš**a**",
+            "naš**e**"
+          ],
+          [
+            "your (vy)",
+            "váš",
+            "vaš**a**",
+            "vaš**e**"
+          ],
+          [
+            "their (oni, ony)",
+            "ich",
+            "ich",
+            "ich"
+          ]
+        ]
       }
     ]
   },
@@ -297,7 +438,7 @@
     "id": "cases-overview",
     "topic": "The Six Cases",
     "summary": "Slovak changes noun/adjective endings depending on grammatical role — six cases are in everyday use.",
-    "explanation": "Instead of relying only on word order, Slovak changes the ending of nouns, adjectives, and pronouns depending on their grammatical role. Traditionally there are seven cases, but the vocative is rarely used in modern spoken Slovak, so in practice you'll use these six:\n\n1. Nominative (Nom, 1st) — the base subject: Kto? Čo? (Who? What?)\n2. Genitive (Gen, 2nd) — possession or absence. Triggered after: bez, do, od, z/zo, u\n3. Dative (Dat, 3rd) — the recipient of an action. Triggered after: k/ku\n4. Accusative (Acc, 4th) — the direct object. Triggered after: pre\n5. Locative (Loc, 6th) — location, always used with a preposition. Triggered after: v/vo, na, o\n6. Instrumental (Inst, 7th) — the means or a companion. Triggered after: s/so\n\nThe numbering (1st, 2nd, 3rd, 4th, 6th, 7th) looks like it skips a number — that's the missing 5th case (vocative), which you'll rarely need.",
+    "explanation": "Slovak changes the **ending** of a noun depending on its **role** in the sentence. Traditionally there are seven cases; the 5th (vocative, for calling someone) is rarely used today, which is why the numbering skips from 4 to 6.\n\nMany prepositions **always** take the same case — that's the easiest way in.",
     "examples": [
       {
         "sk": "Vidím psa.",
@@ -409,17 +550,69 @@
         "answer": "nominative",
         "explain": "Nominative is the base form — answers Kto? Čo?"
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "Case",
+          "Asks",
+          "Used after",
+          "Example"
+        ],
+        "rows": [
+          [
+            "1. nominative",
+            "kto? čo?",
+            "— (the subject)",
+            "To je **pes**."
+          ],
+          [
+            "2. genitive",
+            "koho? čoho?",
+            "bez, do, od, z, u",
+            "bez **psa**"
+          ],
+          [
+            "3. dative",
+            "komu? čomu?",
+            "k / ku",
+            "k **psovi**"
+          ],
+          [
+            "4. accusative",
+            "koho? čo?",
+            "pre; the direct object",
+            "Vidím **psa**."
+          ],
+          [
+            "6. locative",
+            "o kom? o čom?",
+            "v, na, o",
+            "o **psovi**"
+          ],
+          [
+            "7. instrumental",
+            "s kým? s čím?",
+            "s / so",
+            "so **psom**"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "question-words",
     "topic": "Question Words",
     "summary": "The core set of words used to ask who, what, where, why, how, and how much.",
-    "explanation": "These question words start almost every question in Slovak, similar to English \"wh-\" words:\n\nČo — What\nKto — Who\nKde — Where\nKam — Where to (used with motion)\nPrečo — Why\nAko — How\nKedy — When\nKoľko — How much / how many\nAký / Aká / Aké — Which / What kind (agrees with the noun's gender)",
+    "explanation": "Question words usually go **first**, just like English *wh-* words.\n\nWatch out for **kde** and **kam**: *kde* asks where something **is**, *kam* asks where something is **going**.\n*Kde si?* — Where are you?\n*Kam ideš?* — Where are you going?\n\n**aký / aká / aké** changes with gender, just like *tento / táto / toto*: *aký dom, aká kniha, aké auto*.",
     "examples": [
       {
         "sk": "Čo robíš?",
         "en": "What are you doing?"
+      },
+      {
+        "sk": "Kto je to?",
+        "en": "Who is that?"
       },
       {
         "sk": "Kde bývaš?",
@@ -428,6 +621,14 @@
       {
         "sk": "Kam ideš?",
         "en": "Where are you going (to)?"
+      },
+      {
+        "sk": "Kedy prídeš?",
+        "en": "When will you come?"
+      },
+      {
+        "sk": "Prečo sa učíš po slovensky?",
+        "en": "Why are you learning Slovak?"
       },
       {
         "sk": "Koľko to stojí?",
@@ -512,105 +713,185 @@
         "answer": "Kto",
         "explain": "Kto = who."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "Slovak",
+          "English"
+        ],
+        "rows": [
+          [
+            "**čo**",
+            "what"
+          ],
+          [
+            "**kto**",
+            "who"
+          ],
+          [
+            "**kde**",
+            "where (place)"
+          ],
+          [
+            "**kam**",
+            "where to (movement)"
+          ],
+          [
+            "**kedy**",
+            "when"
+          ],
+          [
+            "**prečo**",
+            "why"
+          ],
+          [
+            "**ako**",
+            "how"
+          ],
+          [
+            "**koľko**",
+            "how much / how many"
+          ],
+          [
+            "**aký / aká / aké**",
+            "what kind of / which"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "demonstratives",
     "topic": "Demonstratives (\"This\")",
-    "summary": "The word for \"this\" changes with the noun's gender and whether it's the object of the sentence.",
-    "explanation": "Slovak \"this\" has different forms depending on gender, and the masculine and feminine forms also change again in the accusative case (when the noun is a direct object):\n\n- Masculine, animate: tento (nominative) / tohto (accusative)\n- Masculine, inanimate: tento\n- Feminine: táto (nominative) / túto (accusative)\n- Neuter: toto",
+    "summary": "The word for \"this\" changes to match the gender of the noun after it.",
+    "explanation": "\"This\" has **three forms** — one for each gender. It always **matches the noun** that comes after it (see the table).\n\n**Toto je…** (This is…) works **on its own** for anything, whatever its gender: *Toto je môj brat.* / *Toto je moja izba.*",
     "examples": [
       {
         "sk": "Tento muž je môj otec.",
-        "en": "This man is my father. (masc. animate, subject)"
+        "en": "This man is my father."
       },
       {
-        "sk": "Vidím tohto muža.",
-        "en": "I see this man. (masc. animate, object)"
+        "sk": "Tento dom je veľký.",
+        "en": "This house is big."
       },
       {
         "sk": "Táto žena je moja mama.",
         "en": "This woman is my mom."
       },
       {
+        "sk": "Táto kniha je nová.",
+        "en": "This book is new."
+      },
+      {
+        "sk": "Toto auto je nové.",
+        "en": "This car is new."
+      },
+      {
         "sk": "Toto je moja izba.",
-        "en": "This is my room. (neuter)"
+        "en": "This is my room."
       }
     ],
     "exercises": [
       {
         "prompt": "___ muž je môj otec.",
-        "question": "This man is my father. (subject)",
+        "question": "This man is my father.",
         "options": [
           "Tento",
-          "Tohto",
-          "Táto"
+          "Táto",
+          "Toto"
         ],
         "answer": "Tento",
-        "explain": "Masculine subject takes the nominative tento."
+        "explain": "Muž is masculine, so \"this\" is tento."
       },
       {
-        "prompt": "Vidím ___ muža.",
-        "question": "I see this man. (object)",
+        "prompt": "___ dom je veľký.",
+        "question": "This house is big.",
         "options": [
-          "tohto",
-          "tento",
-          "toto"
+          "Tento",
+          "Táto",
+          "Toto"
         ],
-        "answer": "tohto",
-        "explain": "Masculine animate direct object takes the accusative tohto."
+        "answer": "Tento",
+        "explain": "Dom ends in a consonant — masculine — so tento."
       },
       {
         "prompt": "___ žena je moja mama.",
         "question": "This woman is my mom.",
         "options": [
           "Táto",
-          "Túto",
+          "Tento",
           "Toto"
         ],
         "answer": "Táto",
-        "explain": "Feminine subject takes táto."
+        "explain": "Žena is feminine, so táto."
       },
       {
-        "prompt": "___ je moja izba.",
-        "question": "This is my room.",
+        "prompt": "___ kniha je nová.",
+        "question": "This book is new.",
+        "options": [
+          "Táto",
+          "Toto",
+          "Tento"
+        ],
+        "answer": "Táto",
+        "explain": "Kniha ends in -a — feminine — so táto."
+      },
+      {
+        "prompt": "___ auto je nové.",
+        "question": "This car is new.",
         "options": [
           "Toto",
           "Tento",
           "Táto"
         ],
         "answer": "Toto",
-        "explain": "Standalone \"this is\" uses the neuter toto."
+        "explain": "Auto ends in -o — neuter — so toto."
       },
       {
-        "prompt": "Vidím ___ ženu.",
-        "question": "I see this woman. Which form of \"this\"?",
+        "prompt": "___ je moja izba.",
+        "question": "This is my room.",
         "options": [
-          "túto",
-          "táto",
-          "tohto"
+          "Toto",
+          "Táto",
+          "Tento"
         ],
-        "answer": "túto",
-        "explain": "Feminine changes from táto to túto as a direct object."
-      },
+        "answer": "Toto",
+        "explain": "On its own, \"this is…\" is always toto je, whatever the gender."
+      }
+    ],
+    "tables": [
       {
-        "prompt": "___ auto je nové.",
-        "question": "This car is new. (auto is neuter)",
-        "options": [
-          "toto",
-          "tento",
-          "táto"
+        "head": [
+          "Gender",
+          "\"this\"",
+          "Example"
         ],
-        "answer": "toto",
-        "explain": "Neuter is toto in both nominative and accusative."
+        "rows": [
+          [
+            "masculine",
+            "**tento**",
+            "tento muž — this man"
+          ],
+          [
+            "feminine",
+            "**táto**",
+            "táto žena — this woman"
+          ],
+          [
+            "neuter",
+            "**toto**",
+            "toto auto — this car"
+          ]
+        ]
       }
     ]
   },
   {
     "id": "present-tense",
     "topic": "Present Tense Verbs: How Conjugation Works",
-    "summary": "Slovak verbs conjugate for person and number; there is no separate continuous form.",
-    "explanation": "Slovak present-tense verbs change their ending depending on who is doing the action. A single present-tense form covers what English expresses as both simple present and present continuous (\"I write\" and \"I am writing\" are both píšem).\n\nMost verbs fall into a few conjugation patterns based on their infinitive ending (-ať, -iť, -ovať, -núť, etc). For example, robiť (to do/make):\n\nja robím — I do\nty robíš — you do (informal singular)\non/ona/ono robí — he/she/it does\nmy robíme — we do\nvy robíte — you do (formal / plural)\noni robia — they do\n\nThe conjugation groups below show more verbs following the same pattern.",
+    "summary": "The verb ending shows who is doing the action. Most verbs follow one of three patterns.",
+    "explanation": "The verb **ending** shows **who** is doing the action. There is only **one present tense**: *píšem* means both \"I write\" and \"I am writing\".\n\nMost verbs follow one of **three patterns**, named after the **ja** form:\n- **-ám** verbs — like *hľadať*: hľad**ám**\n- **-ím** verbs — like *robiť*: rob**ím**\n- **-em** verbs — like *pracovať*: pracuj**em**\n\nLearn the **ja** form of a new verb and you can usually build all the others. The **bold** part in the table is what changes.",
     "examples": [
       {
         "sk": "Robím domácu úlohu.",
@@ -621,8 +902,28 @@
         "en": "What are you doing?"
       },
       {
+        "sk": "Hľadám kľúče.",
+        "en": "I'm looking for the keys."
+      },
+      {
+        "sk": "Hľadáte niečo?",
+        "en": "Are you looking for something? (formal)"
+      },
+      {
+        "sk": "On pracuje v banke.",
+        "en": "He works in a bank."
+      },
+      {
+        "sk": "Pracujeme spolu.",
+        "en": "We work together."
+      },
+      {
         "sk": "Oni robia večeru.",
         "en": "They are making dinner."
+      },
+      {
+        "sk": "Píšem list.",
+        "en": "I write a letter. / I'm writing a letter."
       }
     ],
     "exercises": [
@@ -702,30 +1003,128 @@
         ],
         "answer": "both \"I write\" and \"I am writing\"",
         "explain": "Slovak has one present tense covering both English forms."
+      },
+      {
+        "prompt": "Ja ___ kľúče. (hľadať)",
+        "question": "Which form?",
+        "options": [
+          "hľadám",
+          "hľadáš",
+          "hľadajú"
+        ],
+        "answer": "hľadám",
+        "explain": "-ám verb: ja hľadám."
+      },
+      {
+        "prompt": "On ___ v banke. (pracovať)",
+        "question": "Which form?",
+        "options": [
+          "pracuje",
+          "pracujem",
+          "pracujú"
+        ],
+        "answer": "pracuje",
+        "explain": "-em verb: on pracuje."
+      },
+      {
+        "prompt": "Oni ___ spolu. (pracovať)",
+        "question": "Which form?",
+        "options": [
+          "pracujú",
+          "pracuje",
+          "pracujete"
+        ],
+        "answer": "pracujú",
+        "explain": "-em verb: oni pracujú."
+      }
+    ],
+    "tables": [
+      {
+        "title": "The three patterns",
+        "head": [
+          "",
+          "hľadať\n(to look for)",
+          "robiť\n(to do)",
+          "pracovať\n(to work)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "hľad**ám**",
+            "rob**ím**",
+            "pracuj**em**"
+          ],
+          [
+            "ty",
+            "hľad**áš**",
+            "rob**íš**",
+            "pracuj**eš**"
+          ],
+          [
+            "on / ona / ono",
+            "hľad**á**",
+            "rob**í**",
+            "pracuj**e**"
+          ],
+          [
+            "my",
+            "hľad**áme**",
+            "rob**íme**",
+            "pracuj**eme**"
+          ],
+          [
+            "vy",
+            "hľad**áte**",
+            "rob**íte**",
+            "pracuj**ete**"
+          ],
+          [
+            "oni / ony",
+            "hľad**ajú**",
+            "rob**ia**",
+            "pracuj**ú**"
+          ]
+        ]
       }
     ]
   },
   {
     "id": "conjugation-byt-mat-ist-prist",
     "topic": "Key Verbs: Byť, Mať, Ísť, Prísť",
-    "summary": "The full present-tense conjugation of \"to be\", \"to have\", \"to go\", and \"to come\" — four of the most-used verbs in Slovak.",
-    "explanation": "Byť (to be)\nja som — ty si — on/a je — my sme — vy ste — oni sú\n\nMať (to have)\nja mám — ty máš — on/a má — my máme — vy máte — oni majú\n\nÍsť (to go, on foot)\nja idem — ty ideš — on/a ide — my ideme — vy idete — oni idú\n\nPrísť (to come)\nja prídem — ty prídeš — on/a príde — my prídeme — vy prídete — oni prídu",
+    "summary": "Present tense of \"to be\", \"to have\", \"to go\" and \"to come\" — four of the most-used verbs in Slovak.",
+    "explanation": "Read the table **down a column** to see one verb, or **across a row** to see one person.\n\n- **byť** is irregular — learn it by heart.\n- **mať** follows the **-ám** pattern.\n- **ísť** and **prísť** change their stem (*ísť → id-*, *prísť → príd-*) and then take the normal **-em** endings.\n\n**Careful:** *prísť* talks about the **future** even in this form: *Prídem zajtra.* = I **will** come tomorrow.",
     "examples": [
       {
         "sk": "Som doma.",
         "en": "I am home."
       },
       {
+        "sk": "Si hladný?",
+        "en": "Are you hungry?"
+      },
+      {
         "sk": "Mám čas.",
         "en": "I have time."
+      },
+      {
+        "sk": "Máte deti?",
+        "en": "Do you have children? (formal)"
       },
       {
         "sk": "Idem domov.",
         "en": "I'm going home."
       },
       {
+        "sk": "Ideme do školy.",
+        "en": "We're going to school."
+      },
+      {
         "sk": "Prídem zajtra.",
         "en": "I'll come tomorrow."
+      },
+      {
+        "sk": "Oni prídu večer.",
+        "en": "They will come in the evening."
       }
     ],
     "exercises": [
@@ -817,29 +1216,100 @@
         "answer": "prídem",
         "explain": "Prísť: ja prídem."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "byť\n(to be)",
+          "mať\n(to have)",
+          "ísť\n(to go)",
+          "prísť\n(to come)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "**som**",
+            "m**ám**",
+            "id**em**",
+            "príd**em**"
+          ],
+          [
+            "ty",
+            "**si**",
+            "m**áš**",
+            "id**eš**",
+            "príd**eš**"
+          ],
+          [
+            "on / ona / ono",
+            "**je**",
+            "m**á**",
+            "id**e**",
+            "príd**e**"
+          ],
+          [
+            "my",
+            "**sme**",
+            "m**áme**",
+            "id**eme**",
+            "príd**eme**"
+          ],
+          [
+            "vy",
+            "**ste**",
+            "m**áte**",
+            "id**ete**",
+            "príd**ete**"
+          ],
+          [
+            "oni / ony",
+            "**sú**",
+            "m**ajú**",
+            "id**ú**",
+            "príd**u**"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "conjugation-robit-spat-hrat-citat",
     "topic": "Key Verbs: Robiť, Spať, Hrať, Čítať",
-    "summary": "The full present-tense conjugation of \"to do\", \"to sleep\", \"to play\", and \"to read\".",
-    "explanation": "Robiť (to do / make)\nja robím — ty robíš — on/a robí — my robíme — vy robíte — oni robia\n\nSpať (to sleep)\nja spím — ty spíš — on/a spí — my spíme — vy spíte — oni spia\n\nHrať (to play)\nja hrám — ty hráš — on/a hrá — my hráme — vy hráte — oni hrajú\n\nČítať (to read)\nja čítam — ty čítaš — on/a číta — my čítame — vy čítate — oni čítajú",
+    "summary": "Present tense of \"to do\", \"to sleep\", \"to play\" and \"to read\".",
+    "explanation": "- **robiť** and **spať** follow the **-ím** pattern.\n- **hrať** and **čítať** follow the **-ám** pattern.\n\nWhy *čítam* and not *čítám*? After a **long** syllable (*čí-*) the ending gets **short**. It's still the same pattern.",
     "examples": [
       {
         "sk": "Čo robíš?",
         "en": "What are you doing?"
       },
       {
+        "sk": "Robíme obed.",
+        "en": "We're making lunch."
+      },
+      {
         "sk": "Spím dobre.",
         "en": "I sleep well."
+      },
+      {
+        "sk": "Deti ešte spia.",
+        "en": "The children are still sleeping."
       },
       {
         "sk": "Hráme futbal.",
         "en": "We play football."
       },
       {
+        "sk": "Hráš na gitare?",
+        "en": "Do you play the guitar?"
+      },
+      {
         "sk": "Čítam knihu.",
         "en": "I'm reading a book."
+      },
+      {
+        "sk": "Čo čítate?",
+        "en": "What are you reading? (formal, or plural)"
       }
     ],
     "exercises": [
@@ -920,29 +1390,100 @@
         "answer": "robíš",
         "explain": "Robiť: ty robíš."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "robiť\n(to do)",
+          "spať\n(to sleep)",
+          "hrať\n(to play)",
+          "čítať\n(to read)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "rob**ím**",
+            "sp**ím**",
+            "hr**ám**",
+            "čít**am**"
+          ],
+          [
+            "ty",
+            "rob**íš**",
+            "sp**íš**",
+            "hr**áš**",
+            "čít**aš**"
+          ],
+          [
+            "on / ona / ono",
+            "rob**í**",
+            "sp**í**",
+            "hr**á**",
+            "čít**a**"
+          ],
+          [
+            "my",
+            "rob**íme**",
+            "sp**íme**",
+            "hr**áme**",
+            "čít**ame**"
+          ],
+          [
+            "vy",
+            "rob**íte**",
+            "sp**íte**",
+            "hr**áte**",
+            "čít**ate**"
+          ],
+          [
+            "oni / ony",
+            "rob**ia**",
+            "sp**ia**",
+            "hr**ajú**",
+            "čít**ajú**"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "conjugation-hovorit-jest-chciet-pracovat",
     "topic": "Key Verbs: Hovoriť, Jesť, Chcieť, Pracovať",
-    "summary": "The full present-tense conjugation of \"to speak\", \"to eat\", \"to want\", and \"to work\".",
-    "explanation": "Hovoriť (to speak)\nja hovorím — ty hovoríš — on/a hovorí — my hovoríme — vy hovoríte — oni hovoria\n\nJesť (to eat)\nja jem — ty ješ — on/a je — my jeme — vy jete — oni jedia\n\nChcieť (to want)\nja chcem — ty chceš — on/a chce — my chceme — vy chcete — oni chcú\n\nPracovať (to work)\nja pracujem — ty pracuješ — on/a pracuje — my pracujeme — vy pracujete — oni pracujú",
+    "summary": "Present tense of \"to speak\", \"to eat\", \"to want\" and \"to work\".",
+    "explanation": "- **hovoriť** follows the **-ím** pattern.\n- **pracovať** follows the **-em** pattern. Verbs ending in **-ovať** swap it for **-uj-**: *pracovať → pracujem*, *študovať → študujem*.\n- **jesť** and **chcieť** are irregular — watch *oni jedia* and *oni chcú*.\n\n**Careful:** *on je* can mean \"he **is**\" (byť) or \"he **eats**\" (jesť) — the rest of the sentence tells you which.",
     "examples": [
       {
         "sk": "Hovorím po slovensky.",
         "en": "I speak Slovak."
       },
       {
+        "sk": "Hovoríte po anglicky?",
+        "en": "Do you speak English? (formal)"
+      },
+      {
         "sk": "Jem obed.",
         "en": "I'm eating lunch."
+      },
+      {
+        "sk": "Deti jedia ovocie.",
+        "en": "The children are eating fruit."
       },
       {
         "sk": "Chcem kávu.",
         "en": "I want coffee."
       },
       {
+        "sk": "Čo chceš robiť?",
+        "en": "What do you want to do?"
+      },
+      {
         "sk": "Pracujem doma.",
         "en": "I work from home."
+      },
+      {
+        "sk": "Moja mama pracuje v škole.",
+        "en": "My mom works at a school."
       }
     ],
     "exercises": [
@@ -1034,13 +1575,68 @@
         "answer": "pracujú",
         "explain": "Pracovať: oni pracujú."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "hovoriť\n(to speak)",
+          "jesť\n(to eat)",
+          "chcieť\n(to want)",
+          "pracovať\n(to work)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "hovor**ím**",
+            "je**m**",
+            "chc**em**",
+            "pracuj**em**"
+          ],
+          [
+            "ty",
+            "hovor**íš**",
+            "je**š**",
+            "chc**eš**",
+            "pracuj**eš**"
+          ],
+          [
+            "on / ona / ono",
+            "hovor**í**",
+            "je",
+            "chc**e**",
+            "pracuj**e**"
+          ],
+          [
+            "my",
+            "hovor**íme**",
+            "je**me**",
+            "chc**eme**",
+            "pracuj**eme**"
+          ],
+          [
+            "vy",
+            "hovor**íte**",
+            "je**te**",
+            "chc**ete**",
+            "pracuj**ete**"
+          ],
+          [
+            "oni / ony",
+            "hovor**ia**",
+            "**jedia**",
+            "chc**ú**",
+            "pracuj**ú**"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "time-daily-routine",
     "topic": "Telling Time & Daily Routine",
     "summary": "How to say \"at\" a certain hour, and how to describe your day using time words.",
-    "explanation": "To say \"at\" a specific hour in Slovak, you use \"o\" plus the locative form of the number (o jednej, o druhej, o tretej... — see the Telling Time vocabulary list for the full set of hours). \"Pol\" (half) before an hour means \"half past\" the previous hour — pol ôsmej is \"half past seven\", not \"half past eight\".\n\nParts of the day (ráno, dopoludnia, popoludní, večer, v noci) are used on their own, without \"o\", to describe when in the day something happens.",
+    "explanation": "To say **at** a time, use **o** + the hour: *o jednej, o druhej, o tretej…*\n\n**Careful with pol:** it means half-way **to** the next hour. *Pol ôsmej* is **7:30** (half past seven), **not** 8:30.\n\nParts of the day are used **without o**: *Ráno vstávam.* / *Večer pozerám televíziu.*",
     "examples": [
       {
         "sk": "Ráno vstávam o siedmej.",
@@ -1102,15 +1698,15 @@
         "explain": "Ráno, večer, v noci and the rest are used without o."
       },
       {
-        "prompt": "o siedmej, o druhej, o tretej",
-        "question": "The number after \"o\" is in which case?",
+        "prompt": "o pol tretej",
+        "question": "What time is this?",
         "options": [
-          "locative",
-          "nominative",
-          "accusative"
+          "2:30",
+          "3:30",
+          "3:00"
         ],
-        "answer": "locative",
-        "explain": "O jednej, o druhej, o tretej — all locative."
+        "answer": "2:30",
+        "explain": "Pol tretej is half-way to three — 2:30."
       },
       {
         "prompt": "Na obed jem ___ dvanástej.",
@@ -1145,13 +1741,81 @@
         "answer": "at night",
         "explain": "V noci is the night part of the day."
       }
+    ],
+    "tables": [
+      {
+        "title": "Clock times",
+        "head": [
+          "Time",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "at 1:00",
+            "**o** jednej"
+          ],
+          [
+            "at 2:00",
+            "**o** druhej"
+          ],
+          [
+            "at 3:00",
+            "**o** tretej"
+          ],
+          [
+            "at 7:00",
+            "**o** siedmej"
+          ],
+          [
+            "at 7:30",
+            "**o pol** ôsmej"
+          ],
+          [
+            "at 12:00",
+            "**o** dvanástej"
+          ]
+        ]
+      },
+      {
+        "title": "Parts of the day (no o)",
+        "head": [
+          "Slovak",
+          "English"
+        ],
+        "rows": [
+          [
+            "ráno",
+            "in the morning"
+          ],
+          [
+            "dopoludnia",
+            "late morning (before noon)"
+          ],
+          [
+            "na obed",
+            "at lunchtime"
+          ],
+          [
+            "popoludní / poobede",
+            "in the afternoon"
+          ],
+          [
+            "večer",
+            "in the evening"
+          ],
+          [
+            "v noci",
+            "at night"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "verb-to-be",
     "topic": "The Verb \"To Be\" (Byť)",
     "summary": "Byť (to be) is the single most common verb in Slovak — full present-tense conjugation.",
-    "explanation": "Byť (to be) is irregular and used constantly — for identity, description, and location:\n\nja som — I am\nty si — you are (informal singular)\non/ona/ono je — he/she/it is\nmy sme — we are\nvy ste — you are (formal singular, or plural)\noni/ony sú — they are\n\nUnlike English, Slovak usually drops the subject pronoun once the verb ending already shows who's doing the action — \"Som unavený\" (I'm tired) is normal, complete Slovak, not \"Ja som unavený.\" The pronoun only gets added for emphasis or contrast.",
+    "explanation": "**Byť** (to be) is **irregular** — the forms don't follow a pattern, so learn them by heart. You use it to say who someone is, what something is like, and where things are.\n\n**Tip:** Slovak usually **leaves out the pronoun**, because the verb already shows who it is: *Som unavený.* = I'm tired. Saying *Ja som unavený* is only for **emphasis**.",
     "examples": [
       {
         "sk": "Som Peter.",
@@ -1256,17 +1920,86 @@
         "answer": "The verb ending (-om) already shows who — the pronoun gets dropped",
         "explain": "Slovak verb endings already encode the subject, so the pronoun is usually optional."
       }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "byť",
+          "English"
+        ],
+        "rows": [
+          [
+            "ja",
+            "**som**",
+            "I am"
+          ],
+          [
+            "ty",
+            "**si**",
+            "you are (informal)"
+          ],
+          [
+            "on / ona / ono",
+            "**je**",
+            "he / she / it is"
+          ],
+          [
+            "my",
+            "**sme**",
+            "we are"
+          ],
+          [
+            "vy",
+            "**ste**",
+            "you are (formal, or plural)"
+          ],
+          [
+            "oni / ony",
+            "**sú**",
+            "they are"
+          ]
+        ]
+      }
     ]
   },
   {
     "id": "personal-pronouns",
     "topic": "Personal Pronouns & Formal/Informal \"You\"",
-    "summary": "The basic I/you/he/she/it/we/you/they pronouns, and when to use ty vs. vy.",
-    "explanation": "Ja — I\nTy — you (informal, one person you know well)\nOn — he\nOna — she\nOno — it\nMy — we\nVy — you (formal singular, or any plural \"you\")\nOni — they (masculine or mixed groups)\nOny — they (all-feminine or all-neuter groups)\n\nThe biggest trap for English speakers: Slovak has two words for \"you.\" Ty is only for one person you're close to — family, friends, kids, people your own age. Vy is for a single stranger, an elder, a boss, or a teacher, and it's also just the normal word for \"you\" whenever you're talking to more than one person, formal or not. When you're unsure with someone new, start with vy.",
+    "summary": "I, you, he… are usually left out of a sentence — use them only for emphasis. Plus when to say ty vs. vy.",
+    "explanation": "**In a normal sentence the pronoun is left out.** The verb ending already shows who is doing it, so *Som doma.* (I am at home.) is the natural way to say it. Use the pronoun only when you want to **stress** it: *Ja som doma, ale on je v robote.* — **I** am at home, but **he** is at work.\n\nSlovak has **two words for \"you\"**:\n- **ty** — one person you know well: family, friends, children\n- **vy** — one person you should be polite to (a stranger, an older person, a teacher, a boss), **and** any group of people\n\nNot sure which one? Use **vy**.",
     "examples": [
       {
-        "sk": "Ja som z Ameriky.",
-        "en": "I am from America."
+        "sk": "Ja som doma.",
+        "en": "I am at home."
+      },
+      {
+        "sk": "Ty si v robote.",
+        "en": "You are at work. (informal)"
+      },
+      {
+        "sk": "On je dobrý študent.",
+        "en": "He is a good student."
+      },
+      {
+        "sk": "Ona je moja kamarátka.",
+        "en": "She is my friend."
+      },
+      {
+        "sk": "To (ono) je ťažké.",
+        "en": "It is difficult."
+      },
+      {
+        "sk": "My sme súrodenci.",
+        "en": "We are siblings."
+      },
+      {
+        "sk": "Vy ste u lekára.",
+        "en": "You are at the doctor's. (formal, or a group of people)"
+      },
+      {
+        "sk": "Oni sú bratia.",
+        "en": "They are brothers."
       },
       {
         "sk": "Ako sa máš?",
@@ -1275,10 +2008,6 @@
       {
         "sk": "Ako sa máte?",
         "en": "How are you? (formal, or to a group — vy)"
-      },
-      {
-        "sk": "Ona je moja sestra.",
-        "en": "She is my sister."
       }
     ],
     "exercises": [
@@ -1358,6 +2087,54 @@
         ],
         "answer": "they (masculine/mixed group)",
         "explain": "Oni = they, for masculine or mixed-gender groups."
+      },
+      {
+        "prompt": "Som doma.",
+        "question": "Is this a complete, natural sentence?",
+        "options": [
+          "Yes — the verb som already shows \"I\"",
+          "No — it needs ja",
+          "Only in a question"
+        ],
+        "answer": "Yes — the verb som already shows \"I\"",
+        "explain": "The verb ending shows who it is, so the pronoun is normally left out."
+      },
+      {
+        "prompt": "Ja som doma, ale on je v robote.",
+        "question": "Why are the pronouns ja and on used here?",
+        "options": [
+          "To stress who: I am at home, but HE is at work",
+          "They are always required",
+          "Because it is formal"
+        ],
+        "answer": "To stress who: I am at home, but HE is at work",
+        "explain": "Pronouns are added only when you want to stress or contrast who."
+      }
+    ],
+    "tables": [
+      {
+        "head": [
+          "",
+          "Singular",
+          "Plural"
+        ],
+        "rows": [
+          [
+            "1st person",
+            "**ja** — I",
+            "**my** — we"
+          ],
+          [
+            "2nd person",
+            "**ty** — you (informal)",
+            "**vy** — you (formal, or plural)"
+          ],
+          [
+            "3rd person",
+            "**on** — he\n**ona** — she\n**ono** — it",
+            "**oni** — they (men, or a mixed group)\n**ony** — they (women, or things)"
+          ]
+        ]
       }
     ]
   }

@@ -7,7 +7,7 @@
         "en": "hi (informal)"
       },
       {
-        "sk": "ahoj",
+        "sk": "čau / maj sa",
         "en": "bye (informal)"
       },
       {
@@ -36,11 +36,7 @@
       },
       {
         "sk": "prepáčte",
-        "en": "excuse me (formal)"
-      },
-      {
-        "sk": "prepáčte",
-        "en": "sorry (formal)"
+        "en": "sorry / excuse me (formal)"
       }
     ]
   },
@@ -49,11 +45,11 @@
     "words": [
       {
         "sk": "Ahoj",
-        "en": "Hello"
+        "en": "Hi (informal)"
       },
       {
         "sk": "Dovidenia",
-        "en": "Goodbye"
+        "en": "Goodbye (formal)"
       },
       {
         "sk": "Prepáč",
@@ -166,11 +162,7 @@
       },
       {
         "sk": "Na zdravie!",
-        "en": "Cheers!"
-      },
-      {
-        "sk": "Na zdravie!",
-        "en": "Bless you! (for a sneeze)"
+        "en": "Cheers! / Bless you! (after a sneeze)"
       },
       {
         "sk": "Ja si neprosím. (Ja nechcem)",
@@ -266,116 +258,116 @@
     "topic": "Family & People",
     "words": [
       {
-        "sk": "Muž",
-        "en": "Man"
+        "sk": "muž",
+        "en": "man"
       },
       {
-        "sk": "Žena",
-        "en": "Woman"
+        "sk": "žena",
+        "en": "woman"
       },
       {
-        "sk": "Chlapec",
-        "en": "Boy"
+        "sk": "chlapec",
+        "en": "boy"
       },
       {
-        "sk": "Dievča",
-        "en": "Girl"
+        "sk": "dievča",
+        "en": "girl"
       },
       {
-        "sk": "Otec",
-        "en": "Father"
+        "sk": "otec",
+        "en": "father"
       },
       {
-        "sk": "Matka",
-        "en": "Mother"
+        "sk": "matka",
+        "en": "mother"
       },
       {
-        "sk": "Brat",
-        "en": "Brother"
+        "sk": "brat",
+        "en": "brother"
       },
       {
-        "sk": "Sestra",
-        "en": "Sister"
+        "sk": "sestra",
+        "en": "sister"
       },
       {
-        "sk": "Súrodenci",
-        "en": "Siblings"
+        "sk": "súrodenci",
+        "en": "siblings"
       },
       {
-        "sk": "Babka",
-        "en": "Grandma"
+        "sk": "babka",
+        "en": "grandma"
       },
       {
-        "sk": "Dedko",
-        "en": "Grandpa"
+        "sk": "dedko",
+        "en": "grandpa"
       },
       {
-        "sk": "Syn",
-        "en": "Son"
+        "sk": "syn",
+        "en": "son"
       },
       {
-        "sk": "Dcéra",
-        "en": "Daughter"
+        "sk": "dcéra",
+        "en": "daughter"
       },
       {
-        "sk": "Teta",
-        "en": "Aunt"
+        "sk": "teta",
+        "en": "aunt"
       },
       {
-        "sk": "Ujo",
-        "en": "Uncle"
+        "sk": "ujo",
+        "en": "uncle"
       },
       {
-        "sk": "Strýko",
-        "en": "Uncle (alternate word)"
+        "sk": "strýko",
+        "en": "uncle (alternate word)"
       },
       {
-        "sk": "Vnuk",
-        "en": "Grandson"
+        "sk": "vnuk",
+        "en": "grandson"
       },
       {
-        "sk": "Vnučka",
-        "en": "Granddaughter"
+        "sk": "vnučka",
+        "en": "granddaughter"
       },
       {
-        "sk": "Bratranec",
-        "en": "Cousin (male)"
+        "sk": "bratranec",
+        "en": "cousin (male)"
       },
       {
-        "sk": "Sesternica",
-        "en": "Cousin (female)"
+        "sk": "sesternica",
+        "en": "cousin (female)"
       },
       {
-        "sk": "Dvojičky / Dvojčatá",
-        "en": "Twins"
+        "sk": "dvojičky / dvojčatá",
+        "en": "twins"
       },
       {
-        "sk": "Priateľ",
-        "en": "Boyfriend"
+        "sk": "priateľ",
+        "en": "boyfriend"
       },
       {
-        "sk": "Priateľka",
-        "en": "Girlfriend"
+        "sk": "priateľka",
+        "en": "girlfriend"
       },
       {
-        "sk": "Kamarát(ka)",
-        "en": "Friend"
+        "sk": "kamarát(ka)",
+        "en": "friend"
       },
       {
-        "sk": "Učiteľ(ka)",
-        "en": "Teacher"
+        "sk": "učiteľ(ka)",
+        "en": "teacher"
       },
       {
-        "sk": "Domáce zviera",
-        "en": "Pet"
+        "sk": "domáce zviera",
+        "en": "pet"
       },
       {
-        "sk": "Pes",
-        "en": "Dog"
+        "sk": "pes",
+        "en": "dog"
       },
       {
-        "sk": "Mačka",
-        "en": "Cat"
+        "sk": "mačka",
+        "en": "cat"
       }
     ]
   },
@@ -383,209 +375,219 @@
     "topic": "Food & Drink",
     "words": [
       {
-        "sk": "Raňajky",
-        "en": "Breakfast"
+        "sk": "raňajky",
+        "en": "breakfast"
       },
       {
-        "sk": "Desiata",
-        "en": "Morning snack"
+        "sk": "desiata",
+        "en": "morning snack"
       },
       {
-        "sk": "Olovrant",
-        "en": "Afternoon snack"
+        "sk": "olovrant",
+        "en": "afternoon snack"
       },
       {
-        "sk": "Obed",
-        "en": "Lunch"
+        "sk": "obed",
+        "en": "lunch"
       },
       {
-        "sk": "Večera",
-        "en": "Dinner"
+        "sk": "večera",
+        "en": "dinner"
       },
       {
-        "sk": "Jedlo",
-        "en": "Food"
+        "sk": "jedlo",
+        "en": "food"
       },
       {
-        "sk": "Voda",
-        "en": "Water"
+        "sk": "voda",
+        "en": "water"
       },
       {
-        "sk": "Šálka",
-        "en": "Cup"
+        "sk": "šálka",
+        "en": "cup"
       },
       {
-        "sk": "Pohár",
-        "en": "Glass"
+        "sk": "pohár",
+        "en": "glass"
       },
       {
-        "sk": "Príbor",
-        "en": "Cutlery"
+        "sk": "príbor",
+        "en": "cutlery"
       },
       {
-        "sk": "Vidlička",
-        "en": "Fork"
+        "sk": "vidlička",
+        "en": "fork"
       },
       {
-        "sk": "Nôž",
-        "en": "Knife"
+        "sk": "nôž",
+        "en": "knife"
       },
       {
-        "sk": "Lyžica",
-        "en": "Spoon"
+        "sk": "lyžica",
+        "en": "spoon"
       },
       {
-        "sk": "Soľ",
-        "en": "Salt"
+        "sk": "soľ",
+        "en": "salt"
       },
       {
-        "sk": "Korenie",
-        "en": "Pepper"
+        "sk": "korenie",
+        "en": "pepper"
       },
       {
-        "sk": "Cukor",
-        "en": "Sugar"
+        "sk": "cukor",
+        "en": "sugar"
       },
       {
-        "sk": "Melón",
-        "en": "Melon"
+        "sk": "s ľadom",
+        "en": "with ice"
       },
       {
-        "sk": "Ananás",
-        "en": "Pineapple"
-      },
-      {
-        "sk": "Jablko",
-        "en": "Apple"
-      },
-      {
-        "sk": "Pomaranč",
-        "en": "Orange"
-      },
-      {
-        "sk": "Čerešňa",
-        "en": "Cherry"
-      },
-      {
-        "sk": "Jahoda",
-        "en": "Strawberry"
-      },
-      {
-        "sk": "Slivka",
-        "en": "Plum"
-      },
-      {
-        "sk": "Hrozno",
-        "en": "Grape"
-      },
-      {
-        "sk": "Broskyňa",
-        "en": "Peach"
-      },
-      {
-        "sk": "Marhuľa",
-        "en": "Apricot"
-      },
-      {
-        "sk": "Čučoriedka",
-        "en": "Blueberry"
-      },
-      {
-        "sk": "S ľadom",
-        "en": "With ice"
-      },
-      {
-        "sk": "Bez ľadu",
-        "en": "Without ice"
+        "sk": "bez ľadu",
+        "en": "without ice"
       }
     ]
   },
   {
-    "topic": "Places & Things at Home",
+    "topic": "Fruit",
     "words": [
       {
-        "sk": "Práca (v práci)",
-        "en": "Work (at work)"
+        "sk": "melón",
+        "en": "melon"
       },
       {
-        "sk": "Škola (v škole)",
-        "en": "School (at school)"
+        "sk": "ananás",
+        "en": "pineapple"
       },
       {
-        "sk": "Obchod (v obchode)",
-        "en": "Shop (in the shop)"
+        "sk": "jablko",
+        "en": "apple"
       },
       {
-        "sk": "Zastávka (na zastávke)",
-        "en": "Bus stop"
+        "sk": "pomaranč",
+        "en": "orange"
       },
       {
-        "sk": "Výťah (vo výťahu)",
-        "en": "Elevator"
+        "sk": "čerešňa",
+        "en": "cherry"
       },
       {
-        "sk": "Knižnica",
-        "en": "Library"
+        "sk": "jahoda",
+        "en": "strawberry"
       },
       {
-        "sk": "Budova",
-        "en": "Building"
+        "sk": "slivka",
+        "en": "plum"
       },
       {
-        "sk": "Ulica",
-        "en": "Street"
+        "sk": "hrozno",
+        "en": "grape"
       },
       {
-        "sk": "Chodník",
-        "en": "Sidewalk"
+        "sk": "broskyňa",
+        "en": "peach"
       },
       {
-        "sk": "Hrad",
-        "en": "Castle"
+        "sk": "marhuľa",
+        "en": "apricot"
       },
       {
-        "sk": "Rieka",
-        "en": "River"
+        "sk": "čučoriedka",
+        "en": "blueberry"
+      }
+    ]
+  },
+  {
+    "topic": "Places",
+    "words": [
+      {
+        "sk": "práca (v práci)",
+        "en": "work (at work)"
       },
       {
-        "sk": "ZOO (Zool. záhrada)",
-        "en": "Zoo"
+        "sk": "škola (v škole)",
+        "en": "school (at school)"
       },
       {
-        "sk": "Posteľ",
-        "en": "Bed"
+        "sk": "obchod (v obchode)",
+        "en": "shop (in the shop)"
       },
       {
-        "sk": "Stôl",
-        "en": "Table"
+        "sk": "zastávka (na zastávke)",
+        "en": "bus stop (at the bus stop)"
       },
       {
-        "sk": "Stolička",
-        "en": "Chair"
+        "sk": "výťah (vo výťahu)",
+        "en": "elevator (in the elevator)"
       },
       {
-        "sk": "Dvere",
-        "en": "Door"
+        "sk": "knižnica",
+        "en": "library"
       },
       {
-        "sk": "Okno",
-        "en": "Window"
+        "sk": "budova",
+        "en": "building"
       },
       {
-        "sk": "Gauč",
-        "en": "Couch"
+        "sk": "ulica",
+        "en": "street"
       },
       {
-        "sk": "Sedačka",
-        "en": "Sofa"
+        "sk": "chodník",
+        "en": "sidewalk"
       },
       {
-        "sk": "Lampa",
-        "en": "Lamp"
+        "sk": "hrad",
+        "en": "castle"
       },
       {
-        "sk": "Kôš",
-        "en": "Trash can"
+        "sk": "rieka",
+        "en": "river"
+      },
+      {
+        "sk": "zoo (zoologická záhrada)",
+        "en": "zoo"
+      }
+    ]
+  },
+  {
+    "topic": "Things at Home",
+    "words": [
+      {
+        "sk": "posteľ",
+        "en": "bed"
+      },
+      {
+        "sk": "stôl",
+        "en": "table"
+      },
+      {
+        "sk": "stolička",
+        "en": "chair"
+      },
+      {
+        "sk": "dvere",
+        "en": "door"
+      },
+      {
+        "sk": "okno",
+        "en": "window"
+      },
+      {
+        "sk": "gauč",
+        "en": "couch"
+      },
+      {
+        "sk": "sedačka",
+        "en": "sofa"
+      },
+      {
+        "sk": "lampa",
+        "en": "lamp"
+      },
+      {
+        "sk": "kôš",
+        "en": "trash can"
       }
     ]
   },
@@ -593,108 +595,108 @@
     "topic": "Adjectives & Opposites",
     "words": [
       {
-        "sk": "Dobrý",
-        "en": "Good"
+        "sk": "dobrý",
+        "en": "good"
       },
       {
-        "sk": "Zlý",
-        "en": "Bad"
+        "sk": "zlý",
+        "en": "bad"
       },
       {
-        "sk": "Veľký",
-        "en": "Big"
+        "sk": "veľký",
+        "en": "big"
       },
       {
-        "sk": "Malý",
-        "en": "Small"
+        "sk": "malý",
+        "en": "small"
       },
       {
-        "sk": "Čistý",
-        "en": "Clean"
+        "sk": "čistý",
+        "en": "clean"
       },
       {
-        "sk": "Špinavý",
-        "en": "Dirty"
+        "sk": "špinavý",
+        "en": "dirty"
       },
       {
-        "sk": "Silný",
-        "en": "Strong"
+        "sk": "silný",
+        "en": "strong"
       },
       {
-        "sk": "Slabý",
-        "en": "Weak"
+        "sk": "slabý",
+        "en": "weak"
       },
       {
-        "sk": "Ťažký",
-        "en": "Heavy / Hard"
+        "sk": "ťažký",
+        "en": "heavy / hard"
       },
       {
-        "sk": "Ľahký",
-        "en": "Light / Easy"
+        "sk": "ľahký",
+        "en": "light / easy"
       },
       {
-        "sk": "Dlhý",
-        "en": "Long"
+        "sk": "dlhý",
+        "en": "long"
       },
       {
-        "sk": "Krátky",
-        "en": "Short"
+        "sk": "krátky",
+        "en": "short"
       },
       {
-        "sk": "Mladý",
-        "en": "Young"
+        "sk": "mladý",
+        "en": "young"
       },
       {
-        "sk": "Starý",
-        "en": "Old"
+        "sk": "starý",
+        "en": "old"
       },
       {
-        "sk": "Krásny",
-        "en": "Beautiful"
+        "sk": "krásny",
+        "en": "beautiful"
       },
       {
-        "sk": "Škaredý",
-        "en": "Ugly"
+        "sk": "škaredý",
+        "en": "ugly"
       },
       {
-        "sk": "Lenivý",
-        "en": "Lazy"
+        "sk": "lenivý",
+        "en": "lazy"
       },
       {
-        "sk": "Chorý",
-        "en": "Sick"
+        "sk": "chorý",
+        "en": "sick"
       },
       {
-        "sk": "Neperlivá",
-        "en": "Still (water)"
+        "sk": "neperlivá",
+        "en": "still (water)"
       },
       {
-        "sk": "Perlivá",
-        "en": "Sparkling (water)"
+        "sk": "perlivá",
+        "en": "sparkling (water)"
       },
       {
-        "sk": "Vpravo",
-        "en": "Right"
+        "sk": "vpravo",
+        "en": "right"
       },
       {
-        "sk": "Vľavo",
-        "en": "Left"
+        "sk": "vľavo",
+        "en": "left"
       },
       {
-        "sk": "Vonku",
-        "en": "Outside"
+        "sk": "vonku",
+        "en": "outside"
       },
       {
-        "sk": "Vnútri",
-        "en": "Inside"
+        "sk": "vnútri",
+        "en": "inside"
       },
       {
-        "sk": "Hore",
-        "en": "Up"
+        "sk": "hore",
+        "en": "up"
       },
       {
-        "sk": "Dole",
-        "en": "Down"
+        "sk": "dole",
+        "en": "down"
       }
     ]
   },
@@ -703,11 +705,11 @@
     "words": [
       {
         "sk": "hodina",
-        "en": "an hour"
+        "en": "hour"
       },
       {
         "sk": "pol",
-        "en": "half past"
+        "en": "half (pol ôsmej = half past seven)"
       },
       {
         "sk": "o jednej",
@@ -758,136 +760,72 @@
         "en": "at twelve o'clock"
       },
       {
+        "sk": "ráno",
+        "en": "morning"
+      },
+      {
         "sk": "dopoludnia",
         "en": "late morning (before noon)"
+      },
+      {
+        "sk": "na obed",
+        "en": "at lunchtime"
       },
       {
         "sk": "popoludní / poobede",
         "en": "afternoon"
       },
       {
+        "sk": "večer",
+        "en": "evening"
+      },
+      {
         "sk": "v noci",
         "en": "at night"
       },
       {
-        "sk": "Dnes",
-        "en": "Today"
+        "sk": "dnes",
+        "en": "today"
       },
       {
-        "sk": "Zajtra",
-        "en": "Tomorrow"
+        "sk": "zajtra",
+        "en": "tomorrow"
       },
       {
-        "sk": "Včera",
-        "en": "Yesterday"
+        "sk": "včera",
+        "en": "yesterday"
       },
       {
-        "sk": "Teraz",
-        "en": "Now"
+        "sk": "teraz",
+        "en": "now"
       },
       {
-        "sk": "Potom",
-        "en": "Then"
+        "sk": "potom",
+        "en": "then"
       },
       {
-        "sk": "Ráno",
-        "en": "Morning"
+        "sk": "sekundy",
+        "en": "seconds"
       },
       {
-        "sk": "Večer",
-        "en": "Evening"
+        "sk": "minúty",
+        "en": "minutes"
       },
       {
-        "sk": "Mesiac",
-        "en": "Month"
+        "sk": "mesiac",
+        "en": "month"
       },
       {
-        "sk": "Leto",
-        "en": "Summer"
+        "sk": "leto",
+        "en": "summer"
       },
       {
-        "sk": "Dovolenka",
-        "en": "Vacation"
+        "sk": "dovolenka",
+        "en": "vacation"
       },
       {
-        "sk": "Prázdniny",
-        "en": "Holiday (school break)"
-      },
-      {
-        "sk": "Sekundy",
-        "en": "Seconds"
-      },
-      {
-        "sk": "Minúty",
-        "en": "Minutes"
-      },
-      {
-        "sk": "Hodina",
-        "en": "Hour"
-      },
-      {
-        "sk": "jeden",
-        "en": "one"
-      },
-      {
-        "sk": "dva",
-        "en": "two"
-      },
-      {
-        "sk": "tri",
-        "en": "three"
-      },
-      {
-        "sk": "štyri",
-        "en": "four"
-      },
-      {
-        "sk": "päť",
-        "en": "five"
-      },
-      {
-        "sk": "šesť",
-        "en": "six"
-      },
-      {
-        "sk": "sedem",
-        "en": "seven"
-      },
-      {
-        "sk": "osem",
-        "en": "eight"
-      },
-      {
-        "sk": "deväť",
-        "en": "nine"
-      },
-      {
-        "sk": "desat'",
-        "en": "ten"
-      },
-      {
-        "sk": "jedenást'",
-        "en": "eleven"
-      },
-      {
-        "sk": "dvanást'",
-        "en": "twelve"
-      },
-      {
-        "sk": "ráno",
-        "en": "morning"
-      },
-      {
-        "sk": "na obed",
-        "en": "for lunch"
-      },
-      {
-        "sk": "popoludní",
-        "en": "afternoon"
-      },
-      {
-        "sk": "večer",
-        "en": "evening"
+        "sk": "prázdniny",
+        "en": "holiday (school break)"
       }
     ]
   },
@@ -1040,11 +978,11 @@
         "en": "to go home"
       },
       {
-        "sk": "vidieť (vidím, vidia)",
+        "sk": "vidieť",
         "en": "to see"
       },
       {
-        "sk": "vedieť (viem)",
+        "sk": "vedieť",
         "en": "to know (ability / facts)"
       },
       {
@@ -1052,23 +990,23 @@
         "en": "to know (a person / place)"
       },
       {
-        "sk": "rozumieť (rozumiem)",
+        "sk": "rozumieť",
         "en": "to understand"
       },
       {
-        "sk": "potrebovať (potrebujem)",
+        "sk": "potrebovať",
         "en": "to need"
       },
       {
-        "sk": "kupovať (kupujem)",
+        "sk": "kupovať",
         "en": "to buy"
       },
       {
-        "sk": "hľadať (hľadám)",
+        "sk": "hľadať",
         "en": "to look for"
       },
       {
-        "sk": "počúvať (počúvam)",
+        "sk": "počúvať",
         "en": "to listen"
       },
       {
@@ -1076,15 +1014,15 @@
         "en": "to love"
       },
       {
-        "sk": "písať (píšem)",
+        "sk": "písať",
         "en": "to write"
       },
       {
-        "sk": "čakať na (čakám)",
+        "sk": "čakať na",
         "en": "to wait for"
       },
       {
-        "sk": "chodiť (chodím)",
+        "sk": "chodiť",
         "en": "to walk (habitually)"
       },
       {

@@ -136,11 +136,6 @@
     "ref": "pronouns-possessives"
   },
   {
-    "id": "gram-question-words",
-    "kind": "grammar",
-    "ref": "question-words"
-  },
-  {
     "id": "vocab-useful-phrases-0",
     "kind": "vocab",
     "ref": "Useful Phrases",
@@ -177,34 +172,28 @@
     "round": 1
   },
   {
-    "id": "vocab-food-drink-2",
+    "id": "vocab-fruit-0",
     "kind": "vocab",
-    "ref": "Food & Drink",
-    "round": 2
-  },
-  {
-    "id": "vocab-food-drink-3",
-    "kind": "vocab",
-    "ref": "Food & Drink",
-    "round": 3
-  },
-  {
-    "id": "vocab-places-things-at-home-0",
-    "kind": "vocab",
-    "ref": "Places & Things at Home",
+    "ref": "Fruit",
     "round": 0
   },
   {
-    "id": "vocab-places-things-at-home-1",
+    "id": "vocab-places-0",
     "kind": "vocab",
-    "ref": "Places & Things at Home",
+    "ref": "Places",
+    "round": 0
+  },
+  {
+    "id": "vocab-places-1",
+    "kind": "vocab",
+    "ref": "Places",
     "round": 1
   },
   {
-    "id": "vocab-places-things-at-home-2",
+    "id": "vocab-things-at-home-0",
     "kind": "vocab",
-    "ref": "Places & Things at Home",
-    "round": 2
+    "ref": "Things at Home",
+    "round": 0
   },
   {
     "id": "vocab-adjectives-opposites-0",
@@ -269,14 +258,14 @@
     "ref": "conjugation-hovorit-jest-chciet-pracovat"
   },
   {
+    "id": "gram-question-words",
+    "kind": "grammar",
+    "ref": "question-words"
+  },
+  {
     "id": "gram-nouns-plurals",
     "kind": "grammar",
     "ref": "nouns-plurals"
-  },
-  {
-    "id": "gram-cases-overview",
-    "kind": "grammar",
-    "ref": "cases-overview"
   },
   {
     "id": "vocab-time-daily-routine-0",
@@ -301,18 +290,6 @@
     "kind": "vocab",
     "ref": "Time & Daily Routine",
     "round": 3
-  },
-  {
-    "id": "vocab-time-daily-routine-4",
-    "kind": "vocab",
-    "ref": "Time & Daily Routine",
-    "round": 4
-  },
-  {
-    "id": "vocab-time-daily-routine-5",
-    "kind": "vocab",
-    "ref": "Time & Daily Routine",
-    "round": 5
   },
   {
     "id": "gram-time-daily-routine",
