@@ -49,6 +49,14 @@ Changes from "Slovak – notes 2" (section numbers are the roadmap numbers at th
 - **Six cases (54)**: removed from the Learn path (still readable in the Grammar Guide).
 - **Time (60–61)**: repeated numbers and duplicate time words removed.
 
+Follow-up after her answers:
+
+- **vy**: described as "a group of people, or formal" (group first).
+- **Six cases**: stays in the Grammar Guide, at the end, marked as reference only.
+- **ujo / strýko**: one entry, "uncle" — either side of the family.
+- **páčiť sa**: replaces the incorrect "páčiť sa mi"; notes *páči sa mi* = I like it.
+- **New section 27, Adjectives: dobrý / dobrá / dobré** — adjective endings follow the noun's gender (*moja dobrá sestra*), right after possessives.
+
 Word progress (stats and mastered words) is carried over automatically for words whose spelling only changed in capitalisation or lost a bracketed extra. New and reworded phrases need audio: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
 
 ## Quick reference

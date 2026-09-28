@@ -115,12 +115,6 @@
     "round": 2
   },
   {
-    "id": "vocab-family-people-3",
-    "kind": "vocab",
-    "ref": "Family & People",
-    "round": 3
-  },
-  {
     "id": "gram-personal-pronouns",
     "kind": "grammar",
     "ref": "personal-pronouns"
@@ -134,6 +128,11 @@
     "id": "gram-pronouns-possessives",
     "kind": "grammar",
     "ref": "pronouns-possessives"
+  },
+  {
+    "id": "gram-adjectives-gender",
+    "kind": "grammar",
+    "ref": "adjectives-gender"
   },
   {
     "id": "vocab-useful-phrases-0",

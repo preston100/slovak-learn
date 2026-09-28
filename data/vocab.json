@@ -314,12 +314,8 @@
         "en": "aunt"
       },
       {
-        "sk": "ujo",
+        "sk": "ujo / strýko",
         "en": "uncle"
-      },
-      {
-        "sk": "strýko",
-        "en": "uncle (alternate word)"
       },
       {
         "sk": "vnuk",
@@ -1042,8 +1038,8 @@
         "en": "to think"
       },
       {
-        "sk": "páčiť sa mi",
-        "en": "I like it (it pleases me)"
+        "sk": "páčiť sa",
+        "en": "to like (páči sa mi = I like it)"
       }
     ]
   }

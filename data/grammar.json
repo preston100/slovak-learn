@@ -435,9 +435,197 @@
     ]
   },
   {
+    "id": "adjectives-gender",
+    "topic": "Adjectives: dobrý / dobrá / dobré",
+    "summary": "Adjectives change their ending to match the gender of the noun — just like môj / moja / moje.",
+    "explanation": "An adjective **matches the gender** of the noun it describes, just like *môj / moja / moje* and *tento / táto / toto*.\n\nWord lists show adjectives in the **masculine** form (*dobrý, veľký, malý*). For a feminine or neuter noun, change the ending:\n- masculine: **-ý** — *dobrý brat*\n- feminine: **-á** — *dobrá sestra*\n- neuter: **-é** — *dobré auto*\n\nAfter a **long** syllable the endings are **short**, but it's the same pattern: *krásny, krásna, krásne*.\n\nPut it all together: *môj dobrý brat*, *moja dobrá sestra*, *moje dobré auto*.",
+    "tables": [
+      {
+        "head": [
+          "",
+          "masculine\n(brat)",
+          "feminine\n(sestra)",
+          "neuter\n(auto)"
+        ],
+        "rows": [
+          [
+            "good",
+            "dobr**ý**",
+            "dobr**á**",
+            "dobr**é**"
+          ],
+          [
+            "big",
+            "veľk**ý**",
+            "veľk**á**",
+            "veľk**é**"
+          ],
+          [
+            "small",
+            "mal**ý**",
+            "mal**á**",
+            "mal**é**"
+          ],
+          [
+            "new",
+            "nov**ý**",
+            "nov**á**",
+            "nov**é**"
+          ],
+          [
+            "old",
+            "star**ý**",
+            "star**á**",
+            "star**é**"
+          ],
+          [
+            "beautiful",
+            "krásn**y**",
+            "krásn**a**",
+            "krásn**e**"
+          ]
+        ]
+      },
+      {
+        "title": "All together",
+        "head": [
+          "",
+          "my + good + noun"
+        ],
+        "rows": [
+          [
+            "masculine",
+            "môj dobr**ý** brat — my good brother"
+          ],
+          [
+            "feminine",
+            "moj**a** dobr**á** sestra — my good sister"
+          ],
+          [
+            "neuter",
+            "moj**e** dobr**é** auto — my good car"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "môj dobrý brat",
+        "en": "my good brother"
+      },
+      {
+        "sk": "moja dobrá sestra",
+        "en": "my good sister"
+      },
+      {
+        "sk": "moje dobré auto",
+        "en": "my good car"
+      },
+      {
+        "sk": "Náš dom je veľký.",
+        "en": "Our house is big."
+      },
+      {
+        "sk": "Moja izba je malá.",
+        "en": "My room is small."
+      },
+      {
+        "sk": "Jeho auto je nové.",
+        "en": "His car is new."
+      },
+      {
+        "sk": "Táto žena je mladá.",
+        "en": "This woman is young."
+      },
+      {
+        "sk": "Toto mesto je krásne.",
+        "en": "This town is beautiful."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "moja ___ sestra (dobrý)",
+        "question": "Which form? (sestra is feminine)",
+        "options": [
+          "dobrá",
+          "dobrý",
+          "dobré"
+        ],
+        "answer": "dobrá",
+        "explain": "Feminine noun, so -á: dobrá."
+      },
+      {
+        "prompt": "môj ___ brat (dobrý)",
+        "question": "Which form? (brat is masculine)",
+        "options": [
+          "dobrý",
+          "dobrá",
+          "dobré"
+        ],
+        "answer": "dobrý",
+        "explain": "Masculine noun, so -ý: dobrý."
+      },
+      {
+        "prompt": "moje ___ auto (nový)",
+        "question": "Which form? (auto is neuter)",
+        "options": [
+          "nové",
+          "nový",
+          "nová"
+        ],
+        "answer": "nové",
+        "explain": "Neuter noun, so -é: nové."
+      },
+      {
+        "prompt": "Moja izba je ___. (malý)",
+        "question": "Which form? (izba is feminine)",
+        "options": [
+          "malá",
+          "malý",
+          "malé"
+        ],
+        "answer": "malá",
+        "explain": "The adjective still matches the noun after je: izba is feminine, so malá."
+      },
+      {
+        "prompt": "Náš dom je ___. (veľký)",
+        "question": "Which form? (dom is masculine)",
+        "options": [
+          "veľký",
+          "veľká",
+          "veľké"
+        ],
+        "answer": "veľký",
+        "explain": "Masculine noun, so veľký."
+      },
+      {
+        "prompt": "Toto mesto je ___. (krásny)",
+        "question": "Which form? (mesto is neuter)",
+        "options": [
+          "krásne",
+          "krásny",
+          "krásna"
+        ],
+        "answer": "krásne",
+        "explain": "Neuter, so -e — short, because of the long á before it."
+      },
+      {
+        "prompt": "my good sister",
+        "question": "Which one is correct?",
+        "options": [
+          "moja dobrá sestra",
+          "môj dobrý sestra",
+          "moja dobrý sestra"
+        ],
+        "answer": "moja dobrá sestra",
+        "explain": "Both \"my\" and \"good\" change to match sestra, which is feminine."
+      }
+    ]
+  },
+  {
     "id": "cases-overview",
     "topic": "The Six Cases",
-    "summary": "Slovak changes noun/adjective endings depending on grammatical role — six cases are in everyday use.",
+    "summary": "Reference only — not part of the lessons. Slovak changes noun endings depending on their role in the sentence.",
     "explanation": "Slovak changes the **ending** of a noun depending on its **role** in the sentence. Traditionally there are seven cases; the 5th (vocative, for calling someone) is rarely used today, which is why the numbering skips from 4 to 6.\n\nMany prepositions **always** take the same case — that's the easiest way in.",
     "examples": [
       {
@@ -1952,7 +2140,7 @@
           [
             "vy",
             "**ste**",
-            "you are (formal, or plural)"
+            "you are (a group, or formal)"
           ],
           [
             "oni / ony",
@@ -1967,7 +2155,7 @@
     "id": "personal-pronouns",
     "topic": "Personal Pronouns & Formal/Informal \"You\"",
     "summary": "I, you, he… are usually left out of a sentence — use them only for emphasis. Plus when to say ty vs. vy.",
-    "explanation": "**In a normal sentence the pronoun is left out.** The verb ending already shows who is doing it, so *Som doma.* (I am at home.) is the natural way to say it. Use the pronoun only when you want to **stress** it: *Ja som doma, ale on je v robote.* — **I** am at home, but **he** is at work.\n\nSlovak has **two words for \"you\"**:\n- **ty** — one person you know well: family, friends, children\n- **vy** — one person you should be polite to (a stranger, an older person, a teacher, a boss), **and** any group of people\n\nNot sure which one? Use **vy**.",
+    "explanation": "**In a normal sentence the pronoun is left out.** The verb ending already shows who is doing it, so *Som doma.* (I am at home.) is the natural way to say it. Use the pronoun only when you want to **stress** it: *Ja som doma, ale on je v robote.* — **I** am at home, but **he** is at work.\n\nSlovak has **two words for \"you\"**:\n- **ty** — one person you know well: family, friends, children\n- **vy** — any **group of people**, and also **one person** you should be polite to (a stranger, an older person, a teacher, a boss)\n\nNot sure which one? Use **vy**.",
     "examples": [
       {
         "sk": "Ja som doma.",
@@ -1995,7 +2183,7 @@
       },
       {
         "sk": "Vy ste u lekára.",
-        "en": "You are at the doctor's. (formal, or a group of people)"
+        "en": "You are at the doctor's. (to a group, or formal)"
       },
       {
         "sk": "Oni sú bratia.",
@@ -2127,7 +2315,7 @@
           [
             "2nd person",
             "**ty** — you (informal)",
-            "**vy** — you (formal, or plural)"
+            "**vy** — you (a group, or formal)"
           ],
           [
             "3rd person",
