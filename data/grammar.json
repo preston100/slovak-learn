@@ -2140,7 +2140,7 @@
           [
             "vy",
             "**ste**",
-            "you are (a group, or formal)"
+            "you are (formal, or a group)"
           ],
           [
             "oni / ony",
@@ -2155,7 +2155,7 @@
     "id": "personal-pronouns",
     "topic": "Personal Pronouns & Formal/Informal \"You\"",
     "summary": "I, you, he… are usually left out of a sentence — use them only for emphasis. Plus when to say ty vs. vy.",
-    "explanation": "**In a normal sentence the pronoun is left out.** The verb ending already shows who is doing it, so *Som doma.* (I am at home.) is the natural way to say it. Use the pronoun only when you want to **stress** it: *Ja som doma, ale on je v robote.* — **I** am at home, but **he** is at work.\n\nSlovak has **two words for \"you\"**:\n- **ty** — one person you know well: family, friends, children\n- **vy** — any **group of people**, and also **one person** you should be polite to (a stranger, an older person, a teacher, a boss)\n\nNot sure which one? Use **vy**.",
+    "explanation": "**In a normal sentence the pronoun is left out.** The verb ending already shows who is doing it, so *Som doma.* (I am at home.) is the natural way to say it. Use the pronoun only when you want to **stress** it: *Ja som doma, ale on je v robote.* — **I** am at home, but **he** is at work.\n\nSlovak has **two words for \"you\"**:\n- **ty** — one person you know well: family, friends, children\n- **vy** — **one person** you should be polite to (a stranger, an older person, a teacher, a boss), **and** any **group of people**\n\nNot sure which one? Use **vy**.",
     "examples": [
       {
         "sk": "Ja som doma.",
@@ -2183,7 +2183,7 @@
       },
       {
         "sk": "Vy ste u lekára.",
-        "en": "You are at the doctor's. (to a group, or formal)"
+        "en": "You are at the doctor's. (formal, or a group of people)"
       },
       {
         "sk": "Oni sú bratia.",
@@ -2315,7 +2315,7 @@
           [
             "2nd person",
             "**ty** — you (informal)",
-            "**vy** — you (a group, or formal)"
+            "**vy** — you (formal, or a group)"
           ],
           [
             "3rd person",

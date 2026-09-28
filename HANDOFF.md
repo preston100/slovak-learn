@@ -51,7 +51,7 @@ Changes from "Slovak – notes 2" (section numbers are the roadmap numbers at th
 
 Follow-up after her answers:
 
-- **vy**: described as "a group of people, or formal" (group first).
+- **vy**: described as "formal, or a group of people" — she confirmed her original "informal" was a slip.
 - **Six cases**: stays in the Grammar Guide, at the end, marked as reference only.
 - **ujo / strýko**: one entry, "uncle" — either side of the family.
 - **páčiť sa**: replaces the incorrect "páčiť sa mi"; notes *páči sa mi* = I like it.
