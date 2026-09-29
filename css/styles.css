@@ -471,98 +471,11 @@ main {
   display: none;
 }
 
-/* ---------- Grammar cards ---------- */
+/* ---------- Grammar Guide list ---------- */
 .grammar-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.grammar-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.grammar-card summary {
-  list-style: none;
-  cursor: pointer;
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.grammar-card summary::-webkit-details-marker {
-  display: none;
-}
-
-.grammar-card-title h3 {
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
-.grammar-card-title p {
-  font-size: 13.5px;
-  color: var(--color-text-muted);
-}
-
-.chevron {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-faint);
-  transition: transform 0.2s ease;
-}
-
-.grammar-card[open] .chevron {
-  transform: rotate(180deg);
-}
-
-.grammar-card-body {
-  padding: 0 22px 22px;
-  border-top: 1px solid var(--color-border);
-  padding-top: 16px;
-}
-
-.grammar-card-body .explanation {
-  font-size: 14.5px;
-  color: var(--color-text);
-  margin-bottom: 16px;
-}
-
-.grammar-card-body .grammar-table-block + .example-list {
-  margin-top: 16px;
-}
-
-.example-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.example-row {
-  display: flex;
-  gap: 10px;
-  padding: 10px 14px;
-  background: var(--color-surface-alt);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-}
-
-.example-row .sk {
-  font-weight: 600;
-  min-width: 40%;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.example-row .en {
-  color: var(--color-text-muted);
 }
 
 /* ---------- Vocabulary ---------- */
@@ -787,6 +700,47 @@ main {
   font-weight: 700;
   color: var(--color-text-muted);
   white-space: nowrap;
+}
+
+/* Level headers (A1.1, A1.2…) sit on the path itself, with a solid
+   background so the dashed spine runs behind rather than through them. */
+.roadmap-level-header {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  margin: 4px auto 30px;
+  padding: 8px 22px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+.roadmap-level-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-accent);
+  line-height: 1.2;
+}
+.roadmap-level-progress {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+.round-row + .roadmap-level-header {
+  margin-top: 40px;
+}
+
+/* A level's final test is the gate into the next level — bigger than a
+   checkpoint so it reads as the end of the level. */
+.round-node.final-test {
+  width: 90px;
+  height: 90px;
+}
+.round-node.final-test .round-icon {
+  width: 34px;
+  height: 34px;
 }
 
 /* On a phone a long title on the outer lanes ran past the screen edge and
@@ -2636,11 +2590,4 @@ input[type='password']:focus {
     flex-direction: column;
   }
 
-  .example-row {
-    flex-direction: column;
-  }
-
-  .example-row .sk {
-    min-width: 0;
-  }
 }

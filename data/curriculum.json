@@ -1,297 +1,363 @@
 [
   {
     "id": "alpha-vowels-a",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "vowels-a"
   },
   {
     "id": "alpha-vowels-e",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "vowels-e"
   },
   {
     "id": "alpha-vowels-iy",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "vowels-iy"
   },
   {
     "id": "alpha-vowels-o",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "vowels-o"
   },
   {
     "id": "alpha-vowels-u",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "vowels-u"
   },
   {
     "id": "alpha-vowels-rare",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "vowels-rare"
   },
   {
     "id": "alpha-hacek-consonants",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "hacek-consonants"
   },
   {
     "id": "alpha-soft-consonants",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "soft-consonants"
   },
   {
     "id": "alpha-tricky-letters",
+    "level": "A1.1",
     "kind": "alphabet",
     "ref": "tricky-letters"
   },
   {
     "id": "vocab-greetings-basics-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Greetings & Basics",
     "round": 0
   },
   {
+    "id": "vocab-greetings-basics-1",
+    "level": "A1.1",
+    "kind": "vocab",
+    "ref": "Greetings & Basics",
+    "round": 1
+  },
+  {
     "id": "vocab-everyday-phrases-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Everyday Phrases",
     "round": 0
   },
   {
     "id": "vocab-everyday-phrases-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Everyday Phrases",
     "round": 1
   },
   {
-    "id": "vocab-everyday-phrases-2",
-    "kind": "vocab",
-    "ref": "Everyday Phrases",
-    "round": 2
-  },
-  {
     "id": "vocab-numbers-0-20-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Numbers 0-20",
     "round": 0
   },
   {
     "id": "vocab-numbers-0-20-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Numbers 0-20",
     "round": 1
   },
   {
     "id": "vocab-numbers-0-20-2",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Numbers 0-20",
     "round": 2
   },
   {
     "id": "gram-nouns-gender",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "nouns-gender"
   },
   {
     "id": "gram-verb-to-be",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "verb-to-be"
   },
   {
+    "id": "gram-negation",
+    "level": "A1.1",
+    "kind": "grammar",
+    "ref": "negation"
+  },
+  {
     "id": "vocab-family-people-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Family & People",
     "round": 0
   },
   {
     "id": "vocab-family-people-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Family & People",
     "round": 1
   },
   {
     "id": "vocab-family-people-2",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Family & People",
     "round": 2
   },
   {
     "id": "gram-personal-pronouns",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "personal-pronouns"
   },
   {
     "id": "gram-demonstratives",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "demonstratives"
   },
   {
     "id": "gram-pronouns-possessives",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "pronouns-possessives"
   },
   {
     "id": "gram-adjectives-gender",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "adjectives-gender"
   },
   {
     "id": "vocab-useful-phrases-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Useful Phrases",
     "round": 0
   },
   {
     "id": "vocab-useful-phrases-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Useful Phrases",
     "round": 1
   },
   {
     "id": "vocab-useful-phrases-2",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Useful Phrases",
     "round": 2
   },
   {
     "id": "vocab-useful-phrases-3",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Useful Phrases",
     "round": 3
   },
   {
     "id": "vocab-food-drink-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Food & Drink",
     "round": 0
   },
   {
     "id": "vocab-food-drink-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Food & Drink",
     "round": 1
   },
   {
+    "id": "vocab-food-drink-2",
+    "level": "A1.1",
+    "kind": "vocab",
+    "ref": "Food & Drink",
+    "round": 2
+  },
+  {
     "id": "vocab-fruit-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Fruit",
     "round": 0
   },
   {
     "id": "vocab-places-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Places",
     "round": 0
   },
   {
     "id": "vocab-places-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Places",
     "round": 1
   },
   {
     "id": "vocab-things-at-home-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Things at Home",
     "round": 0
   },
   {
     "id": "vocab-adjectives-opposites-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Adjectives & Opposites",
     "round": 0
   },
   {
     "id": "vocab-adjectives-opposites-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Adjectives & Opposites",
     "round": 1
   },
   {
     "id": "vocab-adjectives-opposites-2",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Adjectives & Opposites",
     "round": 2
   },
   {
     "id": "vocab-common-verbs-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Common Verbs",
     "round": 0
   },
   {
     "id": "vocab-common-verbs-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Common Verbs",
     "round": 1
   },
   {
     "id": "vocab-common-verbs-2",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Common Verbs",
     "round": 2
   },
   {
     "id": "vocab-common-verbs-3",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Common Verbs",
     "round": 3
   },
   {
     "id": "gram-present-tense",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "present-tense"
   },
   {
     "id": "gram-conjugation-byt-mat-ist-prist",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "conjugation-byt-mat-ist-prist"
   },
   {
     "id": "gram-conjugation-robit-spat-hrat-citat",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "conjugation-robit-spat-hrat-citat"
   },
   {
     "id": "gram-conjugation-hovorit-jest-chciet-pracovat",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "conjugation-hovorit-jest-chciet-pracovat"
   },
   {
     "id": "gram-question-words",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "question-words"
   },
   {
     "id": "gram-nouns-plurals",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "nouns-plurals"
   },
   {
     "id": "vocab-time-daily-routine-0",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Time & Daily Routine",
     "round": 0
   },
   {
     "id": "vocab-time-daily-routine-1",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Time & Daily Routine",
     "round": 1
   },
   {
     "id": "vocab-time-daily-routine-2",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Time & Daily Routine",
     "round": 2
   },
   {
     "id": "vocab-time-daily-routine-3",
+    "level": "A1.1",
     "kind": "vocab",
     "ref": "Time & Daily Routine",
     "round": 3
   },
   {
     "id": "gram-time-daily-routine",
+    "level": "A1.1",
     "kind": "grammar",
     "ref": "time-daily-routine"
   }

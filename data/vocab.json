@@ -19,6 +19,18 @@
         "en": "goodbye (formal)"
       },
       {
+        "sk": "dobré ráno",
+        "en": "good morning"
+      },
+      {
+        "sk": "dobrý večer",
+        "en": "good evening"
+      },
+      {
+        "sk": "dobrú noc",
+        "en": "good night"
+      },
+      {
         "sk": "prosím",
         "en": "please"
       },
@@ -44,24 +56,16 @@
     "topic": "Everyday Phrases",
     "words": [
       {
-        "sk": "Ahoj",
-        "en": "Hi (informal)"
-      },
-      {
-        "sk": "Dovidenia",
-        "en": "Goodbye (formal)"
-      },
-      {
         "sk": "Prepáč",
         "en": "Sorry (informal)"
       },
       {
         "sk": "Nech sa páči",
-        "en": "Here you are / You’re welcome"
+        "en": "Here you are / Go ahead"
       },
       {
         "sk": "Nemáš za čo",
-        "en": "You're welcome"
+        "en": "You're welcome (informal)"
       },
       {
         "sk": "Volám sa...",
@@ -129,8 +133,8 @@
     "topic": "Useful Phrases",
     "words": [
       {
-        "sk": "Nemáte / Nemáš za čo. // Rado sa stalo.",
-        "en": "You're welcome."
+        "sk": "Nemáte za čo. // Rado sa stalo.",
+        "en": "You're welcome. (formal) // My pleasure."
       },
       {
         "sk": "Teší ma. // Rád Vás / ťa spoznávam.",
@@ -399,6 +403,14 @@
         "en": "water"
       },
       {
+        "sk": "perlivá",
+        "en": "sparkling (water)"
+      },
+      {
+        "sk": "neperlivá",
+        "en": "still (water)"
+      },
+      {
         "sk": "šálka",
         "en": "cup"
       },
@@ -661,14 +673,6 @@
       {
         "sk": "chorý",
         "en": "sick"
-      },
-      {
-        "sk": "neperlivá",
-        "en": "still (water)"
-      },
-      {
-        "sk": "perlivá",
-        "en": "sparkling (water)"
       },
       {
         "sk": "vpravo",

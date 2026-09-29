@@ -1823,9 +1823,25 @@
   {
     "id": "time-daily-routine",
     "topic": "Telling Time & Daily Routine",
-    "summary": "How to say \"at\" a certain hour, and how to describe your day using time words.",
-    "explanation": "To say **at** a time, use **o** + the hour: *o jednej, o druhej, o tretej…*\n\n**Careful with pol:** it means half-way **to** the next hour. *Pol ôsmej* is **7:30** (half past seven), **not** 8:30.\n\nParts of the day are used **without o**: *Ráno vstávam.* / *Večer pozerám televíziu.*",
+    "summary": "How to ask and say what time it is, how to say \"at\" a certain hour, and how to describe your day.",
+    "explanation": "**Koľko je hodín?** — What time is it? The answer depends on the number (see the first table):\n- **1** → *Je jedna hodina.*\n- **2, 3, 4** → *Sú dve / tri / štyri hodiny.*\n- **5 and up** → *Je päť / šesť… hodín.*\n\nTo say **at** a time, use **o** + the hour: *o jednej, o druhej, o tretej…*\n\n**Careful with pol:** it means half-way **to** the next hour. *Pol ôsmej* is **7:30** (half past seven), **not** 8:30.\n\nParts of the day are used **without o**: *Ráno vstávam.* / *Večer pozerám televíziu.*",
     "examples": [
+      {
+        "sk": "Koľko je hodín?",
+        "en": "What time is it?"
+      },
+      {
+        "sk": "Je jedna hodina.",
+        "en": "It's one o'clock."
+      },
+      {
+        "sk": "Sú dve hodiny.",
+        "en": "It's two o'clock."
+      },
+      {
+        "sk": "Je päť hodín.",
+        "en": "It's five o'clock."
+      },
       {
         "sk": "Ráno vstávam o siedmej.",
         "en": "I get up at seven in the morning."
@@ -1852,6 +1868,50 @@
       }
     ],
     "exercises": [
+      {
+        "prompt": "Koľko je hodín?",
+        "question": "What does this mean?",
+        "options": [
+          "What time is it?",
+          "At what time?",
+          "How old are you?"
+        ],
+        "answer": "What time is it?",
+        "explain": "Koľko je hodín? asks what time it is right now."
+      },
+      {
+        "prompt": "1:00",
+        "question": "What time is it?",
+        "options": [
+          "Je jedna hodina.",
+          "Sú jedna hodiny.",
+          "Je jeden hodín."
+        ],
+        "answer": "Je jedna hodina.",
+        "explain": "One takes je … hodina."
+      },
+      {
+        "prompt": "3:00",
+        "question": "What time is it?",
+        "options": [
+          "Sú tri hodiny.",
+          "Je tri hodín.",
+          "Je tri hodina."
+        ],
+        "answer": "Sú tri hodiny.",
+        "explain": "2, 3 and 4 take sú … hodiny."
+      },
+      {
+        "prompt": "6:00",
+        "question": "What time is it?",
+        "options": [
+          "Je šesť hodín.",
+          "Sú šesť hodiny.",
+          "Je šesť hodina."
+        ],
+        "answer": "Je šesť hodín.",
+        "explain": "5 and up take je … hodín."
+      },
       {
         "prompt": "Vstávam ___ siedmej.",
         "question": "I get up at seven.",
@@ -1932,7 +1992,44 @@
     ],
     "tables": [
       {
-        "title": "Clock times",
+        "title": "What time is it?",
+        "head": [
+          "Time",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "1:00",
+            "**Je** jedna **hodina**."
+          ],
+          [
+            "2:00",
+            "**Sú** dve **hodiny**."
+          ],
+          [
+            "3:00",
+            "**Sú** tri **hodiny**."
+          ],
+          [
+            "4:00",
+            "**Sú** štyri **hodiny**."
+          ],
+          [
+            "5:00",
+            "**Je** päť **hodín**."
+          ],
+          [
+            "12:00",
+            "**Je** dvanásť **hodín**."
+          ],
+          [
+            "7:30",
+            "Je **pol** ôsmej."
+          ]
+        ]
+      },
+      {
+        "title": "At what time? (o + hour)",
         "head": [
           "Time",
           "Slovak"
@@ -2148,6 +2245,202 @@
             "they are"
           ]
         ]
+      }
+    ]
+  },
+  {
+    "id": "negation",
+    "topic": "Saying \"Not\" (Negation)",
+    "summary": "Put ne- on the front of a verb to say \"not\". Byť is the exception: nie som, nie je…",
+    "explanation": "To make a verb negative, put **ne-** on the front — **joined to the verb**, as one word:\n*mám* → *nemám* (I don't have)\n*rozumiem* → *nerozumiem* (I don't understand)\n\n**Byť is the exception.** It uses a **separate word, nie**: *som* → *nie som* (I am not), *je* → *nie je* (he / she / it is not).\n\nOn its own, **nie** also means **no**: *Nie, nie som doma.* — No, I'm not at home.",
+    "tables": [
+      {
+        "title": "Byť: nie + verb (two words)",
+        "head": [
+          "",
+          "byť",
+          "not"
+        ],
+        "rows": [
+          [
+            "ja",
+            "som",
+            "**nie** som"
+          ],
+          [
+            "ty",
+            "si",
+            "**nie** si"
+          ],
+          [
+            "on / ona / ono",
+            "je",
+            "**nie** je"
+          ],
+          [
+            "my",
+            "sme",
+            "**nie** sme"
+          ],
+          [
+            "vy",
+            "ste",
+            "**nie** ste"
+          ],
+          [
+            "oni / ony",
+            "sú",
+            "**nie** sú"
+          ]
+        ]
+      },
+      {
+        "title": "Every other verb: ne + verb (one word)",
+        "head": [
+          "Verb",
+          "Not",
+          "English"
+        ],
+        "rows": [
+          [
+            "mám",
+            "**ne**mám",
+            "I don't have"
+          ],
+          [
+            "rozumiem",
+            "**ne**rozumiem",
+            "I don't understand"
+          ],
+          [
+            "viem",
+            "**ne**viem",
+            "I don't know"
+          ],
+          [
+            "chcem",
+            "**ne**chcem",
+            "I don't want"
+          ],
+          [
+            "hovorím",
+            "**ne**hovorím",
+            "I don't speak"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Nie som unavený.",
+        "en": "I'm not tired."
+      },
+      {
+        "sk": "Nie je doma.",
+        "en": "He / She isn't at home."
+      },
+      {
+        "sk": "Nie sme súrodenci.",
+        "en": "We aren't siblings."
+      },
+      {
+        "sk": "Nie, ďakujem.",
+        "en": "No, thank you."
+      },
+      {
+        "sk": "Nemám čas.",
+        "en": "I don't have time."
+      },
+      {
+        "sk": "Nerozumiem.",
+        "en": "I don't understand."
+      },
+      {
+        "sk": "Neviem.",
+        "en": "I don't know."
+      },
+      {
+        "sk": "Nehovorím po slovensky.",
+        "en": "I don't speak Slovak."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ja ___ doma. (byť — not)",
+        "question": "I am not at home.",
+        "options": [
+          "nie som",
+          "nesom",
+          "som nie"
+        ],
+        "answer": "nie som",
+        "explain": "Byť takes a separate nie: nie som."
+      },
+      {
+        "prompt": "On ___ unavený. (byť — not)",
+        "question": "He isn't tired.",
+        "options": [
+          "nie je",
+          "nie si",
+          "nie sme"
+        ],
+        "answer": "nie je",
+        "explain": "On → je, so \"not\" is nie je."
+      },
+      {
+        "prompt": "My ___ súrodenci. (byť — not)",
+        "question": "We aren't siblings.",
+        "options": [
+          "nie sme",
+          "nesme",
+          "nie ste"
+        ],
+        "answer": "nie sme",
+        "explain": "My → sme, so nie sme."
+      },
+      {
+        "prompt": "Ja ___ čas. (mám — not)",
+        "question": "I don't have time.",
+        "options": [
+          "nemám",
+          "nie mám",
+          "mám nie"
+        ],
+        "answer": "nemám",
+        "explain": "Every verb except byť takes ne- joined on: nemám."
+      },
+      {
+        "prompt": "___ po slovensky. (hovorím — not)",
+        "question": "I don't speak Slovak.",
+        "options": [
+          "Nehovorím",
+          "Nie hovorím",
+          "Hovorím nie"
+        ],
+        "answer": "Nehovorím",
+        "explain": "Ne- joined to the verb: nehovorím."
+      },
+      {
+        "prompt": "Nerozumiem.",
+        "question": "What does this mean?",
+        "options": [
+          "I don't understand.",
+          "I understand.",
+          "I don't know."
+        ],
+        "answer": "I don't understand.",
+        "explain": "Ne- + rozumiem = I don't understand."
+      },
+      {
+        "prompt": "Neviem.",
+        "question": "What does this mean?",
+        "options": [
+          "I don't know.",
+          "I don't want.",
+          "I'm not here."
+        ],
+        "answer": "I don't know.",
+        "explain": "Ne- + viem = I don't know."
       }
     ]
   },

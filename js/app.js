@@ -464,7 +464,7 @@
   // roadmap. Any ordering that could shift an already-built section earlier
   // would silently invalidate that account's cleared-section progress.
   async function loadContent() {
-    const grammarContainer = document.getElementById('grammar-list');
+    const guideContainer = document.getElementById('guide-grammar-list');
     const vocabContainer = document.getElementById('vocab-list');
 
     try {
@@ -487,20 +487,19 @@
       vocabData = sharedVocabData.concat(privateVocabData);
       migrateRenamedWordKeys();
 
-      renderGrammar(grammarData);
       renderGrammarGuide();
       renderVocab(vocabData);
       populateTopicSelect();
       updateAudioGenSummary();
       buildRoadmapSections();
     } catch (err) {
-      grammarContainer.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
+      guideContainer.innerHTML = '<div class="empty-state">Could not load grammar content.</div>';
       vocabContainer.innerHTML = '<div class="empty-state">Could not load vocabulary content.</div>';
     }
   }
 
-  // Called right after Add Content saves something new — updates Browse
-  // All and the topic pickers immediately. The Roadmap tab picks up new
+  // Called right after Add Content saves something new — updates the word
+  // lists, the Grammar Guide and the topic pickers immediately. The Roadmap tab picks up new
   // sections on next reload, same as it always required for shared content.
   async function refreshPrivateContent() {
     const privateContent = await fetchPrivateContent();
@@ -509,26 +508,10 @@
     grammarData = sharedGrammarData.concat(privateGrammarData);
     vocabData = sharedVocabData.concat(privateVocabData);
 
-    renderGrammar(grammarData);
     renderGrammarGuide();
     renderVocab(vocabData);
     populateTopicSelect();
     updateAudioGenSummary();
-  }
-
-  function examplesHtml(examples) {
-    return (examples || [])
-      .map(function (ex) {
-        return (
-          '<div class="example-row"><span class="sk">' +
-          speakerButtonHtml(ex.sk) +
-          escapeHtml(ex.sk) +
-          '</span><span class="en">' +
-          escapeHtml(ex.en) +
-          '</span></div>'
-        );
-      })
-      .join('');
   }
 
   /* ---- Grammar text: light markup + tables ---- */
@@ -614,42 +597,6 @@
       .join(' ');
   }
 
-  function renderGrammar(topics, emptyMessage, containerId) {
-    const container = document.getElementById(containerId || 'grammar-list');
-    if (!topics.length) {
-      container.innerHTML = '<div class="empty-state">' + (emptyMessage || 'No grammar topics yet.') + '</div>';
-      return;
-    }
-
-    container.innerHTML = topics
-      .map(function (t, i) {
-        const examples = examplesHtml(t.examples);
-
-        return (
-          '<details class="grammar-card"' +
-          (i === 0 ? ' open' : '') +
-          '>' +
-          '<summary>' +
-          '<div class="grammar-card-title"><h3>' +
-          escapeHtml(t.topic) +
-          '</h3><p>' +
-          escapeHtml(t.summary || '') +
-          '</p></div>' +
-          '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>' +
-          '</summary>' +
-          '<div class="grammar-card-body">' +
-          '<div class="explanation rich-text">' +
-          richTextHtml(t.explanation || '') +
-          '</div>' +
-          grammarTablesHtml(t.tables) +
-          (examples ? '<div class="example-list">' + examples + '</div>' : '') +
-          '</div>' +
-          '</details>'
-        );
-      })
-      .join('');
-  }
-
   /* ---- Vocabulary ---- */
 
   function renderVocab(groups, emptyMessage) {
@@ -685,8 +632,7 @@
       .join('');
   }
 
-  // Filters the already-loaded grammar/vocab arrays client-side and re-renders
-  // both lists — no server round-trip, since everything's already in memory.
+  // Matches a grammar topic against a Grammar Guide search.
   function matchesGrammarQuery(t, q) {
     // Markup asterisks are stripped so "robím" still finds "rob**ím**".
     return (
@@ -770,7 +716,7 @@
     const blocks = [];
 
     // Sounds & Spelling comes from the alphabet data — the single most
-    // reference-shaped thing in the app, and absent from Browse All entirely.
+    // reference-shaped thing in the app, and absent from Word Lists entirely.
     const alphabetMatches = alphabetData.filter(function (u) {
       if (!q) return true;
       return (
@@ -849,15 +795,15 @@
     renderGrammarGuide(query);
   }
 
+  // Word Lists search: filters the already-loaded vocab client-side — no
+  // server round-trip, since everything's already in memory. (Grammar has
+  // its own home and search in the Grammar Guide.)
   function filterBrowseContent(query) {
     const q = query.trim().toLowerCase();
     if (!q) {
-      renderGrammar(grammarData);
       renderVocab(vocabData);
       return;
     }
-
-    const matchedGrammar = grammarData.filter(function (t) { return matchesGrammarQuery(t, q); });
 
     const matchedVocab = vocabData
       .map(function (g) {
@@ -868,9 +814,7 @@
       })
       .filter(Boolean);
 
-    const noMatch = 'No matches for “' + escapeHtml(query.trim()) + '”.';
-    renderGrammar(matchedGrammar, noMatch);
-    renderVocab(matchedVocab, noMatch);
+    renderVocab(matchedVocab, 'No matches for “' + escapeHtml(query.trim()) + '”.');
   }
 
   /* ---- Speech & sound ---- */
@@ -2000,6 +1944,7 @@
         sections.push({
           id: unit.id,
           kind: 'alphabet',
+          level: unit.level || 'A1.1',
           title: a.title,
           subtitle: a.letters.length + ' letters',
           explanation: a.intro || '',
@@ -2015,6 +1960,7 @@
         sections.push({
           id: unit.id,
           kind: 'grammar',
+          level: unit.level || 'A1.1',
           title: t.topic,
           subtitle: t.summary || '',
           explanation: t.explanation || '',
@@ -2033,6 +1979,7 @@
       sections.push({
         id: unit.id,
         kind: 'vocab',
+        level: unit.level || 'A1.1',
         title: g.topic + (rounds.length > 1 ? ' · Part ' + (unit.round + 1) + ' of ' + rounds.length : ''),
         subtitle: round.length + ' words',
         explanation: '',
@@ -2040,14 +1987,15 @@
       });
     });
 
-    // Anything this account added itself via Add Content isn't in the
-    // authored curriculum, so it's appended at the end — same shared-first
-    // rule the content merge uses.
+    // Anything this account added itself via Add Content isn't part of the
+    // authored course, so it goes in its own group after every level —
+    // outside the tests, and never locked.
     privateVocabData.forEach(function (g) {
       chunkIntoRounds(g.words || [], ROUND_SIZE).forEach(function (round, i) {
         sections.push({
           id: 'private-vocab-' + g.topic + '-' + i,
           kind: 'vocab',
+          level: MY_ADDITIONS_LEVEL,
           title: g.topic + ' · Part ' + (i + 1),
           subtitle: round.length + ' words',
           explanation: '',
@@ -2059,6 +2007,7 @@
       sections.push({
         id: 'private-gram-' + t.id,
         kind: 'grammar',
+        level: MY_ADDITIONS_LEVEL,
         title: t.topic,
         subtitle: t.summary || '',
         explanation: t.explanation || '',
@@ -2084,60 +2033,96 @@
   // Below this there aren't enough distinct words to make a test worth sitting.
   const CHECKPOINT_MIN_WORDS = 4;
 
+  // A level's final test is the gate into the next level, so it covers the
+  // whole level — words and grammar — and asks for the same 80% a normal
+  // section does, not the checkpoints' 70%.
+  const FINAL_TEST_WORD_QUESTIONS = 15;
+  const FINAL_TEST_GRAMMAR_QUESTIONS = 10;
+  const FINAL_TEST_CLEAR_THRESHOLD = 0.8;
+
+  // Sections from Add Content: outside every level, untested, never locked.
+  const MY_ADDITIONS_LEVEL = 'mine';
+
   // Grammar sections are excluded on purpose: their items are example
   // sentences, and a checkpoint measures words known, not sentences seen.
+  // (A final test covers grammar separately, through its exercises.)
   function testableWordsIn(section) {
     if (section.kind === 'vocab' || section.kind === 'alphabet') return section.items || [];
     return [];
   }
 
-  // Drops a test in after every 10 sections, covering the words from those
-  // 10. It sits in the path like any other section, so it also gates
-  // progression — you clear the checkpoint to carry on.
+  function wordPoolFrom(group) {
+    const seen = {};
+    const pool = [];
+    group.forEach(function (s) {
+      testableWordsIn(s).forEach(function (w) {
+        if (w && w.sk && w.en && !seen[w.sk]) {
+          seen[w.sk] = true;
+          pool.push(w);
+        }
+      });
+    });
+    return pool;
+  }
+
+  // Within each level (A1.1, A1.2…) a checkpoint drops in after every 10
+  // sections, covering those 10, and the level ends with a final test drawn
+  // from all of it. Both sit in the path like any other section, so they
+  // also gate progression — you pass them to carry on.
   function withCheckpoints(sections) {
-    const out = [];
-    let sinceLast = [];
-    let checkpointNum = 0;
-
-    function poolFrom(group) {
-      const seen = {};
-      const pool = [];
-      group.forEach(function (s) {
-        testableWordsIn(s).forEach(function (w) {
-          if (w && w.sk && w.en && !seen[w.sk]) {
-            seen[w.sk] = true;
-            pool.push(w);
-          }
-        });
-      });
-      return pool;
-    }
-
-    function pushCheckpoint(group, isFinal) {
-      const pool = poolFrom(group);
-      if (pool.length < CHECKPOINT_MIN_WORDS) return;
-      checkpointNum++;
-      out.push({
-        id: 'checkpoint-' + checkpointNum,
-        kind: 'checkpoint',
-        title: isFinal ? 'Final Checkpoint' : 'Checkpoint Test ' + checkpointNum,
-        subtitle: 'Words from the last ' + group.length + ' sections',
-        explanation: '',
-        items: pool,
-      });
-    }
-
-    sections.forEach(function (section) {
-      out.push(section);
-      sinceLast.push(section);
-      if (sinceLast.length < CHECKPOINT_EVERY) return;
-      pushCheckpoint(sinceLast, false);
-      sinceLast = [];
+    const levels = [];
+    sections.forEach(function (s) {
+      const last = levels[levels.length - 1];
+      if (last && last.level === s.level) last.sections.push(s);
+      else levels.push({ level: s.level, sections: [s] });
     });
 
-    // Without this the last stretch of the course would never be tested, so
-    // its words could never be mastered at all.
-    if (sinceLast.length) pushCheckpoint(sinceLast, true);
+    const out = [];
+    levels.forEach(function (group) {
+      if (group.level === MY_ADDITIONS_LEVEL) {
+        out.push.apply(out, group.sections);
+        return;
+      }
+
+      let sinceLast = [];
+      let checkpointNum = 0;
+      group.sections.forEach(function (section, i) {
+        out.push(section);
+        sinceLast.push(section);
+        // No checkpoint straight before the final test — it would only
+        // repeat part of it.
+        if (sinceLast.length < CHECKPOINT_EVERY || i === group.sections.length - 1) return;
+        const pool = wordPoolFrom(sinceLast);
+        sinceLast = [];
+        if (pool.length < CHECKPOINT_MIN_WORDS) return;
+        checkpointNum++;
+        out.push({
+          // A1.1 keeps the ids its checkpoints had before there were levels,
+          // so checkpoints people already passed stay passed.
+          id: group.level === 'A1.1' ? 'checkpoint-' + checkpointNum : 'checkpoint-' + group.level + '-' + checkpointNum,
+          kind: 'checkpoint',
+          level: group.level,
+          title: 'Checkpoint Test ' + checkpointNum,
+          subtitle: 'Words from the last ' + CHECKPOINT_EVERY + ' sections',
+          explanation: '',
+          items: pool,
+        });
+      });
+
+      out.push({
+        id: 'final-test-' + group.level,
+        kind: 'checkpoint',
+        isFinalTest: true,
+        level: group.level,
+        title: group.level + ' Final Test',
+        subtitle: 'Everything from ' + group.level + ' — words and grammar',
+        explanation: '',
+        items: wordPoolFrom(group.sections),
+        grammarPools: group.sections
+          .filter(function (s) { return s.kind === 'grammar' && (s.exercises || []).length; })
+          .map(function (s) { return s.exercises; }),
+      });
+    });
 
     return out;
   }
@@ -2197,6 +2182,38 @@
     }
   }
 
+  // A section normally opens once the one before it is cleared. It also
+  // stays open if you've cleared it, or anything further along — so adding a
+  // section to the middle of the course never locks anyone out of ground
+  // they'd already covered. My-additions sections are always open, and don't
+  // count as "further along" (they come last, so they'd open everything).
+  function lockedSectionFlags() {
+    let furthestCleared = -1;
+    roadmapSections.forEach(function (s, i) {
+      if (s.level !== MY_ADDITIONS_LEVEL && isSectionCleared(s.id)) furthestCleared = i;
+    });
+    return roadmapSections.map(function (s, i) {
+      if (isDevAccount() || i === 0 || s.level === MY_ADDITIONS_LEVEL) return false;
+      if (isSectionCleared(s.id) || i < furthestCleared) return false;
+      return !isSectionCleared(roadmapSections[i - 1].id);
+    });
+  }
+
+  function levelHeaderHtml(level) {
+    if (level === MY_ADDITIONS_LEVEL) {
+      return (
+        '<div class="roadmap-level-header"><div class="roadmap-level-name">My additions</div>' +
+        '<div class="roadmap-level-progress">From Add Content · always open</div></div>'
+      );
+    }
+    const inLevel = roadmapSections.filter(function (s) { return s.level === level; });
+    const cleared = inLevel.filter(function (s) { return isSectionCleared(s.id); }).length;
+    return (
+      '<div class="roadmap-level-header"><div class="roadmap-level-name">' + escapeHtml(level) + '</div>' +
+      '<div class="roadmap-level-progress">' + cleared + ' / ' + inLevel.length + ' cleared</div></div>'
+    );
+  }
+
   function renderRoadmapMap() {
     const mapEl = document.getElementById('roadmap-map');
     if (!roadmapSections.length) {
@@ -2204,6 +2221,7 @@
       return;
     }
 
+    const lockedFlags = lockedSectionFlags();
     const LANES = ['align-center', 'align-end', 'align-start'];
     const LOCK_ICON =
       '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
@@ -2216,11 +2234,13 @@
       roadmapSections
         .map(function (section, i) {
           const cleared = isSectionCleared(section.id);
-          const locked = !isDevAccount() && i > 0 && !isSectionCleared(roadmapSections[i - 1].id);
-          const isCurrent = !cleared && !locked;
+          const locked = lockedFlags[i];
           const isCheckpoint = section.kind === 'checkpoint';
           const stateClass =
-            (cleared ? 'cleared' : locked ? 'locked' : 'current') + (isCheckpoint ? ' checkpoint' : '');
+            (cleared ? 'cleared' : locked ? 'locked' : 'current') +
+            (isCheckpoint ? ' checkpoint' : '') +
+            (section.isFinalTest ? ' final-test' : '');
+          const startsLevel = i === 0 || section.level !== roadmapSections[i - 1].level;
           const inner = cleared
             ? STAR_ICON
             : locked
@@ -2230,6 +2250,7 @@
             : '<span class="round-num-badge">' + (i + 1) + '</span>';
 
           return (
+            (startsLevel ? levelHeaderHtml(section.level) : '') +
             '<div class="round-row ' + LANES[i % LANES.length] + '">' +
             '<div class="round-node-slot">' +
             '<div class="round-node ' + stateClass + '" data-section-index="' + i + '" data-locked="' + locked + '">' +
@@ -2319,7 +2340,8 @@
 
     if (lessonPhase === 'quiz') {
       lessonQuizTotal = Math.max(0, lessonQuizTotal - 1);
-      if (usesExercises) {
+      const inFinalTestGrammar = section.kind === 'checkpoint' && quizIndex >= quizQueue.length;
+      if (usesExercises || inFinalTestGrammar) {
         exerciseIndex++;
         renderExerciseStep();
       } else {
@@ -2380,10 +2402,11 @@
     else renderFinishPhase();
   }
 
-  function kindLabel(kind) {
-    if (kind === 'alphabet') return 'Alphabet';
-    if (kind === 'grammar') return 'Grammar';
-    if (kind === 'checkpoint') return 'Checkpoint';
+  function kindLabel(section) {
+    if (section.isFinalTest) return 'Final Test';
+    if (section.kind === 'alphabet') return 'Alphabet';
+    if (section.kind === 'grammar') return 'Grammar';
+    if (section.kind === 'checkpoint') return 'Checkpoint';
     return 'Vocabulary';
   }
 
@@ -2434,7 +2457,7 @@
 
     body.innerHTML =
       '<div class="lesson-stage">' +
-      '<div class="lesson-eyebrow">' + kindLabel(section.kind) + '</div>' +
+      '<div class="lesson-eyebrow">' + kindLabel(section) + '</div>' +
       '<h2 class="lesson-heading">' + escapeHtml(section.title) + '</h2>' +
       (section.subtitle ? '<p class="lesson-sub">' + escapeHtml(section.subtitle) + '</p>' : '') +
       (section.explanation ? '<div class="lesson-grammar-explanation rich-text">' + richTextHtml(section.explanation) + '</div>' : '') +
@@ -2528,9 +2551,18 @@
     const ex = exerciseQueue[exerciseIndex];
     const options = shuffleArray(ex.options.slice());
 
+    // In a final test these follow its word questions, so they're counted on
+    // from there rather than starting again at 1.
+    const section = roadmapSections[lessonSectionIndex];
+    const inFinalTest = !isPractice && section && section.isFinalTest;
+    const stepNum = inFinalTest ? quizQueue.length + exerciseIndex + 1 : exerciseIndex + 1;
+    const stepTotal = inFinalTest ? quizQueue.length + exerciseQueue.length : exerciseQueue.length;
+    if (inFinalTest) updateLessonChrome(kindLabel(section), 4 * ((stepNum - 1) / Math.max(1, stepTotal)));
+    const eyebrow = inFinalTest ? kindLabel(section) : isPractice ? 'Practice' : 'Quiz';
+
     body.innerHTML =
       '<div class="lesson-stage">' +
-      '<div class="lesson-eyebrow">' + (isPractice ? 'Practice' : 'Quiz') + ' · ' + (exerciseIndex + 1) + ' / ' + exerciseQueue.length + '</div>' +
+      '<div class="lesson-eyebrow">' + eyebrow + ' · ' + stepNum + ' / ' + stepTotal + '</div>' +
       '<h2 class="lesson-heading exercise-prompt">' + escapeHtml(ex.prompt) + '</h2>' +
       '<p class="lesson-sub">' + escapeHtml(ex.question) + '</p>' +
       '<div class="quiz-choice-list">' +
@@ -3013,12 +3045,22 @@
     const section = roadmapSections[lessonSectionIndex];
 
     // Checkpoints test a pool drawn from the previous ten sections, shuffled,
-    // and every word answered right here counts as mastered.
+    // and every word answered right here counts as mastered. A final test
+    // draws words from the whole level, then asks one grammar question from
+    // each grammar section (a random handful, if there are more than fit).
     if (section.kind === 'checkpoint') {
-      quizQueue = shuffleArray(section.items.slice()).slice(0, CHECKPOINT_MAX_QUESTIONS);
+      const isFinal = !!section.isFinalTest;
+      quizQueue = shuffleArray(section.items.slice()).slice(0, isFinal ? FINAL_TEST_WORD_QUESTIONS : CHECKPOINT_MAX_QUESTIONS);
+      exerciseQueue = isFinal
+        ? shuffleArray(
+            (section.grammarPools || []).map(function (pool) { return shuffleArray(pool.slice())[0]; })
+          ).slice(0, FINAL_TEST_GRAMMAR_QUESTIONS)
+        : [];
+      exerciseIndex = 0;
+      exerciseScoreTarget = 'quiz';
       quizIndex = 0;
       lessonQuizCorrect = 0;
-      lessonQuizTotal = quizQueue.length;
+      lessonQuizTotal = quizQueue.length + exerciseQueue.length;
       checkpointMastered = 0;
       renderQuizStep();
       return;
@@ -3052,7 +3094,15 @@
   function renderQuizStep() {
     const body = document.getElementById('lesson-body');
 
+    const section = roadmapSections[lessonSectionIndex];
+    const isCheckpoint = section.kind === 'checkpoint';
+
     if (quizIndex >= quizQueue.length) {
+      // A final test moves on to its grammar questions once the words are done.
+      if (isCheckpoint && exerciseIndex < exerciseQueue.length) {
+        renderExerciseStep();
+        return;
+      }
       lessonPhase = 'finish';
       renderLessonPhase();
       return;
@@ -3060,12 +3110,11 @@
 
     quizAnswered = false;
     const correct = quizQueue[quizIndex];
-    const section = roadmapSections[lessonSectionIndex];
-    const isCheckpoint = section.kind === 'checkpoint';
+    const testLength = quizQueue.length + (isCheckpoint ? exerciseQueue.length : 0);
 
     // A checkpoint has no Learn/Practice/Voice phases to fill the bar, so it
     // tracks its own progress through the questions instead.
-    if (isCheckpoint) updateLessonChrome('Checkpoint', 4 * (quizIndex / Math.max(1, quizQueue.length)));
+    if (isCheckpoint) updateLessonChrome(kindLabel(section), 4 * (quizIndex / Math.max(1, testLength)));
 
     let distractorPool = section.items.filter(function (it) { return it.en !== correct.en; });
     if (distractorPool.length < 3) {
@@ -3078,7 +3127,7 @@
 
     body.innerHTML =
       '<div class="lesson-stage">' +
-      '<div class="lesson-eyebrow">' + (isCheckpoint ? 'Checkpoint' : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + quizQueue.length + '</div>' +
+      '<div class="lesson-eyebrow">' + (isCheckpoint ? kindLabel(section) : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + testLength + '</div>' +
       '<h2 class="lesson-heading">' + speakerButtonHtml(correct.sk) + escapeHtml(correct.sk) + '</h2>' +
       '<p class="lesson-sub">What does this mean?</p>' +
       '<div class="quiz-choice-list">' +
@@ -3150,8 +3199,12 @@
     const totalRight = lessonPracticeCorrect + lessonVoiceCorrect + lessonQuizCorrect;
     const totalPossible = lessonPracticeTotal + lessonVoiceTotal + lessonQuizTotal;
     const pct = totalPossible > 0 ? totalRight / totalPossible : 0;
-    const threshold =
-      roadmapSections[lessonSectionIndex].kind === 'checkpoint' ? CHECKPOINT_CLEAR_THRESHOLD : ROUND_CLEAR_THRESHOLD;
+    const finishedSection = roadmapSections[lessonSectionIndex];
+    const threshold = finishedSection.isFinalTest
+      ? FINAL_TEST_CLEAR_THRESHOLD
+      : finishedSection.kind === 'checkpoint'
+      ? CHECKPOINT_CLEAR_THRESHOLD
+      : ROUND_CLEAR_THRESHOLD;
     const cleared = pct >= threshold;
     const isPerfect = totalPossible > 0 && totalRight === totalPossible;
 
@@ -3163,7 +3216,11 @@
     const hasNext = lessonSectionIndex + 1 < roadmapSections.length;
     const isCheckpoint = roadmapSections[lessonSectionIndex].kind === 'checkpoint';
     const summaryClass = isPerfect ? 'perfect' : cleared ? 'cleared' : 'not-cleared';
-    const message = isCheckpoint
+    const message = finishedSection.isFinalTest
+      ? (cleared
+          ? finishedSection.level + ' passed!'
+          : 'Not quite — you need ' + Math.round(FINAL_TEST_CLEAR_THRESHOLD * 100) + '% to pass ' + finishedSection.level + '. The words you missed are waiting in Revise.')
+      : isCheckpoint
       ? (cleared ? 'Checkpoint passed!' : 'Not quite — the words you missed are waiting in Revise.')
       : isPerfect ? 'Perfect!' : cleared ? 'Section cleared!' : 'Not quite — try this section again.';
     const masteredLine = isCheckpoint
@@ -3349,7 +3406,7 @@
         '<div class="next-info">' +
         '<div class="next-label">Up next</div>' +
         '<div class="next-title">' + escapeHtml(section.title) + '</div>' +
-        '<div class="next-sub">' + kindLabel(section.kind) + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>' +
+        '<div class="next-sub">' + kindLabel(section) + ' · Section ' + (nextIdx + 1) + ' of ' + totalSections + '</div>' +
         '</div>';
       nextCard.onclick = function () {
         document.querySelector('[data-tab="learn"]').click();
@@ -3949,8 +4006,8 @@
       const successEl = document.createElement('div');
       successEl.className = 'success-banner';
       successEl.textContent =
-        'Saved! This content is private to your account — it now shows in Browse All and Tests. ' +
-        'Reload the page to see it worked into your Learn roadmap.';
+        'Saved! This content is private to your account — it now shows in Word Lists, the Grammar Guide and Tests. ' +
+        'Reload the page to see it under "My additions" at the end of your Learn roadmap.';
       area.appendChild(successEl);
       saveBtn.remove();
 

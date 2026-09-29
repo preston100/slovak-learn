@@ -59,8 +59,23 @@ Follow-up after her answers:
 
 Word progress (stats and mastered words) is carried over automatically for words whose spelling only changed in capitalisation or lost a bracketed extra. New and reworded phrases need audio: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
 
+## Levels: A1.1 and A1.2 (September 2026)
+
+The Learn roadmap is split into levels. Everything that existed before is **A1.1**; **A1.2** is being built in batches, each reviewed by the teacher before the next.
+
+- **A1.1 additions**, each where it fits: *dobré ráno / dobrý večer / dobrú noc* in Greetings (now two parts), a new **Negation** section right after "To Be", and **Koľko je hodín?** inside Telling Time.
+- **A1.1 Final Test** at the end of the level: 15 words + 10 grammar questions from the whole of A1.1, needs **80%**. Passing it opens A1.2. Checkpoints inside a level stay at 70% and cover the last 10 sections.
+- **No more re-locking**: a section stays open if you've cleared it or anything after it, so adding sections to the middle never locks anyone out.
+- **Duplicates**: *Ahoj* / *Dovidenia* removed from Everyday Phrases (taught in Greetings). Formal/informal pairs stay, labelled: *Nemáš za čo* (informal) / *Nemáte za čo* (formal). *Nech sa páči* is now "Here you are / Go ahead".
+- *perlivá / neperlivá* (water) moved from Adjectives to Food & Drink.
+- **Add Content** sections sit under "My additions" at the end of the roadmap — outside the levels, untested, always open.
+- **Word Lists** (was Browse All) is vocab only; grammar lives in the Grammar Guide.
+
+A1.2 plan, in order: numbers 21–100+ → days, months, seasons, dates → colors → countries, languages, jobs, *sa* verbs → real food, objects (*Chcem kávu*), likes (*Mám rád*) → places, where you are / going, transport, *môžem / musím* (directions move here from Adjectives) → rooms, clothes, body & health → weather → past tense → future with *budem*. A short dialogue every few sections; its own final test at the end.
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself.
+- **Levels**: every entry in `data/curriculum.json` has a `level` (`"A1.1"`, `"A1.2"`…). Checkpoints and each level's final test are generated from that — nothing else to set.
 - **To change the password**: Netlify → Site configuration → Environment variables → edit `SITE_PASSWORD` → Trigger deploy.
 - **To publish any local change**: `git add -A`, `git commit -m "..."`, `git push` from the project folder — Netlify redeploys automatically within about a minute.
