@@ -107,15 +107,31 @@
     }
   }
 
-  // Dev/preview accounts: every roadmap and practice round shows unlocked,
-  // regardless of prior progress, so these two can freely look around after
-  // every update instead of grinding through prerequisites. Client-side only
-  // — nothing server-side trusts this, it just changes what's rendered.
+  // Dev/preview accounts: every roadmap section, level and practice round
+  // shows unlocked, regardless of prior progress, so these two can freely
+  // look around after every update instead of grinding through
+  // prerequisites. Client-side only — nothing server-side trusts this, it
+  // just changes what's rendered.
   const DEV_ACCOUNT_EMAILS = ['prestonandersen100@gmail.com', 'mravikovamartina@gmail.com'];
 
-  function isDevAccount() {
+  // Normally the email comes from the account details saved at login. The
+  // session token carries it too (its first part is the account as base64
+  // JSON), so dev mode doesn't silently switch off if those details were
+  // never saved or got cleared while the login itself is still valid.
+  function sessionEmail() {
     const user = getSessionUser();
-    return !!(user && DEV_ACCOUNT_EMAILS.indexOf((user.email || '').toLowerCase()) !== -1);
+    if (user && user.email) return user.email;
+    try {
+      const part = getSessionToken().split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+      const bytes = Uint8Array.from(atob(part), function (c) { return c.charCodeAt(0); });
+      return JSON.parse(new TextDecoder().decode(bytes)).email || '';
+    } catch (err) {
+      return '';
+    }
+  }
+
+  function isDevAccount() {
+    return DEV_ACCOUNT_EMAILS.indexOf(sessionEmail().toLowerCase()) !== -1;
   }
 
   function showAuthGate() {
