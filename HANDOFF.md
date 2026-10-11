@@ -76,6 +76,7 @@ A1.2 plan, in order: numbers 21–100+ → days, months, seasons, dates → colo
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself.
+- **Two voices**: recordings use Google's Slovak voice (female). Anything without a recording yet falls back to the browser's own voice, which varies by device and is often male — Add Content → "Check & Generate Missing Audio" replaces it. Slashes in entries (*ujo / strýko*) are spoken as a pause, not "lomka".
 - **Levels**: every entry in `data/curriculum.json` has a `level` (`"A1.1"`, `"A1.2"`…). Checkpoints and each level's final test are generated from that — nothing else to set.
 - **To change the password**: Netlify → Site configuration → Environment variables → edit `SITE_PASSWORD` → Trigger deploy.
 - **To publish any local change**: `git add -A`, `git commit -m "..."`, `git push` from the project folder — Netlify redeploys automatically within about a minute.

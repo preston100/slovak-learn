@@ -89,6 +89,15 @@ const CLOUD_TTS_URL = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 const CLOUD_TTS_VOICE = { languageCode: 'sk-SK', name: 'sk-SK-Wavenet-A' };
 const CLOUD_TTS_TIMEOUT_MS = 8500;
 
+// Entries like "ujo / strýko" list alternatives; a voice would read the
+// slash itself aloud ("lomka"), so it's spoken as a pause instead.
+function speakableText(text) {
+  return String(text)
+    .replace(/\s*\/\/\s*/g, '. ')
+    .replace(/\s*\/\s*/g, ', ')
+    .replace(/([.!?,])[.,]\s/g, '$1 '); // "stojí? / Koľko" → "stojí? Koľko", not "stojí?, Koľko"
+}
+
 async function callCloudTTS(apiKey, text) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), CLOUD_TTS_TIMEOUT_MS);
@@ -98,7 +107,7 @@ async function callCloudTTS(apiKey, text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        input: { text },
+        input: { text: speakableText(text) },
         voice: CLOUD_TTS_VOICE,
         // Default output measures around -19 dB mean, which is quiet for
         // single words. Anything generated from now on comes out louder at

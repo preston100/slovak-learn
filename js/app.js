@@ -851,11 +851,20 @@
     updateAudioGenSummary();
   }
 
+  // Entries like "ujo / strýko" list alternatives. Read aloud as written, a
+  // voice says the slash itself ("lomka"), so it becomes a pause instead.
+  function speakableText(text) {
+    return String(text)
+      .replace(/\s*\/\/\s*/g, '. ')
+      .replace(/\s*\/\s*/g, ', ')
+      .replace(/([.!?,])[.,]\s/g, '$1 '); // "stojí? / Koľko" → "stojí? Koľko", not "stojí?, Koľko"
+  }
+
   function speakWithBrowserVoice(text) {
     if (!window.speechSynthesis) return;
     try {
       window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
+      const utter = new SpeechSynthesisUtterance(speakableText(text));
       utter.lang = 'sk-SK';
       utter.rate = 0.92;
       window.speechSynthesis.speak(utter);
