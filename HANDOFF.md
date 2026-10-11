@@ -3,18 +3,21 @@
 - **Live site**: https://slovaklearn.netlify.app
 - **GitHub repo**: https://github.com/preston100/slovak-learn
 
-## What it is
+## What it is (as of October 2026)
 
-A password-protected website for learning Slovak, with three main sections:
+A website for learning Slovak from scratch to the end of **A1**, behind two locks: a shared site code (checked on the server), then a personal account (email + password). Each account's progress is saved on the server, so it follows you between devices.
 
-- **Grammar** — expandable topic cards (noun gender, the six cases, pronouns, question words, demonstratives, and full verb conjugation tables).
-- **Vocabulary** — word lists grouped by topic (greetings, family, food, places, adjectives, time, numbers, common verbs, useful phrases, etc.), all transcribed from the study sheets you sent.
-- **Tests** — generates a 5-question quiz, either from a topic you pick or from a file you upload, using Google's Gemini AI.
-- **Add Content** — upload photos of notes, and Gemini pulls out new vocab/grammar and adds it permanently to the site for you, after you review and approve it.
+- **Profile** — progress ring, streak, daily goal, badges, leaderboard, and an "Up next" card that takes you to where you left off.
+- **Learn** — one path through the course, split into levels: **A1.1** (alphabet → basics) and **A1.2** (numbers, dates, food, town, health, past & future). Every section is Learn → Practice → Voice → Quiz and needs 80% to unlock the next. A checkpoint test every 10 sections (70%), and a **final test** at the end of each level (80%) that opens the next one. **Word Lists** shows every word, by level.
+- **Grammar Guide** — every grammar section in course order, by level: tables, examples and the explanation, with a "Practice this" button. *The Six Cases* sits at the end as reference only.
+- **Tests** — an AI-written quiz (Gemini) on any topic, free practice rounds per word topic, and **Revise** for words you keep missing.
+- **Add Content** — upload a photo of notes; Gemini proposes vocab/grammar, you approve it, and it appears under "My additions" for your account only. Also home to the **pronunciation audio** generator.
 
-Nobody sees anything until they enter the correct 4-digit code on the lock screen, and that check happens on the server, not just in the browser — so it can't be bypassed.
+**Dev accounts** (`prestonandersen100@gmail.com`, `mravikovamartina@gmail.com`) see every section unlocked, and can press **P** in a lesson to skip a question.
 
-## Everything that happened, in order
+**Content lives in plain files** in `data/`: `curriculum.json` (the order of the course and each unit's level), `vocab.json`, `grammar.json`, `dialogues.json`, `alphabet.json`, plus `audio-manifest.json` → the clips in `audio/`.
+
+## How it started (September 2026)
 
 1. **Built the whole site from scratch**: the page itself, the password gate, all three original sections, and the two Netlify functions that talk to Gemini — then tested the entire flow locally before handing it to you.
 2. **Walked you through deployment**: pushing to GitHub, connecting it to Netlify, and setting up the `SITE_PASSWORD` and `GEMINI_API_KEY` secrets in the Netlify dashboard.
@@ -25,10 +28,6 @@ Nobody sees anything until they enter the correct 4-digit code on the lock scree
    - Netlify (the hosting) kills any request that takes longer than 10 seconds — my first fix didn't account for that and made things worse. Rewrote it to respect that limit properly.
    - Added an automatic fallback to a second, usually-less-busy AI model when the main one is overloaded or rate-limited.
    - Added retrying from your browser too (which isn't stuck with that 10-second limit), so a busy moment now quietly retries a few times before ever showing you an error.
-
-## Where things stand now
-
-The site is live and working. Grammar and Vocabulary are plain files on the site itself, so they can never "go down." Tests and Add Content depend on Google's free Gemini API, which is now much more resilient to hiccups than it was, but can't be made 100% failure-proof since it's a free third-party service outside my control — if it ever fails now, it should be a rare, short-lived blip rather than a broken feature.
 
 ## Teacher's review, round 2 (September 2026)
 
@@ -59,9 +58,9 @@ Follow-up after her answers:
 
 Word progress (stats and mastered words) is carried over automatically for words whose spelling only changed in capitalisation or lost a bracketed extra. New and reworded phrases need audio: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
 
-## Levels: A1.1 and A1.2 (September 2026)
+## Levels: A1.1 and A1.2 (September – October 2026)
 
-The Learn roadmap is split into levels. Everything that existed before is **A1.1**; **A1.2** is being built in batches, each reviewed by the teacher before the next.
+The Learn roadmap is split into levels. Everything that existed before is **A1.1**; **A1.2** was added on top.
 
 - **A1.1 additions**, each where it fits: *dobré ráno / dobrý večer / dobrú noc* in Greetings (now two parts), a new **Negation** section right after "To Be", and **Koľko je hodín?** inside Telling Time.
 - **A1.1 Final Test** at the end of the level: 15 words + 10 grammar questions from the whole of A1.1, needs **80%**. Passing it opens A1.2. Checkpoints inside a level stay at 70% and cover the last 10 sections.
@@ -71,7 +70,16 @@ The Learn roadmap is split into levels. Everything that existed before is **A1.1
 - **Add Content** sections sit under "My additions" at the end of the roadmap — outside the levels, untested, always open.
 - **Word Lists** (was Browse All) is vocab only; grammar lives in the Grammar Guide.
 
-A1.2 plan, in order: numbers 21–100+ → days, months, seasons, dates → colors → countries, languages, jobs, *sa* verbs → real food, objects (*Chcem kávu*), likes (*Mám rád*) → places, where you are / going, transport, *môžem / musím* (directions move here from Adjectives) → rooms, clothes, body & health → weather → past tense → future with *budem*. A short dialogue every few sections; its own final test at the end.
+### A1.2 (built October 2026 — waiting for the teacher's review)
+
+50 sections, in this order: bigger numbers & prices → days, months, seasons & dates → colors → countries, languages & jobs, *sa* verbs (*volám sa*), where you're from → everyday food, objects (*Chcem kávu*), likes (*Mám rád / rada*) → around town, transport & directions, *Kde? / Kam?* (*v škole / do školy*), *môcť / musieť* → rooms, clothes, body & health (*Bolí ma…*) → weather → past tense (*robil som*) → future (*budem*, *pôjdem*). Four checkpoints and the **A1.2 Final Test**.
+
+- **Dialogues** are a new kind of section: a short scene shown as a chat (each speaker on one side, audio on every line), then comprehension questions. Five of them: meeting someone, at the café, asking the way, at the doctor, the weekend. Stored in `data/dialogues.json`.
+- Moved into A1.2: the directions (*vpravo, vľavo, vonku…*) from Adjectives, *leto* from Time (now with the other seasons), *učiteľ / učiteľka* from Family (now in Jobs).
+- *pomaranč* / *oranžový* are labelled "orange (fruit)" / "orange (colour)" so a quiz can't mix them up.
+- Verb aspect (why *prídem* already means "I will come") is deliberately left for A2.
+
+Also in this round: on phones the tabs read "Guide" and "Add" so the bar fits (nothing scrolls sideways at 375px or 320px), Grammar Guide explanations start open, the Guide and Word Lists are split into A1.1 / A1.2, and "Up next" points to where you left off rather than to a section added behind you.
 
 ## Quick reference
 

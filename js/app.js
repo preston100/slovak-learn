@@ -431,6 +431,7 @@
   let privateVocabData = [];
   let alphabetData = [];
   let curriculumData = [];
+  let dialogueData = [];
 
   async function fetchJson(path, fallback) {
     try {
@@ -484,12 +485,13 @@
     const vocabContainer = document.getElementById('vocab-list');
 
     try {
-      const [shared, sharedVoc, privateContent, alphabet, curriculum] = await Promise.all([
+      const [shared, sharedVoc, privateContent, alphabet, curriculum, dialogues] = await Promise.all([
         fetchSharedGrammar(),
         fetchSharedVocab(),
         fetchPrivateContent(),
         fetchJson('data/alphabet.json', []),
         fetchJson('data/curriculum.json', []),
+        fetchJson('data/dialogues.json', []),
       ]);
 
       sharedGrammarData = shared;
@@ -498,6 +500,7 @@
       privateVocabData = privateContent.vocabGroups || [];
       alphabetData = alphabet;
       curriculumData = curriculum;
+      dialogueData = dialogues;
 
       grammarData = sharedGrammarData.concat(privateGrammarData);
       vocabData = sharedVocabData.concat(privateVocabData);
@@ -615,6 +618,20 @@
 
   /* ---- Vocabulary ---- */
 
+  // Word Lists follow the course: grouped by level, each topic where the
+  // roadmap first teaches it. Topics from Add Content aren't in the course,
+  // so they come last.
+  function vocabTopicPlacement(topic) {
+    let order = 0;
+    for (let i = 0; i < curriculumData.length; i++) {
+      const u = curriculumData[i];
+      if (u.kind !== 'vocab') continue;
+      if (u.ref === topic) return { order: order, level: u.level || 'A1.1' };
+      order++;
+    }
+    return { order: 1e9, level: 'My additions' };
+  }
+
   function renderVocab(groups, emptyMessage) {
     const container = document.getElementById('vocab-list');
     if (!groups.length) {
@@ -622,8 +639,17 @@
       return;
     }
 
-    container.innerHTML = groups
-      .map(function (g) {
+    const placed = groups.map(function (g) { return { group: g, at: vocabTopicPlacement(g.topic) }; });
+    placed.sort(function (a, b) { return a.at.order - b.at.order; });
+    let lastLevel = null;
+
+    container.innerHTML = placed
+      .map(function (p) {
+        const g = p.group;
+        const levelHead = p.at.level !== lastLevel
+          ? '<h3 class="browse-subhead">' + escapeHtml(p.at.level) + '</h3>'
+          : '';
+        lastLevel = p.at.level;
         const words = (g.words || [])
           .map(function (w) {
             return (
@@ -638,6 +664,7 @@
           .join('');
 
         return (
+          levelHead +
           '<div class="vocab-group"><h3>' +
           escapeHtml(g.topic) +
           '</h3><div class="vocab-grid">' +
@@ -713,7 +740,7 @@
         ? '<div class="guide-table-wrap"><table class="guide-table"><tbody>' + examples + '</tbody></table></div>'
         : '') +
       (t.explanation
-        ? '<details class="guide-explanation-toggle"><summary>Full explanation</summary>' +
+        ? '<details class="guide-explanation-toggle" open><summary>Explanation</summary>' +
           '<div class="guide-explanation rich-text">' + richTextHtml(t.explanation) + '</div></details>'
         : '')
     );
@@ -761,24 +788,34 @@
     // into separate grammatical categories, so looking something up here
     // means scrolling to roughly where you learned it, not hunting through
     // an unrelated filing scheme.
+    // Split by level (A1.1, A1.2…) to match the roadmap's headers.
     const orderedIds = [];
+    const levelOf = {};
     curriculumData.forEach(function (u) {
-      if (u.kind === 'grammar' && orderedIds.indexOf(u.ref) === -1) orderedIds.push(u.ref);
+      if (u.kind === 'grammar' && orderedIds.indexOf(u.ref) === -1) {
+        orderedIds.push(u.ref);
+        levelOf[u.ref] = u.level || 'A1.1';
+      }
     });
     const ordered = orderedIds
       .map(function (id) { return grammarData.find(function (t) { return t.id === id; }); })
       .filter(Boolean)
       .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
 
-    if (ordered.length) {
+    const levels = [];
+    ordered.forEach(function (t) {
+      if (levels.indexOf(levelOf[t.id]) === -1) levels.push(levelOf[t.id]);
+    });
+    levels.forEach(function (level) {
       blocks.push(
-        '<div class="guide-category"><h3 class="browse-subhead">Grammar</h3>' +
+        '<div class="guide-category"><h3 class="browse-subhead">Grammar — ' + escapeHtml(level) + '</h3>' +
         ordered
+          .filter(function (t) { return levelOf[t.id] === level; })
           .map(function (t) { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); })
           .join('') +
         '</div>'
       );
-    }
+    });
 
     // Anything not part of the authored curriculum (e.g. topics added via
     // Add Content) has no natural position in that sequence, so it goes last.
@@ -1979,6 +2016,25 @@
         return;
       }
 
+      // A short scene: read and hear it, then answer questions about it.
+      // Its lines double as the items, so the Voice step has you say them.
+      if (unit.kind === 'dialogue') {
+        const d = dialogueData.find(function (x) { return x.id === unit.ref; });
+        if (!d) return;
+        sections.push({
+          id: unit.id,
+          kind: 'dialogue',
+          level: unit.level || 'A1.1',
+          title: d.title,
+          subtitle: d.scene || '',
+          explanation: '',
+          lines: d.lines || [],
+          exercises: d.exercises || [],
+          items: (d.lines || []).map(function (l) { return { sk: l.sk, en: l.en }; }),
+        });
+        return;
+      }
+
       if (unit.kind === 'grammar') {
         const t = grammarData.find(function (x) { return x.id === unit.ref; });
         if (!t) return;
@@ -2212,11 +2268,16 @@
   // section to the middle of the course never locks anyone out of ground
   // they'd already covered. My-additions sections are always open, and don't
   // count as "further along" (they come last, so they'd open everything).
-  function lockedSectionFlags() {
-    let furthestCleared = -1;
+  function furthestClearedIndex() {
+    let furthest = -1;
     roadmapSections.forEach(function (s, i) {
-      if (s.level !== MY_ADDITIONS_LEVEL && isSectionCleared(s.id)) furthestCleared = i;
+      if (s.level !== MY_ADDITIONS_LEVEL && isSectionCleared(s.id)) furthest = i;
     });
+    return furthest;
+  }
+
+  function lockedSectionFlags() {
+    const furthestCleared = furthestClearedIndex();
     return roadmapSections.map(function (s, i) {
       if (isDevAccount() || i === 0 || s.level === MY_ADDITIONS_LEVEL) return false;
       if (isSectionCleared(s.id) || i < furthestCleared) return false;
@@ -2431,6 +2492,7 @@
     if (section.isFinalTest) return 'Final Test';
     if (section.kind === 'alphabet') return 'Alphabet';
     if (section.kind === 'grammar') return 'Grammar';
+    if (section.kind === 'dialogue') return 'Dialogue';
     if (section.kind === 'checkpoint') return 'Checkpoint';
     return 'Vocabulary';
   }
@@ -2443,8 +2505,31 @@
     // Alphabet units get letter cards — the letter itself, what it sounds
     // like, and a word to hear it in. A sk/en list would teach vocabulary
     // instead of the alphabet.
-    const content =
-      section.kind === 'alphabet'
+    // Dialogues read as a conversation: each speaker keeps to one side, so
+    // who's talking is clear at a glance.
+    const speakers = [];
+    (section.lines || []).forEach(function (l) { if (speakers.indexOf(l.who) === -1) speakers.push(l.who); });
+    const dialogueHtml = section.kind === 'dialogue'
+      ? '<div class="dialogue">' +
+        section.lines
+          .map(function (l) {
+            return (
+              '<div class="dialogue-line ' + (speakers.indexOf(l.who) % 2 ? 'side-b' : 'side-a') + '">' +
+              '<div class="dialogue-who">' + escapeHtml(l.who) + '</div>' +
+              '<div class="dialogue-bubble">' +
+              '<div class="sk">' + speakerButtonHtml(l.sk) + escapeHtml(l.sk) + '</div>' +
+              '<div class="en">' + escapeHtml(l.en) + '</div>' +
+              '</div>' +
+              '</div>'
+            );
+          })
+          .join('') +
+        '</div>'
+      : '';
+
+    const content = section.kind === 'dialogue'
+      ? dialogueHtml
+      : section.kind === 'alphabet'
         ? '<div class="letter-grid">' +
           section.letters
             .map(function (l) {
@@ -2553,7 +2638,7 @@
 
   function exercisesFor(section) {
     if (section.kind === 'alphabet') return buildAlphabetExercises(section);
-    if (section.kind === 'grammar') return (section.exercises || []).slice();
+    if (section.kind === 'grammar' || section.kind === 'dialogue') return (section.exercises || []).slice();
     return [];
   }
 
@@ -3410,13 +3495,19 @@
     updateReviewCountBadge();
     renderReviseCard();
 
-    let nextIdx = -1;
-    for (let i = 0; i < totalSections; i++) {
-      if (!progress[roadmapSections[i].id]) {
-        nextIdx = i;
-        break;
+    // "Up next" is where you left off: the first open section after the
+    // furthest one you've cleared. Sections added behind that point later
+    // are open on the roadmap, but shouldn't drag this card back to them.
+    // Only once nothing is left ahead does it fall back to anything skipped.
+    const lockedFlags = lockedSectionFlags();
+    function firstOpenFrom(start) {
+      for (let i = start; i < totalSections; i++) {
+        if (!progress[roadmapSections[i].id] && !lockedFlags[i]) return i;
       }
+      return -1;
     }
+    let nextIdx = firstOpenFrom(furthestClearedIndex() + 1);
+    if (nextIdx === -1) nextIdx = firstOpenFrom(0);
 
     const nextCard = document.getElementById('profile-next-card');
     if (totalSections === 0) {
@@ -4124,6 +4215,11 @@
     grammarData.forEach(function (t) {
       (t.examples || []).forEach(function (ex) {
         if (ex.sk) set.add(ex.sk);
+      });
+    });
+    dialogueData.forEach(function (d) {
+      (d.lines || []).forEach(function (l) {
+        if (l.sk) set.add(l.sk);
       });
     });
     // Alphabet example words are spoken in the letter cards and voice phase

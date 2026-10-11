@@ -2618,5 +2618,2616 @@
         ]
       }
     ]
+  },
+  {
+    "id": "numbers-big",
+    "topic": "Building Numbers & Prices",
+    "summary": "Tens + units written as one word (tridsaťpäť), and how to say prices and ages.",
+    "explanation": "The tens end in **-dsať** (20–40) or **-desiat** (50–90): *dvadsať, tridsať, štyridsať* / *päťdesiat, šesťdesiat…*\n\nTo build a number, say the **ten first, then the unit**, and write it as **one word**: *tridsať + päť = tridsaťpäť* (35).\n\nHundreds and thousands work the same way: *sto* (100), *dvesto* (200), *päťsto* (500), *tisíc* (1,000), *dvetisíc* (2,000).\n\n**Prices and ages** follow the same **1 / 2–4 / 5+** pattern as *hodina*: *jedno euro, dve eurá, päť eur* — *jeden rok, dva roky, päť rokov*.",
+    "tables": [
+      {
+        "title": "Tens",
+        "head": [
+          "",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "20",
+            "dvad**sať**"
+          ],
+          [
+            "30",
+            "trid**sať**"
+          ],
+          [
+            "40",
+            "štyrid**sať**"
+          ],
+          [
+            "50",
+            "päť**desiat**"
+          ],
+          [
+            "60",
+            "šesť**desiat**"
+          ],
+          [
+            "70",
+            "sedem**desiat**"
+          ],
+          [
+            "80",
+            "osem**desiat**"
+          ],
+          [
+            "90",
+            "deväť**desiat**"
+          ],
+          [
+            "100",
+            "sto"
+          ]
+        ]
+      },
+      {
+        "title": "Building a number",
+        "head": [
+          "",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "21",
+            "dvadsať**jeden**"
+          ],
+          [
+            "35",
+            "tridsať**päť**"
+          ],
+          [
+            "48",
+            "štyridsať**osem**"
+          ],
+          [
+            "99",
+            "deväťdesiat**deväť**"
+          ],
+          [
+            "150",
+            "sto**päťdesiat**"
+          ],
+          [
+            "2026",
+            "dvetisíc**dvadsaťšesť**"
+          ]
+        ]
+      },
+      {
+        "title": "Prices and age: 1 / 2–4 / 5+",
+        "head": [
+          "",
+          "euros",
+          "years old"
+        ],
+        "rows": [
+          [
+            "1",
+            "jedno **euro**",
+            "jeden **rok**"
+          ],
+          [
+            "2, 3, 4",
+            "dve **eurá**",
+            "dva **roky**"
+          ],
+          [
+            "5 and up",
+            "päť **eur**",
+            "päť **rokov**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Koľko to stojí?",
+        "en": "How much is it?"
+      },
+      {
+        "sk": "Stojí to dvadsaťpäť eur.",
+        "en": "It costs 25 euros."
+      },
+      {
+        "sk": "Lístok stojí tri eurá.",
+        "en": "The ticket costs three euros."
+      },
+      {
+        "sk": "To je jedno euro.",
+        "en": "That's one euro."
+      },
+      {
+        "sk": "Mám tridsaťpäť rokov.",
+        "en": "I'm 35 years old."
+      },
+      {
+        "sk": "Moja babka má osemdesiat rokov.",
+        "en": "My grandma is 80."
+      },
+      {
+        "sk": "Môj syn má dva roky.",
+        "en": "My son is two."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "35",
+        "question": "How do you say this number?",
+        "options": [
+          "tridsaťpäť",
+          "päťtridsať",
+          "trinásťpäť"
+        ],
+        "answer": "tridsaťpäť",
+        "explain": "The ten comes first, then the unit, written as one word."
+      },
+      {
+        "prompt": "šesťdesiat",
+        "question": "Which number is this?",
+        "options": [
+          "60",
+          "16",
+          "6"
+        ],
+        "answer": "60",
+        "explain": "Šesť + desiat: six tens."
+      },
+      {
+        "prompt": "deväťdesiatdeväť",
+        "question": "Which number is this?",
+        "options": [
+          "99",
+          "19",
+          "90"
+        ],
+        "answer": "99",
+        "explain": "Deväťdesiat (90) + deväť (9)."
+      },
+      {
+        "prompt": "dvesto",
+        "question": "Which number is this?",
+        "options": [
+          "200",
+          "20",
+          "2,000"
+        ],
+        "answer": "200",
+        "explain": "Dve + sto = 200."
+      },
+      {
+        "prompt": "Stojí to päť ___.",
+        "question": "It costs 5 euros.",
+        "options": [
+          "eur",
+          "eurá",
+          "euro"
+        ],
+        "answer": "eur",
+        "explain": "5 and up take eur."
+      },
+      {
+        "prompt": "Stojí to tri ___.",
+        "question": "It costs 3 euros.",
+        "options": [
+          "eurá",
+          "eur",
+          "euro"
+        ],
+        "answer": "eurá",
+        "explain": "2, 3 and 4 take eurá."
+      },
+      {
+        "prompt": "Mám dvadsať ___.",
+        "question": "I'm 20 years old.",
+        "options": [
+          "rokov",
+          "roky",
+          "rok"
+        ],
+        "answer": "rokov",
+        "explain": "5 and up (20 too) take rokov."
+      }
+    ]
+  },
+  {
+    "id": "days-dates",
+    "topic": "Days, Months & Dates",
+    "summary": "On Monday (v pondelok), in May (v máji), in summer (v lete) — and how to say the date.",
+    "explanation": "Days, months and seasons are written with a **small letter**: *pondelok, január, leto*.\n\n**On** a day → **v** + day: *v pondelok, v piatok*. The three days ending in **-a** change to **-u**: *v stredu, v sobotu, v nedeľu*. Before *š* it's **vo**: *vo štvrtok*.\n\n**In** a month → **v** + month, which takes a new ending: *v januári, v máji, v auguste* (and *vo februári*).\n\n**Seasons:** *na jar, v lete, na jeseň, v zime*.\n\n**Koľkého je dnes?** — What's the date today? Dates use the *of* form of the month: *prvého mája* (the 1st of May).\n\nLearn these as **set phrases** — the grammar behind them comes later.",
+    "tables": [
+      {
+        "title": "On which day?",
+        "head": [
+          "Day",
+          "on …"
+        ],
+        "rows": [
+          [
+            "pondelok",
+            "v pondelok"
+          ],
+          [
+            "utorok",
+            "v utorok"
+          ],
+          [
+            "streda",
+            "v stred**u**"
+          ],
+          [
+            "štvrtok",
+            "**vo** štvrtok"
+          ],
+          [
+            "piatok",
+            "v piatok"
+          ],
+          [
+            "sobota",
+            "v sobot**u**"
+          ],
+          [
+            "nedeľa",
+            "v nedeľ**u**"
+          ]
+        ]
+      },
+      {
+        "title": "In which month?",
+        "head": [
+          "Month",
+          "in …"
+        ],
+        "rows": [
+          [
+            "január",
+            "v január**i**"
+          ],
+          [
+            "február",
+            "**vo** február**i**"
+          ],
+          [
+            "marec",
+            "v mar**ci**"
+          ],
+          [
+            "apríl",
+            "v apríl**i**"
+          ],
+          [
+            "máj",
+            "v máj**i**"
+          ],
+          [
+            "jún",
+            "v jún**i**"
+          ],
+          [
+            "júl",
+            "v júl**i**"
+          ],
+          [
+            "august",
+            "v august**e**"
+          ],
+          [
+            "september",
+            "v septemb**ri**"
+          ],
+          [
+            "október",
+            "v októb**ri**"
+          ],
+          [
+            "november",
+            "v novemb**ri**"
+          ],
+          [
+            "december",
+            "v decemb**ri**"
+          ]
+        ]
+      },
+      {
+        "title": "Seasons",
+        "head": [
+          "Season",
+          "in …"
+        ],
+        "rows": [
+          [
+            "jar",
+            "**na** jar"
+          ],
+          [
+            "leto",
+            "v let**e**"
+          ],
+          [
+            "jeseň",
+            "**na** jeseň"
+          ],
+          [
+            "zima",
+            "v zim**e**"
+          ]
+        ]
+      },
+      {
+        "title": "Dates: Koľkého je dnes?",
+        "head": [
+          "Written",
+          "Said"
+        ],
+        "rows": [
+          [
+            "1. 5.",
+            "prvého mája"
+          ],
+          [
+            "2. 5.",
+            "druhého mája"
+          ],
+          [
+            "3. 10.",
+            "tretieho októbra"
+          ],
+          [
+            "15. 3.",
+            "pätnásteho marca"
+          ],
+          [
+            "24. 12.",
+            "dvadsiateho štvrtého decembra"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Aký je dnes deň?",
+        "en": "What day is it today?"
+      },
+      {
+        "sk": "Dnes je pondelok.",
+        "en": "Today is Monday."
+      },
+      {
+        "sk": "V sobotu nepracujem.",
+        "en": "I don't work on Saturday."
+      },
+      {
+        "sk": "Vo štvrtok idem do školy.",
+        "en": "On Thursday I go to school."
+      },
+      {
+        "sk": "Mám narodeniny v máji.",
+        "en": "My birthday is in May."
+      },
+      {
+        "sk": "V zime je zima.",
+        "en": "In winter it's cold."
+      },
+      {
+        "sk": "Koľkého je dnes?",
+        "en": "What's the date today?"
+      },
+      {
+        "sk": "Dnes je prvého mája.",
+        "en": "Today is the first of May."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "V ___ nepracujem. (sobota)",
+        "question": "I don't work on Saturday.",
+        "options": [
+          "sobotu",
+          "sobota",
+          "sobote"
+        ],
+        "answer": "sobotu",
+        "explain": "Days ending in -a change to -u after v: v sobotu."
+      },
+      {
+        "prompt": "___ štvrtok",
+        "question": "on Thursday",
+        "options": [
+          "vo",
+          "v",
+          "na"
+        ],
+        "answer": "vo",
+        "explain": "Before š, v becomes vo: vo štvrtok."
+      },
+      {
+        "prompt": "Mám narodeniny v ___. (máj)",
+        "question": "My birthday is in May.",
+        "options": [
+          "máji",
+          "máj",
+          "mája"
+        ],
+        "answer": "máji",
+        "explain": "In a month: v máji."
+      },
+      {
+        "prompt": "leto",
+        "question": "How do you say \"in summer\"?",
+        "options": [
+          "v lete",
+          "na leto",
+          "v leto"
+        ],
+        "answer": "v lete",
+        "explain": "Summer: v lete."
+      },
+      {
+        "prompt": "jar",
+        "question": "How do you say \"in spring\"?",
+        "options": [
+          "na jar",
+          "v jari",
+          "v jar"
+        ],
+        "answer": "na jar",
+        "explain": "Spring and autumn use na: na jar, na jeseň."
+      },
+      {
+        "prompt": "streda",
+        "question": "Which day is this?",
+        "options": [
+          "Wednesday",
+          "Thursday",
+          "Tuesday"
+        ],
+        "answer": "Wednesday",
+        "explain": "Streda = Wednesday."
+      },
+      {
+        "prompt": "Koľkého je dnes?",
+        "question": "What does this mean?",
+        "options": [
+          "What's the date today?",
+          "What day is it today?",
+          "What time is it?"
+        ],
+        "answer": "What's the date today?",
+        "explain": "Koľkého asks for the date; Aký je dnes deň? asks for the day."
+      }
+    ]
+  },
+  {
+    "id": "colors",
+    "topic": "Colors Match the Noun",
+    "summary": "Colors are adjectives: červený dom, červená taška, červené auto.",
+    "explanation": "Colors are **adjectives**, so they change to match the noun — exactly like *dobrý / dobrá / dobré*:\n*červený dom* — *červená taška* — *červené auto*.\n\nWord lists show the **masculine** form (*červený*). For a feminine noun change **-ý** to **-á**, for a neuter noun to **-é**.\n\n**Akej farby je…?** — What colour is…? *Akej farby je tvoje auto? — Je červené.*",
+    "tables": [
+      {
+        "head": [
+          "",
+          "masculine\n(dom)",
+          "feminine\n(taška)",
+          "neuter\n(auto)"
+        ],
+        "rows": [
+          [
+            "red",
+            "červen**ý**",
+            "červen**á**",
+            "červen**é**"
+          ],
+          [
+            "blue",
+            "modr**ý**",
+            "modr**á**",
+            "modr**é**"
+          ],
+          [
+            "green",
+            "zelen**ý**",
+            "zelen**á**",
+            "zelen**é**"
+          ],
+          [
+            "yellow",
+            "žlt**ý**",
+            "žlt**á**",
+            "žlt**é**"
+          ],
+          [
+            "black",
+            "čiern**y**",
+            "čiern**a**",
+            "čiern**e**"
+          ],
+          [
+            "white",
+            "biel**y**",
+            "biel**a**",
+            "biel**e**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Akej farby je tvoje auto?",
+        "en": "What colour is your car?"
+      },
+      {
+        "sk": "Moje auto je červené.",
+        "en": "My car is red."
+      },
+      {
+        "sk": "Obloha je modrá.",
+        "en": "The sky is blue."
+      },
+      {
+        "sk": "Tráva je zelená.",
+        "en": "The grass is green."
+      },
+      {
+        "sk": "Táto taška je čierna.",
+        "en": "This bag is black."
+      },
+      {
+        "sk": "Môj pes je hnedý.",
+        "en": "My dog is brown."
+      },
+      {
+        "sk": "Biele víno, prosím.",
+        "en": "White wine, please."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Moje auto je ___. (červený)",
+        "question": "My car is red. (auto is neuter)",
+        "options": [
+          "červené",
+          "červený",
+          "červená"
+        ],
+        "answer": "červené",
+        "explain": "Neuter noun, so -é."
+      },
+      {
+        "prompt": "Obloha je ___. (modrý)",
+        "question": "The sky is blue. (obloha is feminine)",
+        "options": [
+          "modrá",
+          "modrý",
+          "modré"
+        ],
+        "answer": "modrá",
+        "explain": "Feminine noun, so -á."
+      },
+      {
+        "prompt": "To je ___ dom. (biely)",
+        "question": "That's a white house. (dom is masculine)",
+        "options": [
+          "biely",
+          "biela",
+          "biele"
+        ],
+        "answer": "biely",
+        "explain": "Masculine noun, so the form stays biely."
+      },
+      {
+        "prompt": "Táto taška je ___. (čierny)",
+        "question": "This bag is black. (taška is feminine)",
+        "options": [
+          "čierna",
+          "čierny",
+          "čierne"
+        ],
+        "answer": "čierna",
+        "explain": "Feminine noun, so čierna."
+      },
+      {
+        "prompt": "zelený",
+        "question": "Which colour is this?",
+        "options": [
+          "green",
+          "yellow",
+          "grey"
+        ],
+        "answer": "green",
+        "explain": "Zelený = green."
+      },
+      {
+        "prompt": "žltý",
+        "question": "Which colour is this?",
+        "options": [
+          "yellow",
+          "green",
+          "white"
+        ],
+        "answer": "yellow",
+        "explain": "Žltý = yellow."
+      },
+      {
+        "prompt": "Akej farby je tvoje auto?",
+        "question": "What does this mean?",
+        "options": [
+          "What colour is your car?",
+          "Where is your car?",
+          "Whose car is this?"
+        ],
+        "answer": "What colour is your car?",
+        "explain": "Akej farby = what colour."
+      }
+    ]
+  },
+  {
+    "id": "sa-verbs",
+    "topic": "Verbs with sa (volať sa, učiť sa…)",
+    "summary": "Some verbs come with a little word sa. It never changes, and it usually goes second.",
+    "explanation": "Some verbs come with a little word **sa**. It belongs to the verb — learn them together: *volať sa* (to be called), *učiť sa* (to learn), *mať sa* (to be doing).\n\nThe verb changes as usual; **sa stays the same**: *volám sa, voláš sa, volá sa…*\n\n**Where does sa go?** Usually **second** in the sentence:\n*Volám sa Jana.* — *Ako sa voláš?* — *Moja sestra sa volá Eva.*\n\nYou already know some: *Ako sa máš?* (How are you?), *Páči sa mi.* (I like it.)",
+    "tables": [
+      {
+        "head": [
+          "",
+          "volať sa\n(to be called)",
+          "učiť sa\n(to learn)",
+          "mať sa\n(to be doing)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "volám **sa**",
+            "učím **sa**",
+            "mám **sa**"
+          ],
+          [
+            "ty",
+            "voláš **sa**",
+            "učíš **sa**",
+            "máš **sa**"
+          ],
+          [
+            "on / ona / ono",
+            "volá **sa**",
+            "učí **sa**",
+            "má **sa**"
+          ],
+          [
+            "my",
+            "voláme **sa**",
+            "učíme **sa**",
+            "máme **sa**"
+          ],
+          [
+            "vy",
+            "voláte **sa**",
+            "učíte **sa**",
+            "máte **sa**"
+          ],
+          [
+            "oni / ony",
+            "volajú **sa**",
+            "učia **sa**",
+            "majú **sa**"
+          ]
+        ]
+      },
+      {
+        "title": "More verbs with sa",
+        "head": [
+          "Verb",
+          "English"
+        ],
+        "rows": [
+          [
+            "pýtať **sa**",
+            "to ask"
+          ],
+          [
+            "ponáhľať **sa**",
+            "to hurry"
+          ],
+          [
+            "obliekať **sa**",
+            "to get dressed"
+          ],
+          [
+            "tešiť **sa**",
+            "to look forward to / to be glad"
+          ],
+          [
+            "páčiť **sa**",
+            "to be liked (páči sa mi = I like it)"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Ako sa voláš?",
+        "en": "What's your name? (informal)"
+      },
+      {
+        "sk": "Ako sa voláte?",
+        "en": "What's your name? (formal)"
+      },
+      {
+        "sk": "Volám sa Jana.",
+        "en": "My name is Jana."
+      },
+      {
+        "sk": "Moja sestra sa volá Eva.",
+        "en": "My sister's name is Eva."
+      },
+      {
+        "sk": "Učím sa po slovensky.",
+        "en": "I am learning Slovak."
+      },
+      {
+        "sk": "Mám sa dobre.",
+        "en": "I'm fine."
+      },
+      {
+        "sk": "Ponáhľam sa.",
+        "en": "I'm in a hurry."
+      },
+      {
+        "sk": "Teším sa na víkend.",
+        "en": "I'm looking forward to the weekend."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Ako ___ voláš?",
+        "question": "What's your name?",
+        "options": [
+          "sa",
+          "si",
+          "je"
+        ],
+        "answer": "sa",
+        "explain": "Volať sa: ako sa voláš?"
+      },
+      {
+        "prompt": "Ja ___ volám Peter.",
+        "question": "My name is Peter.",
+        "options": [
+          "sa",
+          "som",
+          "si"
+        ],
+        "answer": "sa",
+        "explain": "Sa goes second, after ja."
+      },
+      {
+        "prompt": "Moja sestra ___ volá Eva.",
+        "question": "My sister's name is Eva.",
+        "options": [
+          "sa",
+          "je",
+          "má"
+        ],
+        "answer": "sa",
+        "explain": "Sa goes second — after the whole subject moja sestra."
+      },
+      {
+        "prompt": "My ___ učíme po slovensky.",
+        "question": "We're learning Slovak.",
+        "options": [
+          "sa",
+          "sme",
+          "si"
+        ],
+        "answer": "sa",
+        "explain": "Učiť sa: my sa učíme."
+      },
+      {
+        "prompt": "Oni ___ dobre. (mať sa)",
+        "question": "They're doing well.",
+        "options": [
+          "majú sa",
+          "má sa",
+          "máme sa"
+        ],
+        "answer": "majú sa",
+        "explain": "Oni → majú, and sa stays the same."
+      },
+      {
+        "prompt": "Ako sa máš?",
+        "question": "Which is a good answer?",
+        "options": [
+          "Mám sa dobre.",
+          "Volám sa dobre.",
+          "Som sa dobre."
+        ],
+        "answer": "Mám sa dobre.",
+        "explain": "Ako sa máš? → Mám sa dobre."
+      },
+      {
+        "prompt": "Ponáhľam sa.",
+        "question": "What does this mean?",
+        "options": [
+          "I'm in a hurry.",
+          "I'm learning.",
+          "I'm called."
+        ],
+        "answer": "I'm in a hurry.",
+        "explain": "Ponáhľať sa = to hurry."
+      }
+    ]
+  },
+  {
+    "id": "where-from",
+    "topic": "Where Are You From? What Do You Do?",
+    "summary": "Som zo Slovenska. Hovorím po anglicky. Som učiteľka.",
+    "explanation": "**Odkiaľ si? / Odkiaľ ste?** — Where are you from?\n*Som z Ameriky. Som zo Slovenska.* After **z** (from), the country takes a new ending — learn the one you need as a set phrase. Before *s* or *z*, **z** becomes **zo**.\n\n**Languages:** *Hovorím po slovensky / po anglicky / po nemecky.* After **po**, the language ends in **-y**.\n\n**Jobs and nationalities** have a **man's** and a **woman's** form: *učiteľ / učiteľka*, *Slovák / Slovenka*. There's **no word for \"a\"**: *Som učiteľka.* = I'm **a** teacher.\n\n**Čím si? / Čím ste?** — What's your job? **Kde pracuješ?** — Where do you work?",
+    "tables": [
+      {
+        "title": "Where are you from?",
+        "head": [
+          "Country",
+          "I'm from …"
+        ],
+        "rows": [
+          [
+            "Slovensko",
+            "Som **zo** Slovensk**a**."
+          ],
+          [
+            "Česko",
+            "Som **z** Česk**a**."
+          ],
+          [
+            "Anglicko",
+            "Som **z** Anglick**a**."
+          ],
+          [
+            "Amerika",
+            "Som **z** Amerik**y**."
+          ],
+          [
+            "Nemecko",
+            "Som **z** Nemeck**a**."
+          ],
+          [
+            "Ukrajina",
+            "Som **z** Ukrajin**y**."
+          ]
+        ]
+      },
+      {
+        "title": "Languages",
+        "head": [
+          "Language",
+          "I speak …"
+        ],
+        "rows": [
+          [
+            "slovenčina",
+            "Hovorím **po slovensky**."
+          ],
+          [
+            "angličtina",
+            "Hovorím **po anglicky**."
+          ],
+          [
+            "nemčina",
+            "Hovorím **po nemecky**."
+          ]
+        ]
+      },
+      {
+        "title": "A man / a woman",
+        "head": [
+          "",
+          "a man",
+          "a woman"
+        ],
+        "rows": [
+          [
+            "Slovak",
+            "Slovák",
+            "Sloven**ka**"
+          ],
+          [
+            "American",
+            "Američan",
+            "Američan**ka**"
+          ],
+          [
+            "teacher",
+            "učiteľ",
+            "učiteľ**ka**"
+          ],
+          [
+            "doctor",
+            "lekár",
+            "lekár**ka**"
+          ],
+          [
+            "student",
+            "študent",
+            "študent**ka**"
+          ],
+          [
+            "waiter / waitress",
+            "čašník",
+            "čašníč**ka**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Odkiaľ si?",
+        "en": "Where are you from? (informal)"
+      },
+      {
+        "sk": "Odkiaľ ste?",
+        "en": "Where are you from? (formal)"
+      },
+      {
+        "sk": "Som zo Slovenska.",
+        "en": "I'm from Slovakia."
+      },
+      {
+        "sk": "Som z Ameriky.",
+        "en": "I'm from America."
+      },
+      {
+        "sk": "Hovoríte po anglicky?",
+        "en": "Do you speak English? (formal)"
+      },
+      {
+        "sk": "Hovorím trochu po slovensky.",
+        "en": "I speak a little Slovak."
+      },
+      {
+        "sk": "Čím ste?",
+        "en": "What's your job? (formal)"
+      },
+      {
+        "sk": "Som učiteľka.",
+        "en": "I'm a teacher. (a woman)"
+      },
+      {
+        "sk": "Kde pracuješ?",
+        "en": "Where do you work?"
+      },
+      {
+        "sk": "Pracujem v nemocnici.",
+        "en": "I work in a hospital."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Som ___ Slovenska.",
+        "question": "I'm from Slovakia.",
+        "options": [
+          "zo",
+          "z",
+          "v"
+        ],
+        "answer": "zo",
+        "explain": "Before s, z becomes zo."
+      },
+      {
+        "prompt": "Som z ___. (Amerika)",
+        "question": "I'm from America.",
+        "options": [
+          "Ameriky",
+          "Amerika",
+          "Ameriku"
+        ],
+        "answer": "Ameriky",
+        "explain": "After z: z Ameriky."
+      },
+      {
+        "prompt": "Hovorím po ___.",
+        "question": "I speak English.",
+        "options": [
+          "anglicky",
+          "angličtina",
+          "Anglicko"
+        ],
+        "answer": "anglicky",
+        "explain": "After po, the language ends in -y."
+      },
+      {
+        "prompt": "Odkiaľ ste?",
+        "question": "What does this mean?",
+        "options": [
+          "Where are you from?",
+          "Where do you live?",
+          "Where are you going?"
+        ],
+        "answer": "Where are you from?",
+        "explain": "Odkiaľ = from where."
+      },
+      {
+        "prompt": "Som ___. (a woman speaking)",
+        "question": "I'm a teacher.",
+        "options": [
+          "učiteľka",
+          "učiteľ",
+          "učiteľa"
+        ],
+        "answer": "učiteľka",
+        "explain": "A woman uses the woman's form: učiteľka."
+      },
+      {
+        "prompt": "Slovenka",
+        "question": "Who is this?",
+        "options": [
+          "a Slovak woman",
+          "a Slovak man",
+          "the Slovak language"
+        ],
+        "answer": "a Slovak woman",
+        "explain": "-ka marks the woman: Slovák → Slovenka."
+      },
+      {
+        "prompt": "slovenčina",
+        "question": "What is this?",
+        "options": [
+          "the Slovak language",
+          "Slovakia",
+          "a Slovak man"
+        ],
+        "answer": "the Slovak language",
+        "explain": "Languages end in -ina: slovenčina, angličtina."
+      }
+    ]
+  },
+  {
+    "id": "objects",
+    "topic": "What You Want, Have or Buy (Objects)",
+    "summary": "Chcem kávu: a feminine -a noun becomes -u when it is the thing you want, have or buy.",
+    "explanation": "When a noun is the **thing you want, have, buy or eat** (the object), its ending can change:\n- **feminine -a → -u**: *káva → Chcem kávu.*\n- **masculine things and neuter → no change**: *Chcem čaj. Pijem pivo.*\n- **masculine people and animals → -a**: *brat → Mám brata.*, *pes → Mám psa.*\n\nAn adjective in front of a feminine noun changes too, **-á → -ú**: *čierna káva → Chcem čiernu kávu.*\n\nYou already know this from **Dobrú chuť!** — and **Dám si…** (I'll have…) is the usual way to order: *Dám si kávu.*",
+    "tables": [
+      {
+        "head": [
+          "",
+          "Word",
+          "As an object"
+        ],
+        "rows": [
+          [
+            "feminine -a",
+            "káva, voda, polievka",
+            "káv**u**, vod**u**, polievk**u**"
+          ],
+          [
+            "masculine — things",
+            "čaj, syr, chlieb",
+            "čaj, syr, chlieb — **no change**"
+          ],
+          [
+            "neuter",
+            "pivo, mlieko, mäso",
+            "pivo, mlieko, mäso — **no change**"
+          ],
+          [
+            "masculine — people, animals",
+            "brat, syn, pes",
+            "brat**a**, syn**a**, ps**a**"
+          ]
+        ]
+      },
+      {
+        "title": "With an adjective",
+        "head": [
+          "",
+          "Word",
+          "As an object"
+        ],
+        "rows": [
+          [
+            "feminine",
+            "čierna káva",
+            "čiern**u** káv**u**"
+          ],
+          [
+            "masculine thing",
+            "zelený čaj",
+            "zelený čaj"
+          ],
+          [
+            "neuter",
+            "studené pivo",
+            "studené pivo"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Dám si kávu, prosím.",
+        "en": "I'll have a coffee, please."
+      },
+      {
+        "sk": "Pijem vodu.",
+        "en": "I'm drinking water."
+      },
+      {
+        "sk": "Kupujem chlieb a mlieko.",
+        "en": "I'm buying bread and milk."
+      },
+      {
+        "sk": "Mám brata a sestru.",
+        "en": "I have a brother and a sister."
+      },
+      {
+        "sk": "Mám psa.",
+        "en": "I have a dog."
+      },
+      {
+        "sk": "Jem polievku.",
+        "en": "I'm eating soup."
+      },
+      {
+        "sk": "Potrebujem tašku.",
+        "en": "I need a bag."
+      },
+      {
+        "sk": "Dáte si čiernu kávu?",
+        "en": "Would you like a black coffee? (formal)"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Dám si ___, prosím. (káva)",
+        "question": "I'll have a coffee, please.",
+        "options": [
+          "kávu",
+          "káva",
+          "kávy"
+        ],
+        "answer": "kávu",
+        "explain": "Feminine -a becomes -u as an object."
+      },
+      {
+        "prompt": "Pijem ___. (voda)",
+        "question": "I'm drinking water.",
+        "options": [
+          "vodu",
+          "voda",
+          "vody"
+        ],
+        "answer": "vodu",
+        "explain": "Voda → vodu."
+      },
+      {
+        "prompt": "Kupujem ___. (chlieb)",
+        "question": "I'm buying bread.",
+        "options": [
+          "chlieb",
+          "chliebu",
+          "chliebom"
+        ],
+        "answer": "chlieb",
+        "explain": "Masculine things don't change."
+      },
+      {
+        "prompt": "Mám ___. (brat)",
+        "question": "I have a brother.",
+        "options": [
+          "brata",
+          "brat",
+          "bratu"
+        ],
+        "answer": "brata",
+        "explain": "Masculine people take -a: brata."
+      },
+      {
+        "prompt": "Chcem ___. (pivo)",
+        "question": "I want a beer.",
+        "options": [
+          "pivo",
+          "pivu",
+          "piva"
+        ],
+        "answer": "pivo",
+        "explain": "Neuter nouns don't change."
+      },
+      {
+        "prompt": "Mám ___. (sestra)",
+        "question": "I have a sister.",
+        "options": [
+          "sestru",
+          "sestra",
+          "sestry"
+        ],
+        "answer": "sestru",
+        "explain": "Sestra → sestru."
+      },
+      {
+        "prompt": "Dám si ___ kávu. (čierna)",
+        "question": "I'll have a black coffee.",
+        "options": [
+          "čiernu",
+          "čierna",
+          "čierny"
+        ],
+        "answer": "čiernu",
+        "explain": "The adjective changes with the noun: -á → -ú."
+      }
+    ]
+  },
+  {
+    "id": "likes",
+    "topic": "Saying What You Like: mám rád / rada",
+    "summary": "Mám rád kávu (a man), mám rada kávu (a woman) — and rád čítam, I like reading.",
+    "explanation": "**Mám rád** (a man) / **Mám rada** (a woman) + a thing = **I like** it: *Mám rád kávu. Mám rada čaj.* The thing is an **object**, so it takes the object ending (*kávu*).\n\n**Rád / rada + a verb** = I like **doing** it: *Rád čítam.* (I like reading.) *Rada plávam.*\n\nFor **we / you / they**, use **radi**: *Máme radi pizzu.* (A group of only women says *rady*.)\n\nDon't like it? **Nemám rád / rada…**: *Nemám rada pivo.*\n\nYou also know **Páči sa mi…** — mostly for something you see or try: *Páči sa mi tvoje auto.*",
+    "tables": [
+      {
+        "head": [
+          "",
+          "a man",
+          "a woman"
+        ],
+        "rows": [
+          [
+            "ja",
+            "mám **rád**",
+            "mám **rada**"
+          ],
+          [
+            "ty",
+            "máš **rád**",
+            "máš **rada**"
+          ],
+          [
+            "on / ona",
+            "má **rád**",
+            "má **rada**"
+          ],
+          [
+            "my / vy / oni",
+            "máme / máte / majú **radi**",
+            "(only women: **rady**)"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Mám rád kávu.",
+        "en": "I like coffee. (a man)"
+      },
+      {
+        "sk": "Mám rada čaj.",
+        "en": "I like tea. (a woman)"
+      },
+      {
+        "sk": "Nemám rád ryby.",
+        "en": "I don't like fish. (a man)"
+      },
+      {
+        "sk": "Rád čítam.",
+        "en": "I like reading. (a man)"
+      },
+      {
+        "sk": "Rada plávam.",
+        "en": "I like swimming. (a woman)"
+      },
+      {
+        "sk": "Čo máš rád?",
+        "en": "What do you like? (to a man)"
+      },
+      {
+        "sk": "Máme radi pizzu.",
+        "en": "We like pizza."
+      },
+      {
+        "sk": "Páči sa mi tvoje auto.",
+        "en": "I like your car."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Mám ___ kávu. (a woman)",
+        "question": "I like coffee.",
+        "options": [
+          "rada",
+          "rád",
+          "radi"
+        ],
+        "answer": "rada",
+        "explain": "A woman says rada."
+      },
+      {
+        "prompt": "Mám ___ čaj. (a man)",
+        "question": "I like tea.",
+        "options": [
+          "rád",
+          "rada",
+          "radi"
+        ],
+        "answer": "rád",
+        "explain": "A man says rád."
+      },
+      {
+        "prompt": "Máme ___ pizzu.",
+        "question": "We like pizza.",
+        "options": [
+          "radi",
+          "rád",
+          "rada"
+        ],
+        "answer": "radi",
+        "explain": "We / you / they: radi."
+      },
+      {
+        "prompt": "Mám rád ___. (káva)",
+        "question": "I like coffee.",
+        "options": [
+          "kávu",
+          "káva",
+          "kávy"
+        ],
+        "answer": "kávu",
+        "explain": "The thing you like is an object: kávu."
+      },
+      {
+        "prompt": "___ rada pivo.",
+        "question": "I don't like beer. (a woman)",
+        "options": [
+          "Nemám",
+          "Nie mám",
+          "Nie som"
+        ],
+        "answer": "Nemám",
+        "explain": "Ne- joins the verb: nemám."
+      },
+      {
+        "prompt": "Rád čítam.",
+        "question": "What does this mean?",
+        "options": [
+          "I like reading.",
+          "I'm reading now.",
+          "I read fast."
+        ],
+        "answer": "I like reading.",
+        "explain": "Rád + verb = I like doing it."
+      },
+      {
+        "prompt": "Rada plávam.",
+        "question": "Who is speaking?",
+        "options": [
+          "a woman",
+          "a man",
+          "a group"
+        ],
+        "answer": "a woman",
+        "explain": "Rada is the woman's form."
+      }
+    ]
+  },
+  {
+    "id": "kde-kam",
+    "topic": "Kde? and Kam? (v škole / do školy)",
+    "summary": "Kde? asks where something is (v škole); Kam? asks where it is going (do školy).",
+    "explanation": "Slovak has two questions for *where*: **Kde?** (where something **is**) and **Kam?** (where something is **going**) — you met them in Question Words.\n\n**Kde? → v + place**, with a new ending: *Som v škole.*\n**Kam? → do + place**, with a different ending: *Idem do školy.*\n\nSome places use **na** instead — mostly services and open places: *na pošte → na poštu*, *na stanici → na stanicu*.\n\n**Home** is special: *Som doma.* (at home) — *Idem domov.* (going home)\n\n**How?** By bus, train or car: *autobusom, vlakom, autom* — or *pešo* (on foot).\n\nDon't work the endings out yet — learn each place as a **pair**: *v škole / do školy*.",
+    "tables": [
+      {
+        "head": [
+          "Place",
+          "Kde? (is)",
+          "Kam? (going)"
+        ],
+        "rows": [
+          [
+            "škola",
+            "v škol**e**",
+            "do škol**y**"
+          ],
+          [
+            "práca",
+            "v prác**i**",
+            "do prác**e**"
+          ],
+          [
+            "obchod",
+            "v obchod**e**",
+            "do obchod**u**"
+          ],
+          [
+            "kino",
+            "v kin**e**",
+            "do kin**a**"
+          ],
+          [
+            "park",
+            "v park**u**",
+            "do park**u**"
+          ],
+          [
+            "banka",
+            "v bank**e**",
+            "do bank**y**"
+          ],
+          [
+            "pošta",
+            "**na** pošt**e**",
+            "**na** pošt**u**"
+          ],
+          [
+            "stanica",
+            "**na** stanic**i**",
+            "**na** stanic**u**"
+          ],
+          [
+            "letisko",
+            "**na** letisk**u**",
+            "**na** letisk**o**"
+          ],
+          [
+            "home",
+            "**doma**",
+            "**domov**"
+          ]
+        ]
+      },
+      {
+        "title": "How? (by …)",
+        "head": [
+          "",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "by bus",
+            "autobus**om**"
+          ],
+          [
+            "by tram",
+            "električk**ou**"
+          ],
+          [
+            "by train",
+            "vlak**om**"
+          ],
+          [
+            "by car",
+            "aut**om**"
+          ],
+          [
+            "by taxi",
+            "taxík**om**"
+          ],
+          [
+            "on foot",
+            "pešo"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Som v práci.",
+        "en": "I'm at work."
+      },
+      {
+        "sk": "Idem do práce.",
+        "en": "I'm going to work."
+      },
+      {
+        "sk": "Moja mama je v obchode.",
+        "en": "My mom is in the shop."
+      },
+      {
+        "sk": "Ideme do kina.",
+        "en": "We're going to the cinema."
+      },
+      {
+        "sk": "Čakám na zastávke.",
+        "en": "I'm waiting at the bus stop."
+      },
+      {
+        "sk": "Idem na poštu.",
+        "en": "I'm going to the post office."
+      },
+      {
+        "sk": "Do práce idem autobusom.",
+        "en": "I go to work by bus."
+      },
+      {
+        "sk": "Večer som doma.",
+        "en": "In the evening I'm at home."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Som ___ škole.",
+        "question": "I'm at school.",
+        "options": [
+          "v",
+          "do",
+          "na"
+        ],
+        "answer": "v",
+        "explain": "Kde? (is) → v: v škole."
+      },
+      {
+        "prompt": "Idem ___ školy.",
+        "question": "I'm going to school.",
+        "options": [
+          "do",
+          "v",
+          "na"
+        ],
+        "answer": "do",
+        "explain": "Kam? (going) → do: do školy."
+      },
+      {
+        "prompt": "Idem do ___. (obchod)",
+        "question": "I'm going to the shop.",
+        "options": [
+          "obchodu",
+          "obchode",
+          "obchod"
+        ],
+        "answer": "obchodu",
+        "explain": "do obchodu (going) — v obchode (is)."
+      },
+      {
+        "prompt": "Som v ___. (práca)",
+        "question": "I'm at work.",
+        "options": [
+          "práci",
+          "práce",
+          "prácu"
+        ],
+        "answer": "práci",
+        "explain": "v práci (is) — do práce (going)."
+      },
+      {
+        "prompt": "Čakám ___ zastávke.",
+        "question": "I'm waiting at the bus stop.",
+        "options": [
+          "na",
+          "v",
+          "do"
+        ],
+        "answer": "na",
+        "explain": "Zastávka is a na-place: na zastávke."
+      },
+      {
+        "prompt": "Idem ___.",
+        "question": "I'm going home.",
+        "options": [
+          "domov",
+          "doma",
+          "do domu"
+        ],
+        "answer": "domov",
+        "explain": "Going home: domov."
+      },
+      {
+        "prompt": "Kde je Peter? Je ___.",
+        "question": "Where is Peter? He is at home.",
+        "options": [
+          "doma",
+          "domov",
+          "do domu"
+        ],
+        "answer": "doma",
+        "explain": "Being at home: doma."
+      },
+      {
+        "prompt": "Do práce idem ___. (autobus)",
+        "question": "I go to work by bus.",
+        "options": [
+          "autobusom",
+          "autobus",
+          "autobusu"
+        ],
+        "answer": "autobusom",
+        "explain": "By + transport: autobusom, vlakom, autom."
+      }
+    ]
+  },
+  {
+    "id": "modals",
+    "topic": "Can and Must: môcť, musieť",
+    "summary": "Môžem…? (Can I…?) and Musím… (I have to…) + a verb in its dictionary form.",
+    "explanation": "**môcť** (can, may) and **musieť** (must, have to) are followed by a verb in its **dictionary form**: *Môžem ísť? Musím pracovať.*\n\n**Môžem…?** is the polite way to ask: *Môžem platiť kartou?* (Can I pay by card?)\n\n**Careful:** **nemusím** means \"I **don't have to**\" — not \"I mustn't\": *Dnes nemusím pracovať.* (I don't have to work today.)",
+    "tables": [
+      {
+        "head": [
+          "",
+          "môcť\n(can)",
+          "musieť\n(must)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "môž**em**",
+            "mus**ím**"
+          ],
+          [
+            "ty",
+            "môž**eš**",
+            "mus**íš**"
+          ],
+          [
+            "on / ona / ono",
+            "môž**e**",
+            "mus**í**"
+          ],
+          [
+            "my",
+            "môž**eme**",
+            "mus**íme**"
+          ],
+          [
+            "vy",
+            "môž**ete**",
+            "mus**íte**"
+          ],
+          [
+            "oni / ony",
+            "môž**u**",
+            "mus**ia**"
+          ]
+        ]
+      },
+      {
+        "title": "Not",
+        "head": [
+          "Slovak",
+          "English"
+        ],
+        "rows": [
+          [
+            "**ne**môžem",
+            "I can't"
+          ],
+          [
+            "**ne**musím",
+            "I don't have to (not \"I mustn't\")"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Môžem platiť kartou?",
+        "en": "Can I pay by card?"
+      },
+      {
+        "sk": "Môžete mi pomôcť?",
+        "en": "Can you help me? (formal)"
+      },
+      {
+        "sk": "Môžem ísť von?",
+        "en": "Can I go outside?"
+      },
+      {
+        "sk": "Musím ísť.",
+        "en": "I have to go."
+      },
+      {
+        "sk": "Zajtra musím pracovať.",
+        "en": "Tomorrow I have to work."
+      },
+      {
+        "sk": "Nemôžem prísť.",
+        "en": "I can't come."
+      },
+      {
+        "sk": "Dnes nemusím vstávať skoro.",
+        "en": "Today I don't have to get up early."
+      },
+      {
+        "sk": "Musíme ísť do obchodu.",
+        "en": "We have to go to the shop."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "___ platiť kartou? (môcť, ja)",
+        "question": "Can I pay by card?",
+        "options": [
+          "Môžem",
+          "Môžeš",
+          "Musím"
+        ],
+        "answer": "Môžem",
+        "explain": "Ja → môžem."
+      },
+      {
+        "prompt": "Zajtra ___ pracovať. (musieť, ja)",
+        "question": "Tomorrow I have to work.",
+        "options": [
+          "musím",
+          "musí",
+          "môžem"
+        ],
+        "answer": "musím",
+        "explain": "Ja → musím."
+      },
+      {
+        "prompt": "Oni ___ prísť. (môcť)",
+        "question": "They can come.",
+        "options": [
+          "môžu",
+          "môže",
+          "môžeme"
+        ],
+        "answer": "môžu",
+        "explain": "Oni → môžu."
+      },
+      {
+        "prompt": "My ___ ísť. (musieť)",
+        "question": "We have to go.",
+        "options": [
+          "musíme",
+          "musia",
+          "musíte"
+        ],
+        "answer": "musíme",
+        "explain": "My → musíme."
+      },
+      {
+        "prompt": "Dnes nemusím pracovať.",
+        "question": "What does this mean?",
+        "options": [
+          "I don't have to work today.",
+          "I mustn't work today.",
+          "I can't work today."
+        ],
+        "answer": "I don't have to work today.",
+        "explain": "Nemusím = I don't have to."
+      },
+      {
+        "prompt": "Nemôžem prísť.",
+        "question": "What does this mean?",
+        "options": [
+          "I can't come.",
+          "I don't have to come.",
+          "I'm not coming yet."
+        ],
+        "answer": "I can't come.",
+        "explain": "Nemôžem = I can't."
+      },
+      {
+        "prompt": "Môžete mi pomôcť?",
+        "question": "What does this mean?",
+        "options": [
+          "Can you help me?",
+          "Must you help me?",
+          "Do you help me?"
+        ],
+        "answer": "Can you help me?",
+        "explain": "Môžete…? = can you…? (formal)"
+      }
+    ]
+  },
+  {
+    "id": "body-health",
+    "topic": "Body & Health: Bolí ma…",
+    "summary": "Bolí ma hlava — I have a headache (literally: the head hurts me).",
+    "explanation": "**Bolí ma hlava.** — I have a headache (literally: *the head hurts me*). The body part does the hurting:\n- one thing → **bolí**: *Bolí ma hlava / zub / brucho.*\n- more than one → **bolia**: *Bolia ma nohy / zuby / oči.*\n\n**ma** = me. For other people: *Bolí ťa…?* (you), *Bolí ho…* (him), *Bolí ju…* (her).\n\n**Čo ťa bolí? / Čo vás bolí?** — What hurts? (informal / formal)\n\n**Mám horúčku / nádchu / kašeľ.** — I have a fever / a cold / a cough. After *mám*, feminine -a → **-u** (as in *Chcem kávu*).\n\n**Som chorý / chorá.** — I'm ill (a man / a woman).",
+    "tables": [
+      {
+        "head": [
+          "Slovak",
+          "English"
+        ],
+        "rows": [
+          [
+            "Bolí ma **hlava**.",
+            "I have a headache."
+          ],
+          [
+            "Bolí ma **zub**.",
+            "I have toothache."
+          ],
+          [
+            "Bolí ma **brucho**.",
+            "I have a stomach ache."
+          ],
+          [
+            "Bolí ma **hrdlo**.",
+            "I have a sore throat."
+          ],
+          [
+            "Bolí ma **chrbát**.",
+            "My back hurts."
+          ],
+          [
+            "**Bolia** ma **nohy**.",
+            "My legs hurt."
+          ]
+        ]
+      },
+      {
+        "title": "Who is it hurting?",
+        "head": [
+          "",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "me",
+            "Bolí **ma** hlava."
+          ],
+          [
+            "you",
+            "Bolí **ťa** hlava?"
+          ],
+          [
+            "him",
+            "Bolí **ho** hlava."
+          ],
+          [
+            "her",
+            "Bolí **ju** hlava."
+          ]
+        ]
+      },
+      {
+        "title": "Mám … (I have …)",
+        "head": [
+          "",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "a fever",
+            "Mám horúčk**u**."
+          ],
+          [
+            "a cold",
+            "Mám nádch**u**."
+          ],
+          [
+            "a cough",
+            "Mám kašeľ."
+          ],
+          [
+            "the flu",
+            "Mám chrípk**u**."
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Čo ťa bolí?",
+        "en": "What hurts? (informal)"
+      },
+      {
+        "sk": "Bolí ma hlava.",
+        "en": "I have a headache."
+      },
+      {
+        "sk": "Bolia ma nohy.",
+        "en": "My legs hurt."
+      },
+      {
+        "sk": "Mám horúčku.",
+        "en": "I have a fever."
+      },
+      {
+        "sk": "Mám nádchu a kašeľ.",
+        "en": "I have a cold and a cough."
+      },
+      {
+        "sk": "Som chorá.",
+        "en": "I'm ill. (a woman)"
+      },
+      {
+        "sk": "Potrebujem liek.",
+        "en": "I need medicine."
+      },
+      {
+        "sk": "Idem do lekárne.",
+        "en": "I'm going to the pharmacy."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "___ ma hlava.",
+        "question": "I have a headache.",
+        "options": [
+          "Bolí",
+          "Bolia",
+          "Bolím"
+        ],
+        "answer": "Bolí",
+        "explain": "One thing hurts: bolí."
+      },
+      {
+        "prompt": "___ ma nohy.",
+        "question": "My legs hurt.",
+        "options": [
+          "Bolia",
+          "Bolí",
+          "Bolíme"
+        ],
+        "answer": "Bolia",
+        "explain": "More than one: bolia."
+      },
+      {
+        "prompt": "Bolí ___ hlava.",
+        "question": "I have a headache. (me)",
+        "options": [
+          "ma",
+          "mi",
+          "ja"
+        ],
+        "answer": "ma",
+        "explain": "Ma = me."
+      },
+      {
+        "prompt": "Mám ___. (horúčka)",
+        "question": "I have a fever.",
+        "options": [
+          "horúčku",
+          "horúčka",
+          "horúčky"
+        ],
+        "answer": "horúčku",
+        "explain": "After mám, feminine -a → -u."
+      },
+      {
+        "prompt": "Čo ťa bolí?",
+        "question": "What does this mean?",
+        "options": [
+          "What hurts?",
+          "Who are you?",
+          "Are you ill?"
+        ],
+        "answer": "What hurts?",
+        "explain": "Čo ťa bolí? = what hurts (you)?"
+      },
+      {
+        "prompt": "Som ___. (a woman)",
+        "question": "I'm ill.",
+        "options": [
+          "chorá",
+          "chorý",
+          "choré"
+        ],
+        "answer": "chorá",
+        "explain": "A woman says chorá."
+      },
+      {
+        "prompt": "Bolí ju zub.",
+        "question": "Who has toothache?",
+        "options": [
+          "she",
+          "he",
+          "I"
+        ],
+        "answer": "she",
+        "explain": "Ju = her."
+      }
+    ]
+  },
+  {
+    "id": "weather",
+    "topic": "Talking About the Weather",
+    "summary": "Prší. Je teplo. Je dvadsať stupňov. — no word for \"it\" needed.",
+    "explanation": "Weather sentences have **no word for \"it\"** — the verb is enough: *Prší.* (It's raining.) *Sneží.* (It's snowing.)\n\n**Je + a describing word** says how it feels outside: *Je teplo. Je zima. Je pekne.*\n\n**Aké je počasie?** — What's the weather like?\n\n**Degrees** follow the **1 / 2–4 / 5+** pattern again: *jeden stupeň, dva stupne, päť stupňov*.\n\nNotice: **zima** means both **winter** and **cold**: *V zime je zima.* — In winter it's cold.",
+    "tables": [
+      {
+        "title": "What's it doing?",
+        "head": [
+          "Slovak",
+          "English"
+        ],
+        "rows": [
+          [
+            "**Prší.**",
+            "It's raining."
+          ],
+          [
+            "**Sneží.**",
+            "It's snowing."
+          ],
+          [
+            "**Fúka** vietor.",
+            "It's windy."
+          ],
+          [
+            "**Svieti** slnko.",
+            "The sun is shining."
+          ]
+        ]
+      },
+      {
+        "title": "How is it? (je + …)",
+        "head": [
+          "Slovak",
+          "English"
+        ],
+        "rows": [
+          [
+            "Je **teplo**.",
+            "It's warm."
+          ],
+          [
+            "Je **horúco**.",
+            "It's hot."
+          ],
+          [
+            "Je **chladno**.",
+            "It's chilly."
+          ],
+          [
+            "Je **zima**.",
+            "It's cold."
+          ],
+          [
+            "Je **pekne**.",
+            "It's nice."
+          ],
+          [
+            "Je **zamračené**.",
+            "It's cloudy."
+          ]
+        ]
+      },
+      {
+        "title": "Degrees: 1 / 2–4 / 5+",
+        "head": [
+          "",
+          "Slovak"
+        ],
+        "rows": [
+          [
+            "1",
+            "jeden **stupeň**"
+          ],
+          [
+            "2, 3, 4",
+            "dva / tri / štyri **stupne**"
+          ],
+          [
+            "5 and up",
+            "päť **stupňov**"
+          ],
+          [
+            "−5",
+            "mínus päť **stupňov**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Aké je dnes počasie?",
+        "en": "What's the weather like today?"
+      },
+      {
+        "sk": "Dnes prší.",
+        "en": "It's raining today."
+      },
+      {
+        "sk": "Svieti slnko a je teplo.",
+        "en": "The sun is shining and it's warm."
+      },
+      {
+        "sk": "V zime často sneží.",
+        "en": "In winter it often snows."
+      },
+      {
+        "sk": "Je dvadsaťpäť stupňov.",
+        "en": "It's 25 degrees."
+      },
+      {
+        "sk": "Vonku je zima.",
+        "en": "It's cold outside."
+      },
+      {
+        "sk": "Dnes je pekne.",
+        "en": "It's nice today."
+      },
+      {
+        "sk": "Je zamračené, ale neprší.",
+        "en": "It's cloudy, but it isn't raining."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Prší.",
+        "question": "What does this mean?",
+        "options": [
+          "It's raining.",
+          "It's snowing.",
+          "It's windy."
+        ],
+        "answer": "It's raining.",
+        "explain": "Pršať = to rain."
+      },
+      {
+        "prompt": "Sneží.",
+        "question": "What does this mean?",
+        "options": [
+          "It's snowing.",
+          "It's raining.",
+          "It's cold."
+        ],
+        "answer": "It's snowing.",
+        "explain": "Snežiť = to snow."
+      },
+      {
+        "prompt": "Je dvadsať ___.",
+        "question": "It's 20 degrees.",
+        "options": [
+          "stupňov",
+          "stupne",
+          "stupeň"
+        ],
+        "answer": "stupňov",
+        "explain": "5 and up: stupňov."
+      },
+      {
+        "prompt": "Sú tri ___.",
+        "question": "It's 3 degrees.",
+        "options": [
+          "stupne",
+          "stupňov",
+          "stupeň"
+        ],
+        "answer": "stupne",
+        "explain": "2, 3 and 4: stupne — just like sú tri hodiny."
+      },
+      {
+        "prompt": "Aké je počasie?",
+        "question": "What does this mean?",
+        "options": [
+          "What's the weather like?",
+          "What time is it?",
+          "Is it cold?"
+        ],
+        "answer": "What's the weather like?",
+        "explain": "Počasie = weather."
+      },
+      {
+        "prompt": "V zime je zima.",
+        "question": "What does this mean?",
+        "options": [
+          "In winter it's cold.",
+          "It's winter in winter.",
+          "Winter is coming."
+        ],
+        "answer": "In winter it's cold.",
+        "explain": "Zima means both winter and cold."
+      },
+      {
+        "prompt": "Je ___.",
+        "question": "It's warm.",
+        "options": [
+          "teplo",
+          "teplý",
+          "teplá"
+        ],
+        "answer": "teplo",
+        "explain": "Weather uses the -o form: je teplo."
+      }
+    ]
+  },
+  {
+    "id": "past-tense",
+    "topic": "The Past Tense: robil som",
+    "summary": "Drop -ť, add -l (a woman -la, more people -li), plus som / si / sme / ste.",
+    "explanation": "To talk about the past, take the dictionary form, drop **-ť** and add **-l**: *robiť → robil*, *čítať → čítal*.\n\nThe ending shows **who** — a man **-l**, a woman **-la**, more people **-li**: *robil, robila, robili*.\n\nThen add **som / si / sme / ste** for *I, you, we, you*. For *he, she, they* there's **nothing extra**: *Ja som robil. — On robil.*\n\nLike *sa*, **som goes second**: *Včera som pracoval.* (Yesterday I worked.)\n\n**Not:** put **ne-** on the verb as usual: *Nerobil som nič.* (I didn't do anything.)",
+    "tables": [
+      {
+        "title": "robiť (to do)",
+        "head": [
+          "",
+          "a man",
+          "a woman"
+        ],
+        "rows": [
+          [
+            "ja",
+            "robi**l** **som**",
+            "robi**la** **som**"
+          ],
+          [
+            "ty",
+            "robi**l** **si**",
+            "robi**la** **si**"
+          ],
+          [
+            "on / ona",
+            "robi**l**",
+            "robi**la**"
+          ],
+          [
+            "my",
+            "robi**li** **sme**",
+            "robi**li** **sme**"
+          ],
+          [
+            "vy",
+            "robi**li** **ste**",
+            "robi**li** **ste**"
+          ],
+          [
+            "oni / ony",
+            "robi**li**",
+            "robi**li**"
+          ]
+        ]
+      },
+      {
+        "title": "Useful past forms",
+        "head": [
+          "Verb",
+          "a man",
+          "a woman",
+          "more people"
+        ],
+        "rows": [
+          [
+            "byť",
+            "bol",
+            "bola",
+            "boli"
+          ],
+          [
+            "mať",
+            "mal",
+            "mala",
+            "mali"
+          ],
+          [
+            "ísť",
+            "išiel",
+            "išla",
+            "išli"
+          ],
+          [
+            "jesť",
+            "jedol",
+            "jedla",
+            "jedli"
+          ],
+          [
+            "prísť",
+            "prišiel",
+            "prišla",
+            "prišli"
+          ],
+          [
+            "môcť",
+            "mohol",
+            "mohla",
+            "mohli"
+          ],
+          [
+            "chcieť",
+            "chcel",
+            "chcela",
+            "chceli"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Včera som pracoval.",
+        "en": "Yesterday I worked. (a man)"
+      },
+      {
+        "sk": "Včera som bola doma.",
+        "en": "Yesterday I was at home. (a woman)"
+      },
+      {
+        "sk": "Kde si bol?",
+        "en": "Where were you? (to a man)"
+      },
+      {
+        "sk": "Čo ste robili cez víkend?",
+        "en": "What did you do at the weekend?"
+      },
+      {
+        "sk": "Išli sme do kina.",
+        "en": "We went to the cinema."
+      },
+      {
+        "sk": "Mala som chrípku.",
+        "en": "I had the flu. (a woman)"
+      },
+      {
+        "sk": "On nebol v škole.",
+        "en": "He wasn't at school."
+      },
+      {
+        "sk": "Jedol som pizzu.",
+        "en": "I ate pizza. (a man)"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Včera som ___ doma. (byť, a man)",
+        "question": "Yesterday I was at home.",
+        "options": [
+          "bol",
+          "bola",
+          "boli"
+        ],
+        "answer": "bol",
+        "explain": "A man: bol."
+      },
+      {
+        "prompt": "Včera som ___ doma. (byť, a woman)",
+        "question": "Yesterday I was at home.",
+        "options": [
+          "bola",
+          "bol",
+          "boli"
+        ],
+        "answer": "bola",
+        "explain": "A woman: bola."
+      },
+      {
+        "prompt": "My sme ___ do kina. (ísť)",
+        "question": "We went to the cinema.",
+        "options": [
+          "išli",
+          "išiel",
+          "išla"
+        ],
+        "answer": "išli",
+        "explain": "More people: išli."
+      },
+      {
+        "prompt": "Ona ___ knihu. (čítať)",
+        "question": "She read a book.",
+        "options": [
+          "čítala",
+          "čítal",
+          "čítala som"
+        ],
+        "answer": "čítala",
+        "explain": "For he / she / they there is no som: ona čítala."
+      },
+      {
+        "prompt": "Včera ___ pracoval. (ja)",
+        "question": "Yesterday I worked.",
+        "options": [
+          "som",
+          "si",
+          "je"
+        ],
+        "answer": "som",
+        "explain": "Ja → som, and it goes second."
+      },
+      {
+        "prompt": "On ___ v škole. (byť — not)",
+        "question": "He wasn't at school.",
+        "options": [
+          "nebol",
+          "nie bol",
+          "nebol som"
+        ],
+        "answer": "nebol",
+        "explain": "Ne- joins the verb, and on needs no som: nebol."
+      },
+      {
+        "prompt": "Čo ste robili cez víkend?",
+        "question": "What does this mean?",
+        "options": [
+          "What did you do at the weekend?",
+          "What are you doing at the weekend?",
+          "What will you do at the weekend?"
+        ],
+        "answer": "What did you do at the weekend?",
+        "explain": "Robili ste = you did (past)."
+      }
+    ]
+  },
+  {
+    "id": "future-tense",
+    "topic": "The Future: budem",
+    "summary": "Budem = I will be. Budem + a verb = I will do it. Ísť has its own future: pôjdem.",
+    "explanation": "**budem** = I will be: *Zajtra budem doma.*\n\nIt also makes the future of other verbs: **budem + dictionary form** — *Budem pracovať. Budeme čítať.*\n\n**Not:** *nebudem* — *Zajtra nebudem pracovať.*\n\n**Watch out:** *ísť* has its own future — **pôjdem** (not *budem ísť*). And *prísť* already talks about the future in its normal form: *Prídem zajtra.* You'll meet more verbs like that in A2.",
+    "tables": [
+      {
+        "head": [
+          "",
+          "byť (future)",
+          "English"
+        ],
+        "rows": [
+          [
+            "ja",
+            "**budem**",
+            "I will be"
+          ],
+          [
+            "ty",
+            "**budeš**",
+            "you will be"
+          ],
+          [
+            "on / ona / ono",
+            "**bude**",
+            "he / she / it will be"
+          ],
+          [
+            "my",
+            "**budeme**",
+            "we will be"
+          ],
+          [
+            "vy",
+            "**budete**",
+            "you will be"
+          ],
+          [
+            "oni / ony",
+            "**budú**",
+            "they will be"
+          ]
+        ]
+      },
+      {
+        "title": "ísť: pôjdem",
+        "head": [
+          "",
+          "ísť (future)"
+        ],
+        "rows": [
+          [
+            "ja",
+            "**pôjdem**"
+          ],
+          [
+            "ty",
+            "**pôjdeš**"
+          ],
+          [
+            "on / ona / ono",
+            "**pôjde**"
+          ],
+          [
+            "my",
+            "**pôjdeme**"
+          ],
+          [
+            "vy",
+            "**pôjdete**"
+          ],
+          [
+            "oni / ony",
+            "**pôjdu**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Zajtra budem doma.",
+        "en": "Tomorrow I'll be at home."
+      },
+      {
+        "sk": "Budeš zajtra v práci?",
+        "en": "Will you be at work tomorrow?"
+      },
+      {
+        "sk": "V sobotu budeme pracovať.",
+        "en": "On Saturday we'll be working."
+      },
+      {
+        "sk": "Zajtra bude pršať.",
+        "en": "Tomorrow it will rain."
+      },
+      {
+        "sk": "Večer budem čítať.",
+        "en": "In the evening I'll read."
+      },
+      {
+        "sk": "Zajtra nebudem pracovať.",
+        "en": "Tomorrow I won't work."
+      },
+      {
+        "sk": "Pôjdeme do kina?",
+        "en": "Shall we go to the cinema?"
+      },
+      {
+        "sk": "V lete pôjdem na Slovensko.",
+        "en": "In summer I'll go to Slovakia."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Zajtra ___ doma. (ja)",
+        "question": "Tomorrow I'll be at home.",
+        "options": [
+          "budem",
+          "bude",
+          "budú"
+        ],
+        "answer": "budem",
+        "explain": "Ja → budem."
+      },
+      {
+        "prompt": "Oni ___ pracovať.",
+        "question": "They will work.",
+        "options": [
+          "budú",
+          "bude",
+          "budeme"
+        ],
+        "answer": "budú",
+        "explain": "Oni → budú."
+      },
+      {
+        "prompt": "Zajtra ___ pršať.",
+        "question": "Tomorrow it will rain.",
+        "options": [
+          "bude",
+          "budem",
+          "budú"
+        ],
+        "answer": "bude",
+        "explain": "It (no word) → bude."
+      },
+      {
+        "prompt": "My ___ v sobotu doma.",
+        "question": "We'll be at home on Saturday.",
+        "options": [
+          "budeme",
+          "budete",
+          "budú"
+        ],
+        "answer": "budeme",
+        "explain": "My → budeme."
+      },
+      {
+        "prompt": "Zajtra ___ do kina. (ísť, ja)",
+        "question": "Tomorrow I'll go to the cinema.",
+        "options": [
+          "pôjdem",
+          "budem ísť",
+          "idem bude"
+        ],
+        "answer": "pôjdem",
+        "explain": "Ísť has its own future: pôjdem."
+      },
+      {
+        "prompt": "Zajtra nebudem pracovať.",
+        "question": "What does this mean?",
+        "options": [
+          "Tomorrow I won't work.",
+          "Tomorrow I will work.",
+          "Yesterday I didn't work."
+        ],
+        "answer": "Tomorrow I won't work.",
+        "explain": "Nebudem = I will not."
+      },
+      {
+        "prompt": "robiť",
+        "question": "How do you say \"I will do\"?",
+        "options": [
+          "budem robiť",
+          "robil som",
+          "robím"
+        ],
+        "answer": "budem robiť",
+        "explain": "Budem + the dictionary form."
+      }
+    ]
   }
 ]

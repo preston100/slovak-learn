@@ -257,13 +257,6 @@
     "round": 1
   },
   {
-    "id": "vocab-adjectives-opposites-2",
-    "level": "A1.1",
-    "kind": "vocab",
-    "ref": "Adjectives & Opposites",
-    "round": 2
-  },
-  {
     "id": "vocab-common-verbs-0",
     "level": "A1.1",
     "kind": "vocab",
@@ -360,5 +353,302 @@
     "level": "A1.1",
     "kind": "grammar",
     "ref": "time-daily-routine"
+  },
+  {
+    "id": "vocab-bigger-numbers-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Bigger Numbers",
+    "round": 0
+  },
+  {
+    "id": "vocab-bigger-numbers-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Bigger Numbers",
+    "round": 1
+  },
+  {
+    "id": "gram-numbers-big",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "numbers-big"
+  },
+  {
+    "id": "vocab-days-months-seasons-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Days, Months & Seasons",
+    "round": 0
+  },
+  {
+    "id": "vocab-days-months-seasons-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Days, Months & Seasons",
+    "round": 1
+  },
+  {
+    "id": "vocab-days-months-seasons-2",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Days, Months & Seasons",
+    "round": 2
+  },
+  {
+    "id": "gram-days-dates",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "days-dates"
+  },
+  {
+    "id": "vocab-colors-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Colors",
+    "round": 0
+  },
+  {
+    "id": "vocab-colors-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Colors",
+    "round": 1
+  },
+  {
+    "id": "gram-colors",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "colors"
+  },
+  {
+    "id": "vocab-countries-languages-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Countries & Languages",
+    "round": 0
+  },
+  {
+    "id": "vocab-countries-languages-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Countries & Languages",
+    "round": 1
+  },
+  {
+    "id": "vocab-jobs-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Jobs",
+    "round": 0
+  },
+  {
+    "id": "vocab-jobs-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Jobs",
+    "round": 1
+  },
+  {
+    "id": "gram-sa-verbs",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "sa-verbs"
+  },
+  {
+    "id": "gram-where-from",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "where-from"
+  },
+  {
+    "id": "dialogue-meeting",
+    "level": "A1.2",
+    "kind": "dialogue",
+    "ref": "meeting"
+  },
+  {
+    "id": "vocab-everyday-food-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Everyday Food",
+    "round": 0
+  },
+  {
+    "id": "vocab-everyday-food-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Everyday Food",
+    "round": 1
+  },
+  {
+    "id": "vocab-everyday-food-2",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Everyday Food",
+    "round": 2
+  },
+  {
+    "id": "gram-objects",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "objects"
+  },
+  {
+    "id": "gram-likes",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "likes"
+  },
+  {
+    "id": "dialogue-cafe",
+    "level": "A1.2",
+    "kind": "dialogue",
+    "ref": "cafe"
+  },
+  {
+    "id": "vocab-around-town-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Around Town",
+    "round": 0
+  },
+  {
+    "id": "vocab-around-town-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Around Town",
+    "round": 1
+  },
+  {
+    "id": "vocab-transport-directions-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Transport & Directions",
+    "round": 0
+  },
+  {
+    "id": "vocab-transport-directions-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Transport & Directions",
+    "round": 1
+  },
+  {
+    "id": "vocab-transport-directions-2",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Transport & Directions",
+    "round": 2
+  },
+  {
+    "id": "gram-kde-kam",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "kde-kam"
+  },
+  {
+    "id": "gram-modals",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "modals"
+  },
+  {
+    "id": "dialogue-directions",
+    "level": "A1.2",
+    "kind": "dialogue",
+    "ref": "directions"
+  },
+  {
+    "id": "vocab-rooms-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Rooms",
+    "round": 0
+  },
+  {
+    "id": "vocab-rooms-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Rooms",
+    "round": 1
+  },
+  {
+    "id": "vocab-clothes-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Clothes",
+    "round": 0
+  },
+  {
+    "id": "vocab-clothes-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Clothes",
+    "round": 1
+  },
+  {
+    "id": "vocab-body-health-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Body & Health",
+    "round": 0
+  },
+  {
+    "id": "vocab-body-health-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Body & Health",
+    "round": 1
+  },
+  {
+    "id": "gram-body-health",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "body-health"
+  },
+  {
+    "id": "dialogue-doctor",
+    "level": "A1.2",
+    "kind": "dialogue",
+    "ref": "doctor"
+  },
+  {
+    "id": "vocab-weather-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Weather",
+    "round": 0
+  },
+  {
+    "id": "vocab-weather-1",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Weather",
+    "round": 1
+  },
+  {
+    "id": "gram-weather",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "weather"
+  },
+  {
+    "id": "gram-past-tense",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "past-tense"
+  },
+  {
+    "id": "gram-future-tense",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "future-tense"
+  },
+  {
+    "id": "dialogue-weekend",
+    "level": "A1.2",
+    "kind": "dialogue",
+    "ref": "weekend"
   }
 ]

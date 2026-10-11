@@ -1,0 +1,617 @@
+[
+  {
+    "id": "meeting",
+    "title": "Dialogue: Meeting Someone",
+    "scene": "Peter and Anna meet for the first time. They are strangers, so they use the polite vy.",
+    "lines": [
+      {
+        "who": "Peter",
+        "sk": "Dobrý deň. Volám sa Peter.",
+        "en": "Hello. My name is Peter."
+      },
+      {
+        "who": "Anna",
+        "sk": "Dobrý deň. Ja som Anna. Teší ma.",
+        "en": "Hello. I'm Anna. Nice to meet you."
+      },
+      {
+        "who": "Peter",
+        "sk": "Teší ma. Odkiaľ ste?",
+        "en": "Nice to meet you. Where are you from?"
+      },
+      {
+        "who": "Anna",
+        "sk": "Som z Ameriky, ale bývam v Bratislave. A vy?",
+        "en": "I'm from America, but I live in Bratislava. And you?"
+      },
+      {
+        "who": "Peter",
+        "sk": "Ja som zo Slovenska, z Košíc.",
+        "en": "I'm from Slovakia, from Košice."
+      },
+      {
+        "who": "Anna",
+        "sk": "Čím ste?",
+        "en": "What's your job?"
+      },
+      {
+        "who": "Peter",
+        "sk": "Som učiteľ. A vy?",
+        "en": "I'm a teacher. And you?"
+      },
+      {
+        "who": "Anna",
+        "sk": "Ja som programátorka. Učím sa po slovensky.",
+        "en": "I'm a programmer. I'm learning Slovak."
+      },
+      {
+        "who": "Peter",
+        "sk": "Hovoríte veľmi dobre!",
+        "en": "You speak very well!"
+      },
+      {
+        "who": "Anna",
+        "sk": "Ďakujem!",
+        "en": "Thank you!"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Odkiaľ je Anna?",
+        "question": "Where is Anna from?",
+        "options": [
+          "z Ameriky",
+          "zo Slovenska",
+          "z Košíc"
+        ],
+        "answer": "z Ameriky",
+        "explain": "Som z Ameriky, ale bývam v Bratislave."
+      },
+      {
+        "prompt": "Kde býva Anna?",
+        "question": "Where does Anna live?",
+        "options": [
+          "v Bratislave",
+          "v Košiciach",
+          "v Amerike"
+        ],
+        "answer": "v Bratislave",
+        "explain": "…ale bývam v Bratislave."
+      },
+      {
+        "prompt": "Čím je Peter?",
+        "question": "What is Peter's job?",
+        "options": [
+          "učiteľ",
+          "programátor",
+          "študent"
+        ],
+        "answer": "učiteľ",
+        "explain": "Som učiteľ."
+      },
+      {
+        "prompt": "Čím je Anna?",
+        "question": "What is Anna's job?",
+        "options": [
+          "programátorka",
+          "učiteľka",
+          "lekárka"
+        ],
+        "answer": "programátorka",
+        "explain": "Ja som programátorka."
+      },
+      {
+        "prompt": "Teší ma.",
+        "question": "What does it mean here?",
+        "options": [
+          "Nice to meet you.",
+          "I'm sorry.",
+          "Thank you."
+        ],
+        "answer": "Nice to meet you.",
+        "explain": "Teší ma is what you say when you meet someone."
+      },
+      {
+        "prompt": "Odkiaľ ste?",
+        "question": "Why ste, not si?",
+        "options": [
+          "They've just met, so they're polite (vy)",
+          "They're a group",
+          "They're old friends"
+        ],
+        "answer": "They've just met, so they're polite (vy)",
+        "explain": "Strangers use vy: odkiaľ ste?"
+      }
+    ]
+  },
+  {
+    "id": "cafe",
+    "title": "Dialogue: At the Café",
+    "scene": "Eva orders in a café.",
+    "lines": [
+      {
+        "who": "Čašník",
+        "sk": "Dobrý deň, čo si dáte?",
+        "en": "Hello, what would you like?"
+      },
+      {
+        "who": "Eva",
+        "sk": "Dobrý deň. Dám si kávu s mliekom, prosím.",
+        "en": "Hello. I'll have a coffee with milk, please."
+      },
+      {
+        "who": "Čašník",
+        "sk": "Malú alebo veľkú?",
+        "en": "Small or large?"
+      },
+      {
+        "who": "Eva",
+        "sk": "Veľkú, prosím. A ešte vodu.",
+        "en": "Large, please. And some water too."
+      },
+      {
+        "who": "Čašník",
+        "sk": "Perlivú alebo neperlivú?",
+        "en": "Sparkling or still?"
+      },
+      {
+        "who": "Eva",
+        "sk": "Neperlivú.",
+        "en": "Still."
+      },
+      {
+        "who": "Čašník",
+        "sk": "Dáte si aj niečo na jedenie?",
+        "en": "Would you like something to eat as well?"
+      },
+      {
+        "who": "Eva",
+        "sk": "Nie, ďakujem. Koľko to stojí?",
+        "en": "No, thank you. How much is it?"
+      },
+      {
+        "who": "Čašník",
+        "sk": "Štyri eurá päťdesiat.",
+        "en": "Four euros fifty."
+      },
+      {
+        "who": "Eva",
+        "sk": "Platím kartou.",
+        "en": "I'm paying by card."
+      },
+      {
+        "who": "Čašník",
+        "sk": "Nech sa páči.",
+        "en": "Here you are."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Čo si dá Eva?",
+        "question": "What does Eva order?",
+        "options": [
+          "kávu s mliekom a vodu",
+          "čaj a vodu",
+          "kávu a koláč"
+        ],
+        "answer": "kávu s mliekom a vodu",
+        "explain": "Dám si kávu s mliekom… A ešte vodu."
+      },
+      {
+        "prompt": "Akú kávu chce?",
+        "question": "What size coffee?",
+        "options": [
+          "veľkú",
+          "malú",
+          "strednú"
+        ],
+        "answer": "veľkú",
+        "explain": "Veľkú, prosím."
+      },
+      {
+        "prompt": "Akú vodu chce?",
+        "question": "What kind of water?",
+        "options": [
+          "neperlivú",
+          "perlivú",
+          "studenú"
+        ],
+        "answer": "neperlivú",
+        "explain": "Neperlivú."
+      },
+      {
+        "prompt": "Koľko to stojí?",
+        "question": "How much does it cost?",
+        "options": [
+          "4,50 €",
+          "5,40 €",
+          "14,50 €"
+        ],
+        "answer": "4,50 €",
+        "explain": "Štyri eurá päťdesiat."
+      },
+      {
+        "prompt": "Ako platí Eva?",
+        "question": "How does Eva pay?",
+        "options": [
+          "kartou",
+          "v hotovosti",
+          "neplatí"
+        ],
+        "answer": "kartou",
+        "explain": "Platím kartou."
+      },
+      {
+        "prompt": "Malú alebo veľkú?",
+        "question": "Why malú, not malá?",
+        "options": [
+          "It describes kávu — an object",
+          "Because it's a question",
+          "Because the waiter is polite"
+        ],
+        "answer": "It describes kávu — an object",
+        "explain": "Feminine object: kávu → malú / veľkú kávu."
+      }
+    ]
+  },
+  {
+    "id": "directions",
+    "title": "Dialogue: Asking the Way",
+    "scene": "A tourist asks a man in the street how to get to the station.",
+    "lines": [
+      {
+        "who": "Turistka",
+        "sk": "Prepáčte, kde je stanica?",
+        "en": "Excuse me, where is the station?"
+      },
+      {
+        "who": "Pán",
+        "sk": "Stanica? Choďte rovno a potom vľavo.",
+        "en": "The station? Go straight on and then left."
+      },
+      {
+        "who": "Turistka",
+        "sk": "Je to ďaleko?",
+        "en": "Is it far?"
+      },
+      {
+        "who": "Pán",
+        "sk": "Nie, je to blízko. Asi päť minút pešo.",
+        "en": "No, it's near. About five minutes on foot."
+      },
+      {
+        "who": "Turistka",
+        "sk": "A môžem ísť aj autobusom?",
+        "en": "And can I go by bus too?"
+      },
+      {
+        "who": "Pán",
+        "sk": "Áno, autobus číslo tri ide na stanicu. Zastávka je tam, vpravo.",
+        "en": "Yes, bus number three goes to the station. The stop is there, on the right."
+      },
+      {
+        "who": "Turistka",
+        "sk": "Ďakujem veľmi pekne.",
+        "en": "Thank you very much."
+      },
+      {
+        "who": "Pán",
+        "sk": "Nemáte za čo. Dovidenia.",
+        "en": "You're welcome. Goodbye."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Kam ide turistka?",
+        "question": "Where does she want to go?",
+        "options": [
+          "na stanicu",
+          "do školy",
+          "na poštu"
+        ],
+        "answer": "na stanicu",
+        "explain": "Kde je stanica?"
+      },
+      {
+        "prompt": "Je stanica ďaleko?",
+        "question": "Is the station far?",
+        "options": [
+          "Nie, je blízko.",
+          "Áno, je ďaleko.",
+          "Pán to nevie."
+        ],
+        "answer": "Nie, je blízko.",
+        "explain": "Nie, je to blízko."
+      },
+      {
+        "prompt": "Koľko minút pešo?",
+        "question": "How many minutes on foot?",
+        "options": [
+          "päť",
+          "tri",
+          "pätnásť"
+        ],
+        "answer": "päť",
+        "explain": "Asi päť minút pešo."
+      },
+      {
+        "prompt": "Ktorý autobus ide na stanicu?",
+        "question": "Which bus goes to the station?",
+        "options": [
+          "číslo tri",
+          "číslo päť",
+          "číslo trinásť"
+        ],
+        "answer": "číslo tri",
+        "explain": "Autobus číslo tri ide na stanicu."
+      },
+      {
+        "prompt": "Kde je zastávka?",
+        "question": "Where is the bus stop?",
+        "options": [
+          "vpravo",
+          "vľavo",
+          "rovno"
+        ],
+        "answer": "vpravo",
+        "explain": "Zastávka je tam, vpravo."
+      },
+      {
+        "prompt": "Choďte rovno a potom vľavo.",
+        "question": "What does this mean?",
+        "options": [
+          "Go straight on and then left.",
+          "Go left and then right.",
+          "Turn back and go left."
+        ],
+        "answer": "Go straight on and then left.",
+        "explain": "Rovno = straight on, vľavo = left."
+      }
+    ]
+  },
+  {
+    "id": "doctor",
+    "title": "Dialogue: At the Doctor",
+    "scene": "Tomáš is ill and visits the doctor.",
+    "lines": [
+      {
+        "who": "Lekárka",
+        "sk": "Dobrý deň, čo vás bolí?",
+        "en": "Hello, what's the problem? (literally: what hurts?)"
+      },
+      {
+        "who": "Tomáš",
+        "sk": "Dobrý deň. Bolí ma hlava a hrdlo.",
+        "en": "Hello. I have a headache and a sore throat."
+      },
+      {
+        "who": "Lekárka",
+        "sk": "Máte horúčku?",
+        "en": "Do you have a fever?"
+      },
+      {
+        "who": "Tomáš",
+        "sk": "Áno, mám. Mám aj kašeľ.",
+        "en": "Yes, I do. I also have a cough."
+      },
+      {
+        "who": "Lekárka",
+        "sk": "Odkedy ste chorý?",
+        "en": "How long have you been ill?"
+      },
+      {
+        "who": "Tomáš",
+        "sk": "Od pondelka.",
+        "en": "Since Monday."
+      },
+      {
+        "who": "Lekárka",
+        "sk": "Máte chrípku. Musíte byť doma a veľa piť.",
+        "en": "You have the flu. You must stay at home and drink a lot."
+      },
+      {
+        "who": "Tomáš",
+        "sk": "Môžem ísť zajtra do práce?",
+        "en": "Can I go to work tomorrow?"
+      },
+      {
+        "who": "Lekárka",
+        "sk": "Nie, nemôžete. Tu je recept na lieky.",
+        "en": "No, you can't. Here's a prescription for medicine."
+      },
+      {
+        "who": "Tomáš",
+        "sk": "Ďakujem. Dovidenia.",
+        "en": "Thank you. Goodbye."
+      },
+      {
+        "who": "Lekárka",
+        "sk": "Dovidenia, a skoro sa uzdravte!",
+        "en": "Goodbye, and get well soon!"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Čo bolí Tomáša?",
+        "question": "What hurts?",
+        "options": [
+          "hlava a hrdlo",
+          "nohy a chrbát",
+          "brucho"
+        ],
+        "answer": "hlava a hrdlo",
+        "explain": "Bolí ma hlava a hrdlo."
+      },
+      {
+        "prompt": "Má Tomáš horúčku?",
+        "question": "Does Tomáš have a fever?",
+        "options": [
+          "Áno.",
+          "Nie.",
+          "Nevie."
+        ],
+        "answer": "Áno.",
+        "explain": "Áno, mám."
+      },
+      {
+        "prompt": "Odkedy je chorý?",
+        "question": "How long has he been ill?",
+        "options": [
+          "od pondelka",
+          "od soboty",
+          "od včera"
+        ],
+        "answer": "od pondelka",
+        "explain": "Od pondelka."
+      },
+      {
+        "prompt": "Čo má Tomáš?",
+        "question": "What does the doctor say he has?",
+        "options": [
+          "chrípku",
+          "nádchu",
+          "nič"
+        ],
+        "answer": "chrípku",
+        "explain": "Máte chrípku."
+      },
+      {
+        "prompt": "Môže ísť zajtra do práce?",
+        "question": "Can he go to work tomorrow?",
+        "options": [
+          "Nie, nemôže.",
+          "Áno, môže.",
+          "Áno, musí."
+        ],
+        "answer": "Nie, nemôže.",
+        "explain": "Nie, nemôžete."
+      },
+      {
+        "prompt": "Musíte byť doma a veľa piť.",
+        "question": "What does this mean?",
+        "options": [
+          "You must stay at home and drink a lot.",
+          "You can go home and eat a lot.",
+          "You don't have to stay at home."
+        ],
+        "answer": "You must stay at home and drink a lot.",
+        "explain": "Musíte = you must."
+      }
+    ]
+  },
+  {
+    "id": "weekend",
+    "title": "Dialogue: The Weekend",
+    "scene": "Jana and Marek are friends, so they use ty. They talk about last weekend and the next one.",
+    "lines": [
+      {
+        "who": "Jana",
+        "sk": "Ahoj Marek! Čo si robil cez víkend?",
+        "en": "Hi Marek! What did you do at the weekend?"
+      },
+      {
+        "who": "Marek",
+        "sk": "Ahoj! V sobotu som bol v horách. Bolo krásne počasie.",
+        "en": "Hi! On Saturday I was in the mountains. The weather was beautiful."
+      },
+      {
+        "who": "Jana",
+        "sk": "To je super! Ja som bola doma, lebo pršalo.",
+        "en": "That's great! I was at home because it was raining."
+      },
+      {
+        "who": "Marek",
+        "sk": "A v nedeľu?",
+        "en": "And on Sunday?"
+      },
+      {
+        "who": "Jana",
+        "sk": "V nedeľu sme išli s mamou do kina.",
+        "en": "On Sunday my mom and I went to the cinema."
+      },
+      {
+        "who": "Marek",
+        "sk": "Čo budeš robiť budúci víkend?",
+        "en": "What are you going to do next weekend?"
+      },
+      {
+        "who": "Jana",
+        "sk": "Budem pracovať. A ty?",
+        "en": "I'll be working. And you?"
+      },
+      {
+        "who": "Marek",
+        "sk": "Pôjdem k babke na dedinu.",
+        "en": "I'll go to my grandma's in the village."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Kde bol Marek v sobotu?",
+        "question": "Where was Marek on Saturday?",
+        "options": [
+          "v horách",
+          "doma",
+          "v kine"
+        ],
+        "answer": "v horách",
+        "explain": "V sobotu som bol v horách."
+      },
+      {
+        "prompt": "Prečo bola Jana doma?",
+        "question": "Why was Jana at home?",
+        "options": [
+          "Pršalo.",
+          "Bola chorá.",
+          "Pracovala."
+        ],
+        "answer": "Pršalo.",
+        "explain": "…lebo pršalo."
+      },
+      {
+        "prompt": "Kam išla Jana v nedeľu?",
+        "question": "Where did Jana go on Sunday?",
+        "options": [
+          "do kina",
+          "do práce",
+          "k babke"
+        ],
+        "answer": "do kina",
+        "explain": "V nedeľu sme išli s mamou do kina."
+      },
+      {
+        "prompt": "Čo bude Jana robiť budúci víkend?",
+        "question": "What will Jana do next weekend?",
+        "options": [
+          "Bude pracovať.",
+          "Pôjde do kina.",
+          "Bude doma s mamou."
+        ],
+        "answer": "Bude pracovať.",
+        "explain": "Budem pracovať."
+      },
+      {
+        "prompt": "Kam pôjde Marek?",
+        "question": "Where will Marek go?",
+        "options": [
+          "k babke na dedinu",
+          "do hôr",
+          "do kina"
+        ],
+        "answer": "k babke na dedinu",
+        "explain": "Pôjdem k babke na dedinu."
+      },
+      {
+        "prompt": "pršalo",
+        "question": "What does this mean?",
+        "options": [
+          "it was raining",
+          "it will rain",
+          "it's raining"
+        ],
+        "answer": "it was raining",
+        "explain": "Past tense of pršať."
+      }
+    ]
+  }
+]

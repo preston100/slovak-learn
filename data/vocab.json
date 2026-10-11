@@ -354,10 +354,6 @@
         "en": "friend"
       },
       {
-        "sk": "učiteľ(ka)",
-        "en": "teacher"
-      },
-      {
         "sk": "domáce zviera",
         "en": "pet"
       },
@@ -473,7 +469,7 @@
       },
       {
         "sk": "pomaranč",
-        "en": "orange"
+        "en": "orange (fruit)"
       },
       {
         "sk": "čerešňa",
@@ -673,30 +669,6 @@
       {
         "sk": "chorý",
         "en": "sick"
-      },
-      {
-        "sk": "vpravo",
-        "en": "right"
-      },
-      {
-        "sk": "vľavo",
-        "en": "left"
-      },
-      {
-        "sk": "vonku",
-        "en": "outside"
-      },
-      {
-        "sk": "vnútri",
-        "en": "inside"
-      },
-      {
-        "sk": "hore",
-        "en": "up"
-      },
-      {
-        "sk": "dole",
-        "en": "down"
       }
     ]
   },
@@ -814,10 +786,6 @@
       {
         "sk": "mesiac",
         "en": "month"
-      },
-      {
-        "sk": "leto",
-        "en": "summer"
       },
       {
         "sk": "dovolenka",
@@ -1044,6 +1012,866 @@
       {
         "sk": "páčiť sa",
         "en": "to like (páči sa mi = I like it)"
+      }
+    ]
+  },
+  {
+    "topic": "Bigger Numbers",
+    "words": [
+      {
+        "sk": "tridsať",
+        "en": "30"
+      },
+      {
+        "sk": "štyridsať",
+        "en": "40"
+      },
+      {
+        "sk": "päťdesiat",
+        "en": "50"
+      },
+      {
+        "sk": "šesťdesiat",
+        "en": "60"
+      },
+      {
+        "sk": "sedemdesiat",
+        "en": "70"
+      },
+      {
+        "sk": "osemdesiat",
+        "en": "80"
+      },
+      {
+        "sk": "deväťdesiat",
+        "en": "90"
+      },
+      {
+        "sk": "sto",
+        "en": "100"
+      },
+      {
+        "sk": "dvadsaťjeden",
+        "en": "21"
+      },
+      {
+        "sk": "tridsaťdva",
+        "en": "32"
+      },
+      {
+        "sk": "štyridsaťpäť",
+        "en": "45"
+      },
+      {
+        "sk": "deväťdesiatdeväť",
+        "en": "99"
+      },
+      {
+        "sk": "dvesto",
+        "en": "200"
+      },
+      {
+        "sk": "tristo",
+        "en": "300"
+      },
+      {
+        "sk": "päťsto",
+        "en": "500"
+      },
+      {
+        "sk": "tisíc",
+        "en": "1,000"
+      },
+      {
+        "sk": "dvetisíc",
+        "en": "2,000"
+      }
+    ]
+  },
+  {
+    "topic": "Days, Months & Seasons",
+    "words": [
+      {
+        "sk": "pondelok",
+        "en": "Monday"
+      },
+      {
+        "sk": "utorok",
+        "en": "Tuesday"
+      },
+      {
+        "sk": "streda",
+        "en": "Wednesday"
+      },
+      {
+        "sk": "štvrtok",
+        "en": "Thursday"
+      },
+      {
+        "sk": "piatok",
+        "en": "Friday"
+      },
+      {
+        "sk": "sobota",
+        "en": "Saturday"
+      },
+      {
+        "sk": "nedeľa",
+        "en": "Sunday"
+      },
+      {
+        "sk": "víkend",
+        "en": "weekend"
+      },
+      {
+        "sk": "týždeň",
+        "en": "week"
+      },
+      {
+        "sk": "rok",
+        "en": "year"
+      },
+      {
+        "sk": "január",
+        "en": "January"
+      },
+      {
+        "sk": "február",
+        "en": "February"
+      },
+      {
+        "sk": "marec",
+        "en": "March"
+      },
+      {
+        "sk": "apríl",
+        "en": "April"
+      },
+      {
+        "sk": "máj",
+        "en": "May"
+      },
+      {
+        "sk": "jún",
+        "en": "June"
+      },
+      {
+        "sk": "júl",
+        "en": "July"
+      },
+      {
+        "sk": "august",
+        "en": "August"
+      },
+      {
+        "sk": "september",
+        "en": "September"
+      },
+      {
+        "sk": "október",
+        "en": "October"
+      },
+      {
+        "sk": "november",
+        "en": "November"
+      },
+      {
+        "sk": "december",
+        "en": "December"
+      },
+      {
+        "sk": "jar",
+        "en": "spring"
+      },
+      {
+        "sk": "leto",
+        "en": "summer"
+      },
+      {
+        "sk": "jeseň",
+        "en": "autumn"
+      },
+      {
+        "sk": "zima",
+        "en": "winter"
+      }
+    ]
+  },
+  {
+    "topic": "Colors",
+    "words": [
+      {
+        "sk": "farba",
+        "en": "colour"
+      },
+      {
+        "sk": "červený",
+        "en": "red"
+      },
+      {
+        "sk": "modrý",
+        "en": "blue"
+      },
+      {
+        "sk": "zelený",
+        "en": "green"
+      },
+      {
+        "sk": "žltý",
+        "en": "yellow"
+      },
+      {
+        "sk": "čierny",
+        "en": "black"
+      },
+      {
+        "sk": "biely",
+        "en": "white"
+      },
+      {
+        "sk": "hnedý",
+        "en": "brown"
+      },
+      {
+        "sk": "sivý",
+        "en": "grey"
+      },
+      {
+        "sk": "oranžový",
+        "en": "orange (colour)"
+      },
+      {
+        "sk": "ružový",
+        "en": "pink"
+      },
+      {
+        "sk": "fialový",
+        "en": "purple"
+      }
+    ]
+  },
+  {
+    "topic": "Countries & Languages",
+    "words": [
+      {
+        "sk": "Slovensko",
+        "en": "Slovakia"
+      },
+      {
+        "sk": "Česko",
+        "en": "Czechia"
+      },
+      {
+        "sk": "Anglicko",
+        "en": "England"
+      },
+      {
+        "sk": "Amerika",
+        "en": "America"
+      },
+      {
+        "sk": "Nemecko",
+        "en": "Germany"
+      },
+      {
+        "sk": "Rakúsko",
+        "en": "Austria"
+      },
+      {
+        "sk": "Maďarsko",
+        "en": "Hungary"
+      },
+      {
+        "sk": "Poľsko",
+        "en": "Poland"
+      },
+      {
+        "sk": "Ukrajina",
+        "en": "Ukraine"
+      },
+      {
+        "sk": "slovenčina",
+        "en": "Slovak (the language)"
+      },
+      {
+        "sk": "angličtina",
+        "en": "English (the language)"
+      },
+      {
+        "sk": "nemčina",
+        "en": "German (the language)"
+      },
+      {
+        "sk": "Slovák / Slovenka",
+        "en": "a Slovak (man / woman)"
+      },
+      {
+        "sk": "Američan / Američanka",
+        "en": "an American (man / woman)"
+      },
+      {
+        "sk": "Angličan / Angličanka",
+        "en": "an Englishman / Englishwoman"
+      }
+    ]
+  },
+  {
+    "topic": "Jobs",
+    "words": [
+      {
+        "sk": "učiteľ / učiteľka",
+        "en": "teacher"
+      },
+      {
+        "sk": "lekár / lekárka",
+        "en": "doctor"
+      },
+      {
+        "sk": "zdravotník / zdravotná sestra",
+        "en": "nurse"
+      },
+      {
+        "sk": "študent / študentka",
+        "en": "student"
+      },
+      {
+        "sk": "predavač / predavačka",
+        "en": "shop assistant"
+      },
+      {
+        "sk": "čašník / čašníčka",
+        "en": "waiter / waitress"
+      },
+      {
+        "sk": "kuchár / kuchárka",
+        "en": "cook"
+      },
+      {
+        "sk": "vodič / vodička",
+        "en": "driver"
+      },
+      {
+        "sk": "programátor / programátorka",
+        "en": "programmer"
+      },
+      {
+        "sk": "úradník / úradníčka",
+        "en": "office worker"
+      },
+      {
+        "sk": "policajt / policajtka",
+        "en": "police officer"
+      },
+      {
+        "sk": "inžinier / inžinierka",
+        "en": "engineer"
+      },
+      {
+        "sk": "dôchodca / dôchodkyňa",
+        "en": "pensioner"
+      },
+      {
+        "sk": "nezamestnaný / nezamestnaná",
+        "en": "unemployed"
+      },
+      {
+        "sk": "povolanie",
+        "en": "job / profession"
+      },
+      {
+        "sk": "firma",
+        "en": "company"
+      }
+    ]
+  },
+  {
+    "topic": "Everyday Food",
+    "words": [
+      {
+        "sk": "chlieb",
+        "en": "bread"
+      },
+      {
+        "sk": "rožok",
+        "en": "bread roll"
+      },
+      {
+        "sk": "maslo",
+        "en": "butter"
+      },
+      {
+        "sk": "syr",
+        "en": "cheese"
+      },
+      {
+        "sk": "šunka",
+        "en": "ham"
+      },
+      {
+        "sk": "vajce",
+        "en": "egg"
+      },
+      {
+        "sk": "mlieko",
+        "en": "milk"
+      },
+      {
+        "sk": "jogurt",
+        "en": "yogurt"
+      },
+      {
+        "sk": "mäso",
+        "en": "meat"
+      },
+      {
+        "sk": "kuracie mäso",
+        "en": "chicken (meat)"
+      },
+      {
+        "sk": "ryba",
+        "en": "fish"
+      },
+      {
+        "sk": "ryža",
+        "en": "rice"
+      },
+      {
+        "sk": "zemiaky",
+        "en": "potatoes"
+      },
+      {
+        "sk": "polievka",
+        "en": "soup"
+      },
+      {
+        "sk": "zelenina",
+        "en": "vegetables"
+      },
+      {
+        "sk": "ovocie",
+        "en": "fruit"
+      },
+      {
+        "sk": "paradajka",
+        "en": "tomato"
+      },
+      {
+        "sk": "uhorka",
+        "en": "cucumber"
+      },
+      {
+        "sk": "cibuľa",
+        "en": "onion"
+      },
+      {
+        "sk": "káva",
+        "en": "coffee"
+      },
+      {
+        "sk": "čaj",
+        "en": "tea"
+      },
+      {
+        "sk": "pivo",
+        "en": "beer"
+      },
+      {
+        "sk": "víno",
+        "en": "wine"
+      },
+      {
+        "sk": "džús",
+        "en": "juice"
+      }
+    ]
+  },
+  {
+    "topic": "Around Town",
+    "words": [
+      {
+        "sk": "pošta",
+        "en": "post office"
+      },
+      {
+        "sk": "banka",
+        "en": "bank"
+      },
+      {
+        "sk": "lekáreň",
+        "en": "pharmacy"
+      },
+      {
+        "sk": "nemocnica",
+        "en": "hospital"
+      },
+      {
+        "sk": "reštaurácia",
+        "en": "restaurant"
+      },
+      {
+        "sk": "kaviareň",
+        "en": "café"
+      },
+      {
+        "sk": "kino",
+        "en": "cinema"
+      },
+      {
+        "sk": "divadlo",
+        "en": "theatre"
+      },
+      {
+        "sk": "múzeum",
+        "en": "museum"
+      },
+      {
+        "sk": "park",
+        "en": "park"
+      },
+      {
+        "sk": "námestie",
+        "en": "square"
+      },
+      {
+        "sk": "hotel",
+        "en": "hotel"
+      }
+    ]
+  },
+  {
+    "topic": "Transport & Directions",
+    "words": [
+      {
+        "sk": "autobus",
+        "en": "bus"
+      },
+      {
+        "sk": "električka",
+        "en": "tram"
+      },
+      {
+        "sk": "vlak",
+        "en": "train"
+      },
+      {
+        "sk": "auto",
+        "en": "car"
+      },
+      {
+        "sk": "taxík",
+        "en": "taxi"
+      },
+      {
+        "sk": "bicykel",
+        "en": "bike"
+      },
+      {
+        "sk": "lietadlo",
+        "en": "plane"
+      },
+      {
+        "sk": "stanica",
+        "en": "station"
+      },
+      {
+        "sk": "letisko",
+        "en": "airport"
+      },
+      {
+        "sk": "lístok",
+        "en": "ticket"
+      },
+      {
+        "sk": "pešo",
+        "en": "on foot"
+      },
+      {
+        "sk": "rovno",
+        "en": "straight on"
+      },
+      {
+        "sk": "vpravo",
+        "en": "right"
+      },
+      {
+        "sk": "vľavo",
+        "en": "left"
+      },
+      {
+        "sk": "vonku",
+        "en": "outside"
+      },
+      {
+        "sk": "vnútri",
+        "en": "inside"
+      },
+      {
+        "sk": "hore",
+        "en": "up"
+      },
+      {
+        "sk": "dole",
+        "en": "down"
+      },
+      {
+        "sk": "blízko",
+        "en": "near"
+      },
+      {
+        "sk": "ďaleko",
+        "en": "far"
+      }
+    ]
+  },
+  {
+    "topic": "Rooms",
+    "words": [
+      {
+        "sk": "byt",
+        "en": "flat / apartment"
+      },
+      {
+        "sk": "dom",
+        "en": "house"
+      },
+      {
+        "sk": "izba",
+        "en": "room"
+      },
+      {
+        "sk": "obývačka",
+        "en": "living room"
+      },
+      {
+        "sk": "spálňa",
+        "en": "bedroom"
+      },
+      {
+        "sk": "kuchyňa",
+        "en": "kitchen"
+      },
+      {
+        "sk": "kúpeľňa",
+        "en": "bathroom"
+      },
+      {
+        "sk": "záchod",
+        "en": "toilet"
+      },
+      {
+        "sk": "chodba",
+        "en": "hallway"
+      },
+      {
+        "sk": "balkón",
+        "en": "balcony"
+      },
+      {
+        "sk": "záhrada",
+        "en": "garden"
+      },
+      {
+        "sk": "poschodie",
+        "en": "floor (storey)"
+      }
+    ]
+  },
+  {
+    "topic": "Clothes",
+    "words": [
+      {
+        "sk": "oblečenie",
+        "en": "clothes"
+      },
+      {
+        "sk": "tričko",
+        "en": "T-shirt"
+      },
+      {
+        "sk": "košeľa",
+        "en": "shirt"
+      },
+      {
+        "sk": "sveter",
+        "en": "sweater"
+      },
+      {
+        "sk": "mikina",
+        "en": "hoodie"
+      },
+      {
+        "sk": "nohavice",
+        "en": "trousers"
+      },
+      {
+        "sk": "rifle",
+        "en": "jeans"
+      },
+      {
+        "sk": "sukňa",
+        "en": "skirt"
+      },
+      {
+        "sk": "šaty",
+        "en": "dress"
+      },
+      {
+        "sk": "bunda",
+        "en": "jacket"
+      },
+      {
+        "sk": "kabát",
+        "en": "coat"
+      },
+      {
+        "sk": "topánky",
+        "en": "shoes"
+      },
+      {
+        "sk": "ponožky",
+        "en": "socks"
+      },
+      {
+        "sk": "čiapka",
+        "en": "hat"
+      },
+      {
+        "sk": "šál",
+        "en": "scarf"
+      }
+    ]
+  },
+  {
+    "topic": "Body & Health",
+    "words": [
+      {
+        "sk": "hlava",
+        "en": "head"
+      },
+      {
+        "sk": "oko / oči",
+        "en": "eye / eyes"
+      },
+      {
+        "sk": "ucho / uši",
+        "en": "ear / ears"
+      },
+      {
+        "sk": "nos",
+        "en": "nose"
+      },
+      {
+        "sk": "ústa",
+        "en": "mouth"
+      },
+      {
+        "sk": "zub / zuby",
+        "en": "tooth / teeth"
+      },
+      {
+        "sk": "ruka",
+        "en": "hand / arm"
+      },
+      {
+        "sk": "noha",
+        "en": "leg / foot"
+      },
+      {
+        "sk": "brucho",
+        "en": "stomach"
+      },
+      {
+        "sk": "chrbát",
+        "en": "back"
+      },
+      {
+        "sk": "hrdlo",
+        "en": "throat"
+      },
+      {
+        "sk": "horúčka",
+        "en": "fever"
+      },
+      {
+        "sk": "nádcha",
+        "en": "a cold (runny nose)"
+      },
+      {
+        "sk": "kašeľ",
+        "en": "cough"
+      },
+      {
+        "sk": "liek",
+        "en": "medicine"
+      }
+    ]
+  },
+  {
+    "topic": "Weather",
+    "words": [
+      {
+        "sk": "počasie",
+        "en": "weather"
+      },
+      {
+        "sk": "slnko",
+        "en": "sun"
+      },
+      {
+        "sk": "dážď",
+        "en": "rain"
+      },
+      {
+        "sk": "sneh",
+        "en": "snow"
+      },
+      {
+        "sk": "vietor",
+        "en": "wind"
+      },
+      {
+        "sk": "mrak / oblak",
+        "en": "cloud"
+      },
+      {
+        "sk": "Je teplo.",
+        "en": "It's warm."
+      },
+      {
+        "sk": "Je horúco.",
+        "en": "It's hot."
+      },
+      {
+        "sk": "Je zima.",
+        "en": "It's cold."
+      },
+      {
+        "sk": "Je chladno.",
+        "en": "It's chilly."
+      },
+      {
+        "sk": "Prší.",
+        "en": "It's raining."
+      },
+      {
+        "sk": "Sneží.",
+        "en": "It's snowing."
+      },
+      {
+        "sk": "Fúka vietor.",
+        "en": "It's windy."
+      },
+      {
+        "sk": "Svieti slnko.",
+        "en": "The sun is shining."
+      },
+      {
+        "sk": "Je zamračené.",
+        "en": "It's cloudy."
+      },
+      {
+        "sk": "Je pekne.",
+        "en": "It's nice (weather)."
       }
     ]
   }
