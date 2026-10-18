@@ -680,5 +680,7 @@
   "autobus": "audio/016ccee7270f9580.mp3",
   "električka": "audio/36aafdfe1058a23c.mp3",
   "vlak": "audio/c6103bbff5b50fb7.mp3",
-  "auto": "audio/0d612c12d2ac3362.mp3"
+  "auto": "audio/0d612c12d2ac3362.mp3",
+  "taxík": "audio/cbbd1bf33af06c37.mp3",
+  "bicykel": "audio/e9e61a7db5feb027.mp3"
 }
