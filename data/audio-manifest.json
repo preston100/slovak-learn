@@ -870,5 +870,7 @@
   "Prepáčte, kde je stanica?": "audio/c13dcf250db59dfe.mp3",
   "Stanica? Choďte rovno a potom vľavo.": "audio/2362e381d7f8138a.mp3",
   "Je to ďaleko?": "audio/53ca434c3a38e985.mp3",
-  "Nie, je to blízko. Asi päť minút pešo.": "audio/183ce580209276a6.mp3"
+  "Nie, je to blízko. Asi päť minút pešo.": "audio/183ce580209276a6.mp3",
+  "A môžem ísť aj autobusom?": "audio/85856d21287649c4.mp3",
+  "Áno, autobus číslo tri ide na stanicu. Zastávka je tam, vpravo.": "audio/7dc6a6b710d7c9e0.mp3"
 }
