@@ -584,5 +584,7 @@
   "štvrtok": "audio/d5eb0b56ba7e1e84.mp3",
   "piatok": "audio/15975c998a51e0e6.mp3",
   "sobota": "audio/2c224f4a2bd72cf3.mp3",
-  "nedeľa": "audio/26f1b5752570a85b.mp3"
+  "nedeľa": "audio/26f1b5752570a85b.mp3",
+  "víkend": "audio/d71706479b2ca344.mp3",
+  "týždeň": "audio/686d1e104a98ecd8.mp3"
 }
