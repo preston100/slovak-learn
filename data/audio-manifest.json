@@ -678,5 +678,7 @@
   "námestie": "audio/4e3902e79f43ef5b.mp3",
   "hotel": "audio/14e833557d06a77a.mp3",
   "autobus": "audio/016ccee7270f9580.mp3",
-  "električka": "audio/36aafdfe1058a23c.mp3"
+  "električka": "audio/36aafdfe1058a23c.mp3",
+  "vlak": "audio/c6103bbff5b50fb7.mp3",
+  "auto": "audio/0d612c12d2ac3362.mp3"
 }
