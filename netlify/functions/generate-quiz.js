@@ -1,4 +1,4 @@
-const { jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { jsonResponse, callGemini, geminiText, friendlyGeminiError } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
 
 // Netlify's synchronous function payload limit is 6MB. Base64 inflates size by
@@ -116,7 +116,6 @@ exports.handler = async function (event) {
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: QUIZ_SCHEMA,
-        temperature: 0.8,
       },
     });
   } catch (err) {
@@ -135,7 +134,7 @@ exports.handler = async function (event) {
     return jsonResponse(502, { error: 'Gemini returned an unreadable response.' });
   }
 
-  const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+  const rawText = geminiText(geminiData);
   if (!rawText) {
     return jsonResponse(502, { error: 'Gemini returned no quiz content. Try again.' });
   }

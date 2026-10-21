@@ -81,6 +81,14 @@ The Learn roadmap is split into levels. Everything that existed before is **A1.1
 
 Also in this round: on phones the tabs read "Guide" and "Add" so the bar fits (nothing scrolls sideways at 375px or 320px), Grammar Guide explanations start open, the Guide and Word Lists are split into A1.1 / A1.2, and "Up next" points to where you left off rather than to a section added behind you.
 
+## Teacher's review, round 3 (October 2026)
+
+- **"Hear it in a sentence", Tests quizzes and Add Content timing out**: Google moved the `gemini-flash-latest` alias to Gemini 3.8 Flash, which "thinks" at a medium level by default — slow enough to blow Netlify's 10-second limit, and the first model was allowed the whole budget so the fallback never ran. Now Flash is asked for `thinkingLevel: "low"`, 3 seconds are always kept for the Flash-Lite fallback, sentences try Flash-Lite first, the deprecated `temperature` setting is gone, and "Hear it in a sentence" retries quietly like the quiz does. If a future model rejects the thinking setting, the request is retried without it. (`netlify/functions/lib/shared.js`)
+- **Voice check accepted a wrong number** (*osemdesiat* for *sedemdesiat*): it allowed a third of the letters to differ and passed any word contained in the other (*mám* for *nemám*). Now words are compared one by one — short words exactly, long words at most one letter off and never in the ending — so wrong numbers, wrong endings and dropped *ne-* fail, while missing accents, split compounds (*tridsať päť*) and digits (*70*) still pass. Slash entries accept either alternative.
+- **Numbers (61–64)** in her order: 61 Building Numbers (20–100, no prices/age), 62 Tens & Units (21–99), 63 Hundreds & Thousands (200–1,000), 64 Prices & Age.
+- **Days (65–67)**: days of the week | all twelve months | *deň, týždeň, mesiac, rok, ročné obdobie* + the seasons. A vocab topic can now fix its own parts with `"split": [8, 12, 9]` in `vocab.json`. *mesiac* moved here from A1.1's Time.
+- **Colours** are listed in the feminine (*červená, modrá…*), because *farba* is feminine; the grammar section explains that and still shows how they match a noun (*červený dom*).
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself.

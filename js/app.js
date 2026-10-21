@@ -1471,14 +1471,16 @@
     slot.innerHTML = '<div class="sentence-loading">Writing a sentence…</div>';
 
     try {
-      const token = getSessionToken();
-      const res = await fetch('/.netlify/functions/word-sentence', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-        body: JSON.stringify({ sk: sk, en: en }),
+      // Same automatic retries as the quiz: a busy or slow moment at Gemini
+      // is tried again quietly before the learner ever sees an error.
+      const result = await postJsonWithRetry('/.netlify/functions/word-sentence', { sk: sk, en: en }, {
+        initialMessage: '',
+        onStatus: function (msg) {
+          if (msg) slot.innerHTML = '<div class="sentence-loading">' + escapeHtml(msg) + '</div>';
+        },
       });
-      const data = await res.json();
-      if (!res.ok || !data.sentence) throw new Error(data.error || 'No sentence.');
+      const data = result.data || {};
+      if (!result.ok || !data.sentence) throw new Error(result.error || 'No sentence.');
 
       const entry = { sentence: data.sentence, translation: data.translation || '' };
       cacheSentence(sk, entry);
@@ -1615,10 +1617,6 @@
 
   const ROUND_PROGRESS_KEY = 'slovencina_round_progress';
 
-  function getWordsForTopic(topic) {
-    const group = vocabData.find(function (g) { return g.topic === topic; });
-    return (group && group.words) || [];
-  }
 
   // Balanced, not greedy: filling full-size rounds and dumping whatever's
   // left into a final round can leave that last round absurdly small — 17
@@ -1639,6 +1637,29 @@
       i += thisSize;
     }
     return rounds;
+  }
+
+  // A topic can set its own parts with "split" in vocab.json, e.g.
+  // [8, 12, 9] — for when the teacher wants a particular grouping (all
+  // twelve months in one section) rather than the automatic ~8-word chunks.
+  // A split that doesn't add up to the word count is ignored.
+  function roundsForGroup(group) {
+    const words = (group && group.words) || [];
+    const split = group && group.split;
+    const valid = Array.isArray(split) && split.length > 0 &&
+      split.every(function (n) { return n > 0; }) &&
+      split.reduce(function (a, b) { return a + b; }, 0) === words.length;
+    if (!valid) return chunkIntoRounds(words, ROUND_SIZE);
+    let i = 0;
+    return split.map(function (n) {
+      const round = words.slice(i, i + n);
+      i += n;
+      return round;
+    });
+  }
+
+  function roundsForTopic(topic) {
+    return roundsForGroup(vocabData.find(function (g) { return g.topic === topic; }));
   }
 
   function loadRoundProgress() {
@@ -1669,7 +1690,7 @@
       return;
     }
 
-    const rounds = chunkIntoRounds(getWordsForTopic(topic), ROUND_SIZE);
+    const rounds = roundsForTopic(topic);
     if (!rounds.length) {
       mapEl.innerHTML = '<div class="empty-state">No words in this topic yet.</div>';
       return;
@@ -1744,7 +1765,7 @@
   }
 
   function startRound(topic, roundIndex) {
-    const rounds = chunkIntoRounds(getWordsForTopic(topic), ROUND_SIZE);
+    const rounds = roundsForTopic(topic);
     const words = rounds[roundIndex] || [];
     if (!words.length) return;
 
@@ -1778,7 +1799,7 @@
 
       if (isCleared) setRoundCleared(currentRoundTopic, currentRoundIndex);
 
-      const rounds = chunkIntoRounds(getWordsForTopic(currentRoundTopic), ROUND_SIZE);
+      const rounds = roundsForTopic(currentRoundTopic);
       const hasNext = currentRoundIndex + 1 < rounds.length;
 
       const summaryClass = isPerfect ? 'perfect' : isCleared ? 'cleared' : 'not-cleared';
@@ -2054,7 +2075,7 @@
 
       const g = vocabData.find(function (x) { return x.topic === unit.ref; });
       if (!g) return;
-      const rounds = chunkIntoRounds(g.words || [], ROUND_SIZE);
+      const rounds = roundsForGroup(g);
       const round = rounds[unit.round];
       if (!round || !round.length) return;
       sections.push({
@@ -2072,7 +2093,7 @@
     // authored course, so it goes in its own group after every level —
     // outside the tests, and never locked.
     privateVocabData.forEach(function (g) {
-      chunkIntoRounds(g.words || [], ROUND_SIZE).forEach(function (round, i) {
+      roundsForGroup(g).forEach(function (round, i) {
         sections.push({
           id: 'private-vocab-' + g.topic + '-' + i,
           kind: 'vocab',
@@ -2843,13 +2864,8 @@
   }
 
   // Speech recognition transcripts frequently drop Slovak diacritics even
-  // when the pronunciation itself was correct, so comparison is deliberately
-  // lenient — it strips diacritics on both sides rather than requiring an
-  // exact match, which would punish correct speech for a transcription quirk.
-  // Google's Slovak recognition is noticeably weaker than for major
-  // languages and regularly returns a near-miss ("zen" for "žena"). Marking
-  // a genuinely correct attempt wrong is worse here than being slightly
-  // generous, so small edit distances count as a match.
+  // when the pronunciation itself was correct, so diacritics are stripped on
+  // both sides before comparing.
   // Counts an adjacent swap as one edit rather than two, because a
   // transposed pair ("sokla" for "skola") is the recogniser garbling the
   // word, not the learner mispronouncing it.
@@ -2875,10 +2891,83 @@
     return d[m][n];
   }
 
+  // A different word has to fail even when it's spelled almost the same:
+  // "osemdesiat" (80) is not "sedemdesiat" (70), "desať" is not "deväť", and
+  // "mám" is not "nemám". The old check allowed a third of the letters to
+  // differ and also passed any word contained in the other, so all of those
+  // got through. Now words are compared one by one: short words must match
+  // exactly, and only longer ones may be a single letter off (the recogniser
+  // garbling a long word, not a different word) — and never in the last two
+  // letters, because Slovak endings carry the grammar: "pracujeme" (we work)
+  // is not "pracujem" (I work).
+  function wordsAgree(heardWord, targetWord) {
+    if (heardWord === targetWord) return true;
+    return (
+      targetWord.length >= 6 &&
+      heardWord.slice(-2) === targetWord.slice(-2) &&
+      editDistance(heardWord, targetWord) <= 1
+    );
+  }
+
+  // How many words are missing, extra or wrong, in order.
+  function wordErrors(heardWords, targetWords) {
+    const m = heardWords.length;
+    const n = targetWords.length;
+    const d = [];
+    for (let i = 0; i <= m; i++) {
+      d.push(new Array(n + 1).fill(0));
+      d[i][0] = i;
+    }
+    for (let j = 0; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = wordsAgree(heardWords[i - 1], targetWords[j - 1]) ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      }
+    }
+    return d[m][n];
+  }
+
   function isCloseEnough(heard, target) {
     if (!heard || !target) return false;
-    const allowed = Math.max(1, Math.floor(target.length * 0.34));
-    return editDistance(heard, target) <= allowed;
+    const h = heard.split(/\s+/).filter(Boolean);
+    const t = target.split(/\s+/).filter(Boolean);
+    // Long sentences may have one stray word per six; short ones none.
+    if (wordErrors(h, t) <= Math.floor(t.length / 6)) return true;
+    // A compound like "tridsaťpäť" can come back split ("tridsať päť"), or
+    // two words joined — so also compare with the spaces taken out. Exactly:
+    // this is only for spacing, and a looser match here would let a wrong
+    // ending back in ("pracujeme doma" for "pracujem doma").
+    return h.join('') === t.join('');
+  }
+
+  // Everything that counts as saying this item: the whole text, the text
+  // without its bracketed extras ("práca (v práci)" → "práca"), and each
+  // alternative of a slash entry ("ujo / strýko" → "ujo", "strýko").
+  function voiceTargets(sk) {
+    const out = [];
+    function add(text) {
+      const norm = normalizeForVoiceCompare(text);
+      if (norm && out.indexOf(norm) === -1) out.push(norm);
+    }
+    add(sk);
+    const noBrackets = String(sk).replace(/\([^)]*\)/g, ' ');
+    add(noBrackets);
+    if (sk.indexOf('/') !== -1) {
+      noBrackets.split(/\/+/).forEach(add);
+      String(sk).split(/\/+/).forEach(add);
+    }
+    return out;
+  }
+
+  function voiceMatches(transcript, item) {
+    const heard = normalizeForVoiceCompare(transcript || '');
+    if (!heard) return false;
+    // A number may come back as digits ("70") rather than as a word.
+    const digits = heard.replace(/\s+/g, '');
+    const enDigits = String(item.en || '').replace(/[\s,]/g, '');
+    if (/^[0-9]+$/.test(digits) && /^[0-9]+$/.test(enDigits)) return digits === enDigits;
+    return voiceTargets(item.sk).some(function (target) { return isCloseEnough(heard, target); });
   }
 
   function normalizeForVoiceCompare(text) {
@@ -3104,9 +3193,7 @@
       }
 
       const transcript = result.data.transcript || '';
-      const target = normalizeForVoiceCompare(item.sk);
-      const norm = normalizeForVoiceCompare(transcript);
-      const isMatch = norm.length > 0 && (norm === target || norm.indexOf(target) !== -1 || target.indexOf(norm) !== -1 || isCloseEnough(norm, target));
+      const isMatch = voiceMatches(transcript, item);
 
       heardEl.textContent = transcript ? 'Heard: “' + transcript + '”' : 'Didn’t catch that — try again next time.';
       resultEl.innerHTML = isMatch

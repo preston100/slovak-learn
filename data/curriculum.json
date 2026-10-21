@@ -355,24 +355,30 @@
     "ref": "time-daily-routine"
   },
   {
-    "id": "vocab-bigger-numbers-0",
+    "id": "gram-numbers-building",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "numbers-building"
+  },
+  {
+    "id": "vocab-tens-units-0",
     "level": "A1.2",
     "kind": "vocab",
-    "ref": "Bigger Numbers",
+    "ref": "Tens & Units",
     "round": 0
   },
   {
-    "id": "vocab-bigger-numbers-1",
+    "id": "vocab-hundreds-thousands-0",
     "level": "A1.2",
     "kind": "vocab",
-    "ref": "Bigger Numbers",
-    "round": 1
+    "ref": "Hundreds & Thousands",
+    "round": 0
   },
   {
-    "id": "gram-numbers-big",
+    "id": "gram-prices-age",
     "level": "A1.2",
     "kind": "grammar",
-    "ref": "numbers-big"
+    "ref": "prices-age"
   },
   {
     "id": "vocab-days-months-seasons-0",

@@ -2620,10 +2620,10 @@
     ]
   },
   {
-    "id": "numbers-big",
-    "topic": "Building Numbers & Prices",
-    "summary": "Tens + units written as one word (tridsaťpäť), and how to say prices and ages.",
-    "explanation": "The tens end in **-dsať** (20–40) or **-desiat** (50–90): *dvadsať, tridsať, štyridsať* / *päťdesiat, šesťdesiat…*\n\nTo build a number, say the **ten first, then the unit**, and write it as **one word**: *tridsať + päť = tridsaťpäť* (35).\n\nHundreds and thousands work the same way: *sto* (100), *dvesto* (200), *päťsto* (500), *tisíc* (1,000), *dvetisíc* (2,000).\n\n**Prices and ages** follow the same **1 / 2–4 / 5+** pattern as *hodina*: *jedno euro, dve eurá, päť eur* — *jeden rok, dva roky, päť rokov*.",
+    "id": "numbers-building",
+    "topic": "Building Numbers (20–100)",
+    "summary": "Tens end in -dsať or -desiat; then add the unit, all as one word: tridsaťpäť.",
+    "explanation": "The tens end in **-dsať** (20–40) or **-desiat** (50–90): *dvadsať, tridsať, štyridsať* / *päťdesiat, šesťdesiat…* — and 100 is **sto**.\n\nTo build a number, say the **ten first, then the unit**, and write it as **one word**: *tridsať + päť = tridsaťpäť* (35).\n\nHundreds work the same way — *dvesto* (200), *päťsto* (500)… up to *tisíc* (1,000). They come two sections from now.",
     "tables": [
       {
         "title": "Tens",
@@ -2671,7 +2671,7 @@
         ]
       },
       {
-        "title": "Building a number",
+        "title": "Ten first, then the unit",
         "head": [
           "",
           "Slovak"
@@ -2690,21 +2690,145 @@
             "štyridsať**osem**"
           ],
           [
+            "73",
+            "sedemdesiat**tri**"
+          ],
+          [
             "99",
             "deväťdesiat**deväť**"
-          ],
-          [
-            "150",
-            "sto**päťdesiat**"
-          ],
-          [
-            "2026",
-            "dvetisíc**dvadsaťšesť**"
           ]
         ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "dvadsať",
+        "en": "20"
       },
       {
-        "title": "Prices and age: 1 / 2–4 / 5+",
+        "sk": "tridsaťpäť",
+        "en": "35"
+      },
+      {
+        "sk": "štyridsaťosem",
+        "en": "48"
+      },
+      {
+        "sk": "päťdesiat",
+        "en": "50"
+      },
+      {
+        "sk": "sedemdesiattri",
+        "en": "73"
+      },
+      {
+        "sk": "deväťdesiatdeväť",
+        "en": "99"
+      },
+      {
+        "sk": "sto",
+        "en": "100"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "30",
+        "question": "How do you say this number?",
+        "options": [
+          "tridsať",
+          "trinásť",
+          "tri"
+        ],
+        "answer": "tridsať",
+        "explain": "Tens from 20 to 40 end in -dsať: tridsať. (Trinásť is 13.)"
+      },
+      {
+        "prompt": "50",
+        "question": "How do you say this number?",
+        "options": [
+          "päťdesiat",
+          "pätnásť",
+          "päťdsať"
+        ],
+        "answer": "päťdesiat",
+        "explain": "From 50 the tens end in -desiat. (Pätnásť is 15.)"
+      },
+      {
+        "prompt": "35",
+        "question": "How do you say this number?",
+        "options": [
+          "tridsaťpäť",
+          "päťtridsať",
+          "trinásťpäť"
+        ],
+        "answer": "tridsaťpäť",
+        "explain": "The ten comes first, then the unit, written as one word."
+      },
+      {
+        "prompt": "dvadsať",
+        "question": "Which number is this?",
+        "options": [
+          "20",
+          "12",
+          "2"
+        ],
+        "answer": "20",
+        "explain": "Dvadsať = 20. (Dvanásť is 12.)"
+      },
+      {
+        "prompt": "šesťdesiat",
+        "question": "Which number is this?",
+        "options": [
+          "60",
+          "16",
+          "6"
+        ],
+        "answer": "60",
+        "explain": "Šesť + desiat: six tens."
+      },
+      {
+        "prompt": "sedemdesiattri",
+        "question": "Which number is this?",
+        "options": [
+          "73",
+          "37",
+          "70"
+        ],
+        "answer": "73",
+        "explain": "Sedemdesiat (70) + tri (3)."
+      },
+      {
+        "prompt": "deväťdesiatdeväť",
+        "question": "Which number is this?",
+        "options": [
+          "99",
+          "19",
+          "90"
+        ],
+        "answer": "99",
+        "explain": "Deväťdesiat (90) + deväť (9)."
+      },
+      {
+        "prompt": "100",
+        "question": "How do you say this number?",
+        "options": [
+          "sto",
+          "tisíc",
+          "desať"
+        ],
+        "answer": "sto",
+        "explain": "100 = sto."
+      }
+    ]
+  },
+  {
+    "id": "prices-age",
+    "topic": "Prices & Age",
+    "summary": "Koľko to stojí? Koľko máš rokov? — jedno euro, dve eurá, päť eur.",
+    "explanation": "**Koľko to stojí?** — How much is it?\n**Koľko máš rokov?** — How old are you? (*Koľko máte rokov?* to someone you'd say *vy* to.)\n\nPrices and ages follow the same **1 / 2–4 / 5+** pattern as *hodina*:\n- **1** → *jedno euro*, *jeden rok*\n- **2, 3, 4** → *dve eurá*, *dva roky*\n- **5 and up** → *päť eur*, *päť rokov*\n\nNumbers built from two parts, like 21 or 32, take the **5+** form: *dvadsaťjeden eur*, *tridsaťdva rokov*.\n\nIn Slovak you **have** your age: *Mám dvadsaťpäť rokov.* — I'm 25 (literally: I have 25 years).",
+    "tables": [
+      {
+        "title": "1 / 2–4 / 5+",
         "head": [
           "",
           "euros",
@@ -2725,6 +2849,11 @@
             "5 and up",
             "päť **eur**",
             "päť **rokov**"
+          ],
+          [
+            "21, 32…",
+            "dvadsaťjeden **eur**",
+            "tridsaťdva **rokov**"
           ]
         ]
       }
@@ -2747,6 +2876,10 @@
         "en": "That's one euro."
       },
       {
+        "sk": "Koľko máš rokov?",
+        "en": "How old are you?"
+      },
+      {
         "sk": "Mám tridsaťpäť rokov.",
         "en": "I'm 35 years old."
       },
@@ -2760,50 +2893,6 @@
       }
     ],
     "exercises": [
-      {
-        "prompt": "35",
-        "question": "How do you say this number?",
-        "options": [
-          "tridsaťpäť",
-          "päťtridsať",
-          "trinásťpäť"
-        ],
-        "answer": "tridsaťpäť",
-        "explain": "The ten comes first, then the unit, written as one word."
-      },
-      {
-        "prompt": "šesťdesiat",
-        "question": "Which number is this?",
-        "options": [
-          "60",
-          "16",
-          "6"
-        ],
-        "answer": "60",
-        "explain": "Šesť + desiat: six tens."
-      },
-      {
-        "prompt": "deväťdesiatdeväť",
-        "question": "Which number is this?",
-        "options": [
-          "99",
-          "19",
-          "90"
-        ],
-        "answer": "99",
-        "explain": "Deväťdesiat (90) + deväť (9)."
-      },
-      {
-        "prompt": "dvesto",
-        "question": "Which number is this?",
-        "options": [
-          "200",
-          "20",
-          "2,000"
-        ],
-        "answer": "200",
-        "explain": "Dve + sto = 200."
-      },
       {
         "prompt": "Stojí to päť ___.",
         "question": "It costs 5 euros.",
@@ -2827,6 +2916,17 @@
         "explain": "2, 3 and 4 take eurá."
       },
       {
+        "prompt": "To je jedno ___.",
+        "question": "That's one euro.",
+        "options": [
+          "euro",
+          "eurá",
+          "eur"
+        ],
+        "answer": "euro",
+        "explain": "One: jedno euro."
+      },
+      {
         "prompt": "Mám dvadsať ___.",
         "question": "I'm 20 years old.",
         "options": [
@@ -2836,6 +2936,39 @@
         ],
         "answer": "rokov",
         "explain": "5 and up (20 too) take rokov."
+      },
+      {
+        "prompt": "Môj syn má dva ___.",
+        "question": "My son is two.",
+        "options": [
+          "roky",
+          "rokov",
+          "rok"
+        ],
+        "answer": "roky",
+        "explain": "2, 3 and 4 take roky."
+      },
+      {
+        "prompt": "Stojí to dvadsaťjeden ___.",
+        "question": "It costs 21 euros.",
+        "options": [
+          "eur",
+          "euro",
+          "eurá"
+        ],
+        "answer": "eur",
+        "explain": "Two-part numbers like 21 take the 5+ form."
+      },
+      {
+        "prompt": "Koľko máš rokov?",
+        "question": "What does this mean?",
+        "options": [
+          "How old are you?",
+          "How much is it?",
+          "What time is it?"
+        ],
+        "answer": "How old are you?",
+        "explain": "Koľko máš rokov? — literally: how many years do you have?"
       }
     ]
   },
@@ -3111,8 +3244,8 @@
   {
     "id": "colors",
     "topic": "Colors Match the Noun",
-    "summary": "Colors are adjectives: červený dom, červená taška, červené auto.",
-    "explanation": "Colors are **adjectives**, so they change to match the noun — exactly like *dobrý / dobrá / dobré*:\n*červený dom* — *červená taška* — *červené auto*.\n\nWord lists show the **masculine** form (*červený*). For a feminine noun change **-ý** to **-á**, for a neuter noun to **-é**.\n\n**Akej farby je…?** — What colour is…? *Akej farby je tvoje auto? — Je červené.*",
+    "summary": "Colours are named in the feminine (červená — farba is feminine), but match the noun they describe: červený dom.",
+    "explanation": "Slovaks usually **name a colour in the feminine form** — *červená, modrá, zelená* — because the word **farba** (colour) is feminine: *Aká je to farba? — Červená.* That's why the word lists show them that way.\n\nTo **describe** something, a colour is an adjective and **matches the noun** — exactly like *dobrý / dobrá / dobré*:\n*červený dom* — *červená taška* — *červené auto*.\n\n**Akej farby je…?** — What colour is…? *Akej farby je tvoje auto? — Je červené.*",
     "tables": [
       {
         "head": [
@@ -3237,7 +3370,7 @@
         "explain": "Feminine noun, so čierna."
       },
       {
-        "prompt": "zelený",
+        "prompt": "zelená",
         "question": "Which colour is this?",
         "options": [
           "green",
@@ -3245,10 +3378,10 @@
           "grey"
         ],
         "answer": "green",
-        "explain": "Zelený = green."
+        "explain": "Zelená = green."
       },
       {
-        "prompt": "žltý",
+        "prompt": "žltá",
         "question": "Which colour is this?",
         "options": [
           "yellow",
@@ -3256,7 +3389,7 @@
           "white"
         ],
         "answer": "yellow",
-        "explain": "Žltý = yellow."
+        "explain": "Žltá = yellow."
       },
       {
         "prompt": "Akej farby je tvoje auto?",
@@ -3268,6 +3401,17 @@
         ],
         "answer": "What colour is your car?",
         "explain": "Akej farby = what colour."
+      },
+      {
+        "prompt": "Aká je to farba?",
+        "question": "What does this mean?",
+        "options": [
+          "What colour is it?",
+          "Where is the colour?",
+          "Whose colour is it?"
+        ],
+        "answer": "What colour is it?",
+        "explain": "Farba = colour. The answer is the feminine form: Červená."
       }
     ]
   },

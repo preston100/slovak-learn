@@ -1,4 +1,4 @@
-const { jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { jsonResponse, callGemini, geminiText, friendlyGeminiError } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
 
 // One short, natural Slovak sentence using a given word, so any word can be
@@ -55,14 +55,14 @@ exports.handler = async function (event) {
 
   let res;
   try {
+    // One short sentence doesn't need the bigger model: Flash-Lite first.
     res = await callGemini(apiKey, {
       contents: [{ role: 'user', parts: [{ text: buildPrompt(sk, en) }] }],
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: SENTENCE_SCHEMA,
-        temperature: 0.4,
       },
-    });
+    }, { preferFast: true });
   } catch (err) {
     return jsonResponse(502, { error: err.message || 'Could not reach Gemini.' });
   }
@@ -72,10 +72,8 @@ exports.handler = async function (event) {
     return jsonResponse(res.status, { error: friendlyGeminiError(res.status, errText) });
   }
 
-  const data = await res.json();
-  const text = data && data.candidates && data.candidates[0] && data.candidates[0].content &&
-    data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-    data.candidates[0].content.parts[0].text;
+  const data = await res.json().catch(() => null);
+  const text = geminiText(data);
 
   let parsed;
   try {

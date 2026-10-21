@@ -25,49 +25,97 @@ function jsonResponse(statusCode, payload) {
 // instead of getting killed by the platform.
 const TOTAL_BUDGET_MS = 8500;
 
-// Freshly-launched flagship models (like the current "-latest" alias) tend to
-// get hit with a capacity crunch right after release. Falling back to the
-// lighter "-lite" model spreads load across a separate, usually less
-// congested capacity pool, and it's lower-latency too.
-const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+// Two models, each with its own capacity pool: the main Flash model, and the
+// lighter, faster Flash-Lite as a fallback when it's overloaded or slow.
+//
+// The "-latest" aliases move to each new release. The current Flash
+// (3.8) "thinks" at a medium level before answering by default, which alone
+// can eat most of the 10 seconds — that's what made sentences and quizzes
+// time out. These are short, simple jobs, so Flash is asked for its lowest
+// level ("low"; it rejects "minimal"). Flash-Lite already defaults to
+// minimal thinking, so it's left alone.
+const GEMINI_MODELS = [
+  { name: 'gemini-flash-latest', thinkingLevel: 'low' },
+  { name: 'gemini-flash-lite-latest' },
+];
+
+// Time held back for the fallback, so a slow first model can never use up
+// the whole budget and leave the fallback no chance to answer.
+const FALLBACK_RESERVE_MS = 3000;
+
+const TOO_SLOW = 'Gemini took too long to respond. Please try again.';
 
 function geminiUrl(model, apiKey) {
   return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 }
 
-async function callGemini(apiKey, requestBody) {
+function withThinkingLevel(requestBody, thinkingLevel) {
+  if (!thinkingLevel) return requestBody;
+  return {
+    ...requestBody,
+    generationConfig: {
+      ...(requestBody.generationConfig || {}),
+      thinkingConfig: { thinkingLevel },
+    },
+  };
+}
+
+async function postWithTimeout(url, body, ms) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    throw err.name === 'AbortError' ? new Error(TOO_SLOW) : err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// options.preferFast puts Flash-Lite first, for jobs too small to need the
+// bigger model (one example sentence) where speed matters most.
+async function callGemini(apiKey, requestBody, options) {
   const startedAt = Date.now();
+  const models = options && options.preferFast ? GEMINI_MODELS.slice().reverse() : GEMINI_MODELS;
+  const remainingMs = () => TOTAL_BUDGET_MS - (Date.now() - startedAt);
   let lastRes;
   let lastErr;
 
-  for (const model of GEMINI_MODELS) {
-    const remaining = TOTAL_BUDGET_MS - (Date.now() - startedAt);
-    if (remaining < 1200) break; // not enough time left to make another attempt worthwhile
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), remaining);
+  for (let i = 0; i < models.length; i++) {
+    const model = models[i];
+    const isLast = i === models.length - 1;
+    if (remainingMs() < 1200) break; // not enough time left to make another attempt worthwhile
+    const attemptMs = () => (isLast ? remainingMs() : Math.max(1200, remainingMs() - FALLBACK_RESERVE_MS));
 
     let res;
     try {
-      res = await fetch(geminiUrl(model, apiKey), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
+      res = await postWithTimeout(geminiUrl(model.name, apiKey), withThinkingLevel(requestBody, model.thinkingLevel), attemptMs());
+      // If a future model behind the alias refuses this thinking setting,
+      // don't let that break the feature: ask again without it.
+      if (res.status === 400 && model.thinkingLevel) {
+        const errText = await res.text().catch(() => '');
+        if (/thinking/i.test(errText) && remainingMs() >= 1200) {
+          res = await postWithTimeout(geminiUrl(model.name, apiKey), requestBody, attemptMs());
+        } else {
+          res = new Response(errText, { status: 400 });
+        }
+      }
     } catch (err) {
-      clearTimeout(timeoutId);
-      lastErr = err.name === 'AbortError' ? new Error('Gemini took too long to respond. Please try again.') : err;
+      lastErr = err;
       continue;
     }
-    clearTimeout(timeoutId);
 
     if (res.ok) return res;
 
-    if (res.status === 503 || res.status === 429) {
-      // 503 = temporary overload, 429 = rate/quota limit — each Gemini model
-      // has its own separate quota, so a 429 on one doesn't mean the other
-      // is blocked too. Worth trying the next model either way.
+    if (res.status === 503 || res.status === 429 || res.status === 404) {
+      // 503 = temporary overload, 429 = rate/quota limit, 404 = this alias
+      // isn't available — all specific to one model, and each model has its
+      // own quota, so it's worth trying the next one.
       lastRes = res;
       continue;
     }
@@ -78,7 +126,16 @@ async function callGemini(apiKey, requestBody) {
 
   if (lastRes) return lastRes;
   if (lastErr) throw lastErr;
-  throw new Error('Gemini took too long to respond. Please try again.');
+  throw new Error(TOO_SLOW);
+}
+
+// The answer text from a Gemini response. Thinking models can attach
+// thought parts too; those are skipped so only the real answer is read.
+function geminiText(data) {
+  const parts = (data && data.candidates && data.candidates[0] && data.candidates[0].content &&
+    data.candidates[0].content.parts) || [];
+  const part = parts.find((p) => typeof p.text === 'string' && !p.thought);
+  return part ? part.text : '';
 }
 
 // Google Cloud Text-to-Speech — a separate, long-established Google product
@@ -137,4 +194,4 @@ function friendlyGeminiError(status, errText) {
   return `Gemini API error (${status}). ${(errText || '').slice(0, 300)}`;
 }
 
-module.exports = { safeEqual, jsonResponse, callGemini, callCloudTTS, friendlyGeminiError };
+module.exports = { safeEqual, jsonResponse, callGemini, geminiText, callCloudTTS, friendlyGeminiError };

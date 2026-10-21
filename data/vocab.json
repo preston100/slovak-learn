@@ -784,10 +784,6 @@
         "en": "minutes"
       },
       {
-        "sk": "mesiac",
-        "en": "month"
-      },
-      {
         "sk": "dovolenka",
         "en": "vacation"
       },
@@ -1016,56 +1012,53 @@
     ]
   },
   {
-    "topic": "Bigger Numbers",
+    "topic": "Tens & Units",
     "words": [
-      {
-        "sk": "tridsať",
-        "en": "30"
-      },
-      {
-        "sk": "štyridsať",
-        "en": "40"
-      },
-      {
-        "sk": "päťdesiat",
-        "en": "50"
-      },
-      {
-        "sk": "šesťdesiat",
-        "en": "60"
-      },
-      {
-        "sk": "sedemdesiat",
-        "en": "70"
-      },
-      {
-        "sk": "osemdesiat",
-        "en": "80"
-      },
-      {
-        "sk": "deväťdesiat",
-        "en": "90"
-      },
-      {
-        "sk": "sto",
-        "en": "100"
-      },
       {
         "sk": "dvadsaťjeden",
         "en": "21"
       },
       {
-        "sk": "tridsaťdva",
-        "en": "32"
+        "sk": "dvadsaťšesť",
+        "en": "26"
+      },
+      {
+        "sk": "tridsaťštyri",
+        "en": "34"
+      },
+      {
+        "sk": "tridsaťosem",
+        "en": "38"
       },
       {
         "sk": "štyridsaťpäť",
         "en": "45"
       },
       {
+        "sk": "päťdesiatdva",
+        "en": "52"
+      },
+      {
+        "sk": "šesťdesiatsedem",
+        "en": "67"
+      },
+      {
+        "sk": "sedemdesiattri",
+        "en": "73"
+      },
+      {
+        "sk": "osemdesiatdeväť",
+        "en": "89"
+      },
+      {
         "sk": "deväťdesiatdeväť",
         "en": "99"
-      },
+      }
+    ]
+  },
+  {
+    "topic": "Hundreds & Thousands",
+    "words": [
       {
         "sk": "dvesto",
         "en": "200"
@@ -1075,16 +1068,32 @@
         "en": "300"
       },
       {
+        "sk": "štyristo",
+        "en": "400"
+      },
+      {
         "sk": "päťsto",
         "en": "500"
       },
       {
-        "sk": "tisíc",
-        "en": "1,000"
+        "sk": "šesťsto",
+        "en": "600"
       },
       {
-        "sk": "dvetisíc",
-        "en": "2,000"
+        "sk": "sedemsto",
+        "en": "700"
+      },
+      {
+        "sk": "osemsto",
+        "en": "800"
+      },
+      {
+        "sk": "deväťsto",
+        "en": "900"
+      },
+      {
+        "sk": "tisíc",
+        "en": "1,000"
       }
     ]
   },
@@ -1122,14 +1131,6 @@
       {
         "sk": "víkend",
         "en": "weekend"
-      },
-      {
-        "sk": "týždeň",
-        "en": "week"
-      },
-      {
-        "sk": "rok",
-        "en": "year"
       },
       {
         "sk": "január",
@@ -1180,6 +1181,26 @@
         "en": "December"
       },
       {
+        "sk": "deň",
+        "en": "day"
+      },
+      {
+        "sk": "týždeň",
+        "en": "week"
+      },
+      {
+        "sk": "mesiac",
+        "en": "month"
+      },
+      {
+        "sk": "rok",
+        "en": "year"
+      },
+      {
+        "sk": "ročné obdobie",
+        "en": "season"
+      },
+      {
         "sk": "jar",
         "en": "spring"
       },
@@ -1195,6 +1216,11 @@
         "sk": "zima",
         "en": "winter"
       }
+    ],
+    "split": [
+      8,
+      12,
+      9
     ]
   },
   {
@@ -1205,47 +1231,47 @@
         "en": "colour"
       },
       {
-        "sk": "červený",
+        "sk": "červená",
         "en": "red"
       },
       {
-        "sk": "modrý",
+        "sk": "modrá",
         "en": "blue"
       },
       {
-        "sk": "zelený",
+        "sk": "zelená",
         "en": "green"
       },
       {
-        "sk": "žltý",
+        "sk": "žltá",
         "en": "yellow"
       },
       {
-        "sk": "čierny",
+        "sk": "čierna",
         "en": "black"
       },
       {
-        "sk": "biely",
+        "sk": "biela",
         "en": "white"
       },
       {
-        "sk": "hnedý",
+        "sk": "hnedá",
         "en": "brown"
       },
       {
-        "sk": "sivý",
+        "sk": "sivá",
         "en": "grey"
       },
       {
-        "sk": "oranžový",
+        "sk": "oranžová",
         "en": "orange (colour)"
       },
       {
-        "sk": "ružový",
+        "sk": "ružová",
         "en": "pink"
       },
       {
-        "sk": "fialový",
+        "sk": "fialová",
         "en": "purple"
       }
     ]

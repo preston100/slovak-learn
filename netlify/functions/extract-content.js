@@ -1,4 +1,4 @@
-const { jsonResponse, callGemini, friendlyGeminiError } = require('./lib/shared');
+const { jsonResponse, callGemini, geminiText, friendlyGeminiError } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
 
 const MAX_TOTAL_BYTES = 4.5 * 1024 * 1024; // stays well under Netlify's 6MB sync function body limit
@@ -121,7 +121,6 @@ exports.handler = async function (event) {
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: EXTRACT_SCHEMA,
-        temperature: 0.3,
       },
     });
   } catch (err) {
@@ -140,7 +139,7 @@ exports.handler = async function (event) {
     return jsonResponse(502, { error: 'Gemini returned an unreadable response.' });
   }
 
-  const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+  const rawText = geminiText(geminiData);
   if (!rawText) {
     return jsonResponse(502, { error: 'Gemini returned no content. Try again.' });
   }
