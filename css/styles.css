@@ -649,18 +649,38 @@ main {
   padding: 12px 0 4px;
 }
 
-/* The winding "spine" every node sits along, like a game level-select screen. */
-.round-map::before {
-  content: '';
+/* The winding path every node sits on, like a game level-select screen —
+   an SVG drawn from the nodes' real positions (drawRoadmapPath in app.js):
+   a dashed line through the whole course, and a gold one over the stretch
+   already done. */
+.roadmap-svg {
   position: absolute;
-  top: 44px;
-  bottom: 44px;
-  left: 50%;
-  width: 4px;
-  transform: translateX(-50%);
-  border-radius: 2px;
-  background: repeating-linear-gradient(to bottom, var(--color-border) 0 8px, transparent 8px 18px);
+  top: 0;
+  left: 0;
   z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.roadmap-path-base,
+.roadmap-path-glow,
+.roadmap-path-done {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.roadmap-path-base {
+  stroke: var(--color-border);
+  stroke-width: 4;
+  stroke-dasharray: 8 10;
+}
+.roadmap-path-glow {
+  stroke: var(--warm);
+  stroke-width: 12;
+  opacity: 0.16;
+}
+.roadmap-path-done {
+  stroke: var(--warm);
+  stroke-width: 5;
 }
 
 .round-row {
@@ -693,7 +713,8 @@ main {
   cursor: pointer;
   background: var(--color-surface);
   border: 3px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  /* The top highlight makes each node read as a raised medallion. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--shadow-md);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   flex-shrink: 0;
 }
@@ -730,39 +751,56 @@ main {
   font-weight: 700;
   line-height: 1.3;
   color: var(--color-text-muted);
-  padding: 1px 4px;
-  border-radius: 4px;
-}
-/* So the dashed path runs behind a centred label, not through it. */
-.round-row.align-center .round-label {
-  background: var(--color-bg);
 }
 
-/* "Grammar", "Dialogue", "Alphabet" above the title; vocabulary is the
-   default and checkpoints have their trophy, so those carry no tag. */
+/* "Grammar", "Dialogue", "Alphabet" pills above the title, each its own
+   tint so the path has some variety as you scroll. Vocabulary is the
+   default and checkpoints have their trophy, so those carry none. */
 .round-kind {
-  display: block;
-  margin-bottom: 1px;
+  display: table;
+  margin: 0 auto 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
   font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--warm);
+  color: #8a5d16;
+  background: var(--warm-soft);
+}
+.round-kind.kind-dialogue {
+  color: #a2462a;
+  background: #f8e0d6;
+}
+.round-kind.kind-alphabet {
+  color: #3c7350;
+  background: #e2efe5;
+}
+@media (prefers-color-scheme: dark) {
+  .round-kind { color: var(--warm); }
+  .round-kind.kind-dialogue { color: #ef9a90; background: rgba(224, 104, 95, 0.16); }
+  .round-kind.kind-alphabet { color: var(--color-success); background: rgba(111, 191, 139, 0.14); }
 }
 
-/* Level headers (A1.1, A1.2…) sit on the path itself, with a solid
-   background so the dashed spine runs behind rather than through them. */
+/* Level headers (A1.1, A1.2…) are milestone cards on the path, solid so
+   the path runs behind them, with the level's progress as a bar. */
 .roadmap-level-header {
   position: relative;
   z-index: 1;
-  width: fit-content;
-  margin: 4px auto 30px;
-  padding: 8px 22px;
-  text-align: center;
+  width: 100%;
+  max-width: 320px;
+  margin: 4px auto 34px;
+  padding: 12px 18px 14px;
   background: var(--color-surface);
-  border: 2px solid var(--color-accent);
-  border-radius: 999px;
-  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--shadow-md);
+}
+.roadmap-level-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 .roadmap-level-name {
   font-family: var(--font-display);
@@ -775,6 +813,18 @@ main {
   font-size: 12px;
   font-weight: 700;
   color: var(--color-text-muted);
+}
+.roadmap-level-bar {
+  height: 6px;
+  margin-top: 9px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+.roadmap-level-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--warm), var(--color-accent));
 }
 .round-row + .roadmap-level-header {
   margin-top: 40px;
@@ -838,6 +888,27 @@ main {
   white-space: nowrap;
   box-shadow: var(--shadow-sm);
   pointer-events: none;
+  animation: tag-bob 2.4s ease-in-out infinite;
+}
+@keyframes tag-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -3px); }
+}
+
+/* A soft ring breathing around the Up next node, on top of its pulse. */
+.round-node.up-next::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  opacity: 0.22;
+  pointer-events: none;
+  animation: halo-breathe 2.8s ease-in-out infinite;
+}
+@keyframes halo-breathe {
+  0%, 100% { transform: scale(0.97); opacity: 0.14; }
+  50% { transform: scale(1.04); opacity: 0.32; }
 }
 
 /* A level's final test is the gate into the next level — bigger than a
@@ -873,18 +944,26 @@ main {
 }
 .round-node.locked .round-icon { color: var(--color-text-faint); }
 
+/* .current is the one node to do next (it pulses); .open is any other
+   playable node — ground already covered, or everything on a dev account. */
 .round-node.current {
   border-color: var(--color-accent);
   animation: node-pulse 1.8s ease-in-out infinite;
 }
+.round-node.open {
+  border-color: var(--color-border);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+}
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: var(--shadow-md), 0 0 0 0 rgba(178, 58, 58, 0.35); }
-  50% { box-shadow: var(--shadow-md), 0 0 0 10px rgba(178, 58, 58, 0); }
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--shadow-md), 0 0 0 0 rgba(178, 58, 58, 0.35); }
+  50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--shadow-md), 0 0 0 10px rgba(178, 58, 58, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .round-node.current { animation: none; }
+  .round-node.current,
+  .round-node.up-next::after,
+  .round-up-next-tag { animation: none; }
 }
 
 .round-map-hint {
@@ -1494,8 +1573,11 @@ main {
   border-color: transparent;
   color: #fff;
 }
+/* Locked, it's a plain locked medallion like the rest — a bare lock with
+   no circle looked like the path just stopped. */
 .round-node.checkpoint.locked {
-  background: none;
+  background: var(--color-surface-alt);
+  border-color: var(--color-border);
 }
 
 .finish-mastered {
@@ -2588,7 +2670,9 @@ input[type='password']:focus {
   .panel-header,
   .topbar,
   .tabs,
-  .streak-badge {
+  .streak-badge,
+  .roadmap-jump,
+  .card-direction {
     background: rgba(255, 255, 255, 0.045);
     border-color: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
@@ -2700,15 +2784,62 @@ input[type='password']:focus {
 .round-map .round-node.current {
   animation: fade-in 0.35s ease backwards, node-pulse 1.8s ease-in-out infinite;
 }
-.badge-grid .badge-card:nth-child(1), .round-map .round-node:nth-child(1), .letter-grid .letter-card:nth-child(1) { animation-delay: 0ms; }
-.badge-grid .badge-card:nth-child(2), .round-map .round-node:nth-child(2), .letter-grid .letter-card:nth-child(2) { animation-delay: 30ms; }
-.badge-grid .badge-card:nth-child(3), .round-map .round-node:nth-child(3), .letter-grid .letter-card:nth-child(3) { animation-delay: 60ms; }
-.badge-grid .badge-card:nth-child(4), .round-map .round-node:nth-child(4), .letter-grid .letter-card:nth-child(4) { animation-delay: 90ms; }
-.badge-grid .badge-card:nth-child(5), .round-map .round-node:nth-child(5), .letter-grid .letter-card:nth-child(5) { animation-delay: 120ms; }
-.badge-grid .badge-card:nth-child(6), .round-map .round-node:nth-child(6), .letter-grid .letter-card:nth-child(6) { animation-delay: 150ms; }
-.badge-grid .badge-card:nth-child(7), .round-map .round-node:nth-child(7), .letter-grid .letter-card:nth-child(7) { animation-delay: 180ms; }
-.badge-grid .badge-card:nth-child(8), .round-map .round-node:nth-child(8), .letter-grid .letter-card:nth-child(8) { animation-delay: 210ms; }
-.badge-grid .badge-card:nth-child(n+9), .round-map .round-node:nth-child(n+9), .letter-grid .letter-card:nth-child(n+9) { animation-delay: 240ms; }
+.badge-grid .badge-card:nth-child(1), .round-map .round-row:nth-child(1) .round-node, .letter-grid .letter-card:nth-child(1) { animation-delay: 0ms; }
+.badge-grid .badge-card:nth-child(2), .round-map .round-row:nth-child(2) .round-node, .letter-grid .letter-card:nth-child(2) { animation-delay: 30ms; }
+.badge-grid .badge-card:nth-child(3), .round-map .round-row:nth-child(3) .round-node, .letter-grid .letter-card:nth-child(3) { animation-delay: 60ms; }
+.badge-grid .badge-card:nth-child(4), .round-map .round-row:nth-child(4) .round-node, .letter-grid .letter-card:nth-child(4) { animation-delay: 90ms; }
+.badge-grid .badge-card:nth-child(5), .round-map .round-row:nth-child(5) .round-node, .letter-grid .letter-card:nth-child(5) { animation-delay: 120ms; }
+.badge-grid .badge-card:nth-child(6), .round-map .round-row:nth-child(6) .round-node, .letter-grid .letter-card:nth-child(6) { animation-delay: 150ms; }
+.badge-grid .badge-card:nth-child(7), .round-map .round-row:nth-child(7) .round-node, .letter-grid .letter-card:nth-child(7) { animation-delay: 180ms; }
+.badge-grid .badge-card:nth-child(8), .round-map .round-row:nth-child(8) .round-node, .letter-grid .letter-card:nth-child(8) { animation-delay: 210ms; }
+.badge-grid .badge-card:nth-child(n+9), .round-map .round-row:nth-child(n+9) .round-node, .letter-grid .letter-card:nth-child(n+9) { animation-delay: 240ms; }
+
+/* Roadmap rows slide up into place as they scroll into view. The .reveal
+   class is only added by JS when IntersectionObserver exists and reduced
+   motion is off, so without it every row simply shows. */
+.round-map.reveal .round-row {
+  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.round-map.reveal .round-row:not(.in-view) {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Answer feedback: a wrong answer gives a little head-shake, a right one
+   a small spring. Used by quiz/exercise buttons and flashcards alike. */
+@keyframes head-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+@keyframes answer-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.quiz-choice-btn.incorrect,
+.practice-card.flash-incorrect {
+  animation: head-shake 0.35s ease;
+}
+.quiz-choice-btn.correct,
+.practice-card.flash-correct {
+  animation: answer-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The back of a flashcard eases in when revealed (and its note just after),
+   rather than appearing all at once. */
+@keyframes answer-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.practice-answer:not(:empty) {
+  animation: answer-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.practice-answer .word-note {
+  animation: answer-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) 0.08s backwards;
+}
 
 .leaderboard-row {
   animation: fade-in 0.3s ease backwards;
@@ -2798,8 +2929,18 @@ input[type='password']:focus {
   .round-map .round-node.current,
   .letter-grid .letter-card,
   .leaderboard-row,
-  .panel.active {
+  .panel.active,
+  .quiz-choice-btn.incorrect,
+  .quiz-choice-btn.correct,
+  .practice-card.flash-incorrect,
+  .practice-card.flash-correct,
+  .practice-answer:not(:empty),
+  .practice-answer .word-note {
     animation: none;
+  }
+  .round-map.reveal .round-row:not(.in-view) {
+    opacity: 1;
+    transform: none;
   }
   .btn:not(:disabled):hover,
   .icon-btn:hover,

@@ -125,6 +125,14 @@ From an outside review of the site, the changes that were worth making:
 | Učím sa po slovensky. | po slovensky = in Slovak, like hovorím po anglicky (I speak English). |
 | Môžeš / Môžete … | Môžeš is informal, Môžete formal. |
 
+## Polish pass (October 2026)
+
+- **Roadmap path**: the straight dashed line down the middle is now a winding path drawn through every node (an SVG built from where the nodes actually are). Each step leaves a node sideways and drops into the next from above, so it never runs through a title. The stretch you've cleared, up to *Up next*, is drawn in gold. The Tests round picker gets the same path.
+- **Only one node pulses**: *Up next* (and the first round still to do in Tests). Other open sections have a calm red-tinted border — before, a dev account had 100+ nodes pulsing at once.
+- **Nodes**: a raised-medallion highlight, a breathing ring around *Up next* with its tag gently bobbing, and tinted Grammar (gold) / Dialogue (coral) / Alphabet (sage) pills. Level headers are milestone cards with a progress bar. A locked checkpoint now looks like other locked nodes (it used to be a bare lock).
+- **Motion**: roadmap rows slide up into place as they scroll into view; a wrong answer gives a small head-shake, a right one a little spring; a card's answer (and its note) eases in when revealed. All of it is switched off for anyone with "reduce motion" set on their device.
+- **Fixes**: in dark mode the patch behind centre titles is gone, and the shortcut bar and card switch are frosted glass like the other surfaces; the roadmap's staggered entrance now actually staggers; renaming a word keeps its first-right day (mastery counts from it); "today" is the learner's own calendar day — it was UTC, so anything done between midnight and 1–2am in Slovakia counted as the day before (streaks, daily goal, mastery).
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.

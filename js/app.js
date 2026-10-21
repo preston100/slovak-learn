@@ -1253,8 +1253,14 @@
   const STREAK_DATE_KEY = 'slovencina_streak_last_date';
   const LONGEST_STREAK_KEY = 'slovencina_longest_streak';
 
+  // The learner's own calendar day. toISOString() is UTC, which in Slovakia
+  // made anything done between midnight and 1–2am count as the day before.
+  function localDateStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   function todayStr() {
-    return new Date().toISOString().slice(0, 10);
+    return localDateStr(new Date());
   }
 
   function renderStreak() {
@@ -1273,7 +1279,9 @@
     if (lastDate === today) return;
 
     let count = Number(localStorage.getItem(STREAK_COUNT_KEY) || '0');
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const d = new Date();
+    d.setDate(d.getDate() - 1); // a calendar day back, even across a clock change
+    const yesterday = localDateStr(d);
     count = lastDate === yesterday ? count + 1 : 1;
 
     localStorage.setItem(STREAK_COUNT_KEY, String(count));
@@ -1682,7 +1690,11 @@
 
     const stats = loadVocabStats();
     const statsChanged = remap(stats, function (a, b) {
-      return { misses: Math.max((a && a.misses) || 0, (b && b.misses) || 0) };
+      const merged = { misses: Math.max((a && a.misses) || 0, (b && b.misses) || 0) };
+      // Keep the earlier first-right day, which later mastery is counted from.
+      const days = [a && a.firstRight, b && b.firstRight].filter(Boolean).sort();
+      if (days.length) merged.firstRight = days[0];
+      return merged;
     });
     if (statsChanged) saveVocabStats(stats);
 
@@ -1817,13 +1829,19 @@
     const STAR_ICON =
       '<svg class="round-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"/></svg>';
 
+    // Only the first round still to do pulses; other playable ones are calm.
+    let firstOpen = -1;
+    rounds.forEach(function (round, i) {
+      if (firstOpen === -1 && !isRoundCleared(topic, i)) firstOpen = i;
+    });
+
     mapEl.innerHTML =
       rounds
         .map(function (round, i) {
           const cleared = isRoundCleared(topic, i);
           const locked = !devUnlocked() && i > 0 && !isRoundCleared(topic, i - 1);
           const isCurrent = !cleared && !locked;
-          const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
+          const stateClass = cleared ? 'cleared' : locked ? 'locked' : i === firstOpen ? 'current up-next' : 'open';
 
           const inner = cleared ? STAR_ICON : locked ? LOCK_ICON : '<span class="round-num-badge">' + (i + 1) + '</span>';
 
@@ -1849,6 +1867,9 @@
         startRound(topic, Number(node.dataset.roundIndex));
       });
     });
+
+    drawRoadmapPath(mapEl);
+    revealRowsOnScroll(mapEl);
   }
 
   let practiceQueue = [];
@@ -2493,10 +2514,101 @@
     }
     const inLevel = roadmapSections.filter(function (s) { return s.level === level; });
     const cleared = inLevel.filter(function (s) { return isSectionCleared(s.id); }).length;
+    const pct = inLevel.length ? Math.round((cleared / inLevel.length) * 100) : 0;
     return (
-      '<div class="roadmap-level-header" data-level="' + escapeHtml(level) + '"><div class="roadmap-level-name">' + escapeHtml(level) + '</div>' +
-      '<div class="roadmap-level-progress">' + cleared + ' / ' + inLevel.length + ' cleared</div></div>'
+      '<div class="roadmap-level-header" data-level="' + escapeHtml(level) + '">' +
+      '<div class="roadmap-level-top">' +
+      '<div class="roadmap-level-name">' + escapeHtml(level) + '</div>' +
+      '<div class="roadmap-level-progress">' + cleared + ' / ' + inLevel.length + ' cleared</div>' +
+      '</div>' +
+      '<div class="roadmap-level-bar"><div class="roadmap-level-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>'
     );
+  }
+
+  // The path the nodes sit on: a dashed curve through every node in order,
+  // and a gold one over the stretch already done (cleared nodes, up to Up
+  // next). Drawn from where the nodes actually are, so it follows the lanes
+  // and level headers at any width. Each step leaves a node sideways and
+  // drops into the next one from above, so it never runs through a label
+  // (labels hang below their node).
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function drawRoadmapPath(mapEl) {
+    // Redraw whenever the map changes size — including when its tab is
+    // first opened, since a hidden map has no size to measure.
+    if (!mapEl.pathObserver && window.ResizeObserver) {
+      mapEl.pathObserver = new ResizeObserver(function () { drawRoadmapPath(mapEl); });
+      mapEl.pathObserver.observe(mapEl);
+    }
+
+    let svg = mapEl.querySelector('.roadmap-svg');
+    const nodes = [].slice.call(mapEl.querySelectorAll('.round-node'));
+    const w = mapEl.offsetWidth;
+    const h = mapEl.offsetHeight;
+    if (!w || nodes.length < 2) {
+      if (svg) svg.innerHTML = '';
+      return;
+    }
+    if (!svg) {
+      svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'roadmap-svg');
+      svg.setAttribute('aria-hidden', 'true');
+      mapEl.appendChild(svg);
+    }
+
+    // Layout offsets, not getBoundingClientRect, so the scroll-in slide
+    // (a transform) doesn't shift the path.
+    const pts = nodes.map(function (n) {
+      let x = n.offsetWidth / 2;
+      let y = n.offsetHeight / 2;
+      let el = n;
+      while (el && el !== mapEl) {
+        x += el.offsetLeft;
+        y += el.offsetTop;
+        el = el.offsetParent;
+      }
+      return { x: x, y: y, done: n.classList.contains('cleared'), next: n.classList.contains('up-next') };
+    });
+
+    function step(p, q) {
+      const dx = q.x - p.x;
+      const dy = q.y - p.y;
+      if (Math.abs(dx) < 1) return ' L' + q.x + ' ' + q.y;
+      return ' C' + (p.x + dx * 0.6) + ' ' + p.y + ' ' + q.x + ' ' + (p.y + dy * 0.35) + ' ' + q.x + ' ' + q.y;
+    }
+
+    let all = 'M' + pts[0].x + ' ' + pts[0].y;
+    let done = '';
+    for (let i = 1; i < pts.length; i++) {
+      all += step(pts[i - 1], pts[i]);
+      if (pts[i - 1].done && (pts[i].done || pts[i].next)) {
+        done += 'M' + pts[i - 1].x + ' ' + pts[i - 1].y + step(pts[i - 1], pts[i]);
+      }
+    }
+
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    svg.innerHTML =
+      '<path class="roadmap-path-base" d="' + all + '"/>' +
+      (done ? '<path class="roadmap-path-glow" d="' + done + '"/><path class="roadmap-path-done" d="' + done + '"/>' : '');
+  }
+
+  // Rows fade up into place as they scroll into view (only once each).
+  function revealRowsOnScroll(mapEl) {
+    if (mapEl.revealObserver) mapEl.revealObserver.disconnect();
+    if (!window.IntersectionObserver || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    mapEl.classList.add('reveal');
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.1 });
+    mapEl.querySelectorAll('.round-row').forEach(function (row) { io.observe(row); });
+    mapEl.revealObserver = io;
   }
 
   // The roadmap is over a hundred sections long, so a bar of shortcuts stays pinned
@@ -2565,11 +2677,13 @@
           const cleared = isSectionCleared(section.id);
           const locked = lockedFlags[i];
           const isCheckpoint = section.kind === 'checkpoint';
+          // Only "Up next" pulses. Any other playable section (a dev account,
+          // or ground already covered) is "open": a calm border, no pulse —
+          // otherwise a dev account had 100+ nodes pulsing at once.
           const stateClass =
-            (cleared ? 'cleared' : locked ? 'locked' : 'current') +
+            (cleared ? 'cleared' : locked ? 'locked' : i === nextIdx ? 'current up-next' : 'open') +
             (isCheckpoint ? ' checkpoint' : '') +
-            (section.isFinalTest ? ' final-test' : '') +
-            (i === nextIdx ? ' up-next' : '');
+            (section.isFinalTest ? ' final-test' : '');
           const startsLevel = i === 0 || section.level !== roadmapSections[i - 1].level;
           const inner = cleared
             ? STAR_ICON
@@ -2588,7 +2702,7 @@
             (i === nextIdx ? '<span class="round-up-next-tag">Up next</span>' : '') +
             '<div class="round-label">' +
             (section.kind === 'grammar' || section.kind === 'dialogue' || section.kind === 'alphabet'
-              ? '<span class="round-kind">' + kindLabel(section) + '</span>'
+              ? '<span class="round-kind kind-' + section.kind + '">' + kindLabel(section) + '</span>'
               : '') +
             // The tag already says "Dialogue", so the title doesn't repeat it.
             escapeHtml(section.title.replace(/^Dialogue:\s*/, '')) + '</div>' +
@@ -2608,6 +2722,8 @@
     });
 
     renderRoadmapJump(nextIdx);
+    drawRoadmapPath(mapEl);
+    revealRowsOnScroll(mapEl);
   }
 
   /* ---- Full-screen lesson flow: Learn -> Practice -> Voice -> Quiz ---- */
