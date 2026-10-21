@@ -29,7 +29,7 @@
       {
         "sk": "dobrú noc",
         "en": "good night",
-        "note": "noc is feminine, and a wish ends in -ú: dobrá noc → (prajem) dobrú noc."
+        "note": "It follows prajem (I wish), which takes the accusative: dobrá noc → (prajem) dobrú noc."
       },
       {
         "sk": "prosím",
@@ -108,9 +108,9 @@
         "en": "What's your opinion?"
       },
       {
-        "sk": "Záleží od počasia.",
+        "sk": "Záleží na počasí.",
         "en": "Depends on the weather.",
-        "note": "počasie (weather) → od počasia after od."
+        "note": "“It depends on” is záleží na: počasie → na počasí."
       },
       {
         "sk": "Učím sa po slovensky.",
@@ -175,7 +175,7 @@
       {
         "sk": "Dobrú chuť!",
         "en": "Enjoy your meal!",
-        "note": "A wish, so -ú: dobrá chuť → (prajem) dobrú chuť."
+        "note": "It follows prajem (I wish), which takes the accusative: dobrá chuť → (prajem) dobrú chuť."
       },
       {
         "sk": "Na zdravie!",
@@ -272,7 +272,7 @@
       {
         "sk": "Šťastnú cestu!",
         "en": "Have a safe trip!",
-        "note": "A wish: šťastná cesta → (prajem) šťastnú cestu."
+        "note": "It follows prajem (I wish), which takes the accusative: šťastná cesta → (prajem) šťastnú cestu."
       }
     ]
   },
@@ -463,12 +463,12 @@
       {
         "sk": "s ľadom",
         "en": "with ice",
-        "note": "s (with) changes the ending: ľad → s ľadom."
+        "note": "s (with) takes the instrumental: ľad → s ľadom."
       },
       {
         "sk": "bez ľadu",
         "en": "without ice",
-        "note": "bez (without) changes the ending: ľad → bez ľadu."
+        "note": "bez (without) takes the genitive: ľad → bez ľadu."
       }
     ]
   },

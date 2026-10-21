@@ -102,28 +102,27 @@ From an outside review of the site, the changes that were worth making:
 - **Notes on phrases**: a word can have a short `note` in `data/vocab.json`, shown on the Learn screen, the back of the card and in Word Lists (searchable).
 - **Smaller things**: roadmap titles wrap instead of running sideways, Grammar / Dialogue / Alphabet tags on the roadmap, a daily goal picker (5 / 10 / 20 / 30) instead of a pop-up box, a warmer top bar, a shorter top bar on phones (logo and buttons on one row), short tab names on tablets, and switching tabs starts at the top of the page.
 
-**For the teacher to check** — the new notes (first time these explanations appear on the site):
+**Checked by the teacher** (October 2026). The notes as they now read on the site:
 
-| Phrase | Note |
-|---|---|
-| dobrú noc | noc is feminine, and a wish ends in -ú: dobrá noc → (prajem) dobrú noc. |
-| Dobrú chuť! | A wish, so -ú: dobrá chuť → (prajem) dobrú chuť. |
-| Šťastnú cestu! | A wish: šťastná cesta → (prajem) šťastnú cestu. |
-| Idem do obchodu. | do (to) changes the ending: obchod → do obchodu. Compare v obchode (in the shop). |
-| Platím kartou. | kartou = by card: karta → kartou (paying with something). |
-| Platím v hotovosti. | hotovosť (cash) → v hotovosti after v. |
-| Tašku si neprosím. | taška → tašku: the thing you ask for (or don't) changes -a to -u. |
-| Záleží od počasia. | počasie (weather) → od počasia after od. |
-| Teší ma. // Rád Vás / ťa spoznávam. | Rád if you're a man, rada if you're a woman. Vás is formal, ťa informal. |
-| Ja mám osemnásť. | Age is said with mať (to have): literally "I have eighteen". |
-| Koľko máš rokov? | Literally "how many years do you have?" — after koľko, rok becomes rokov. |
-| Volám sa... | Literally "I call myself…" (volať sa). |
-| Som unavený. / Som plný. | unavený / plný if you're a man, unavená / plná if you're a woman. |
-| Už si to povedala. | Said to a woman. To a man: Už si to povedal. |
-| s ľadom / bez ľadu | s (with) / bez (without) change the ending: ľad → s ľadom, bez ľadu. |
-| o jednej | hodina (hour) is left out: o jednej (hodine). The other hours work the same way. |
-| Učím sa po slovensky. | po slovensky = in Slovak, like hovorím po anglicky (I speak English). |
-| Môžeš / Môžete … | Môžeš is informal, Môžete formal. |
+| Phrase | Note | Teacher |
+|---|---|---|
+| dobrú noc · Dobrú chuť! · Šťastnú cestu! | It follows prajem (I wish), which takes the accusative: dobrá noc → (prajem) dobrú noc. | Corrected: it's the accusative after "to wish" |
+| Idem do obchodu. | do (to) changes the ending: obchod → do obchodu. Compare v obchode (in the shop). | ✓ |
+| Platím kartou. | kartou = by card: karta → kartou (paying with something). | ✓ |
+| Platím v hotovosti. | hotovosť (cash) → v hotovosti after v. | ✓ |
+| Tašku si neprosím. | taška → tašku: the thing you ask for (or don't) changes -a to -u. | ✓ |
+| Záleží na počasí. | "It depends on" is záleží na: počasie → na počasí. | Corrected: was *Záleží od počasia*; "od" is common but wrong |
+| Teší ma. // Rád Vás / ťa spoznávam. | Rád if you're a man, rada if you're a woman. Vás is formal, ťa informal. | ✓ |
+| Ja mám osemnásť. | Age is said with mať (to have): literally "I have eighteen". | ✓ |
+| Koľko máš rokov? | Literally "how many years do you have?" — after koľko, rok becomes rokov. | ✓ |
+| Som unavený. / Som plný. | unavený / plný if you're a man, unavená / plná if you're a woman. | ✓ (unavený) |
+| s ľadom / bez ľadu | s (with) takes the instrumental: ľad → s ľadom. bez (without) takes the genitive: ľad → bez ľadu. | Case names added |
+| o jednej | hodina (hour) is left out: o jednej (hodine). The other hours work the same way. | ✓ |
+| Môžeš / Môžete … | Môžeš is informal, Môžete formal. | ✓ |
+
+Not in the list she was sent, so not checked yet: *Volám sa...* (literally "I call myself…"), *Už si to povedala.* (said to a woman; to a man: povedal), *Učím sa po slovensky.* (po slovensky = in Slovak, like hovorím po anglicky).
+
+*Záleží na počasí* is new text, so it needs a recording: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
 
 ## Polish pass (October 2026)
 
