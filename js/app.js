@@ -134,6 +134,24 @@
     return DEV_ACCOUNT_EMAILS.indexOf(sessionEmail().toLowerCase()) !== -1;
   }
 
+  // A dev account can switch to "student view" (tap the elephant on the
+  // Profile) to see the locks and the course exactly as a student does.
+  // Remembered on this device only.
+  const STUDENT_VIEW_KEY = 'slovencina_student_view';
+
+  function studentViewOn() {
+    try {
+      return localStorage.getItem(STUDENT_VIEW_KEY) === '1';
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // Dev powers — everything unlocked, P to skip — unless in student view.
+  function devUnlocked() {
+    return isDevAccount() && !studentViewOn();
+  }
+
   function showAuthGate() {
     authGateEl.classList.remove('hidden');
   }
@@ -380,6 +398,7 @@
     appInitialized = true;
 
     setupTabs();
+    trackTopbarHeight();
     setupLogout();
     loadContent();
     setupTests();
@@ -388,6 +407,7 @@
     setupSound();
     renderStreak();
     setupDailyGoal();
+    setupStudentViewToggle();
     renderLeaderboard();
     setupLearnModes();
     setupLessonOverlay();
@@ -417,8 +437,24 @@
           renderProfile();
           renderLeaderboard();
         }
+        // A new tab starts at its top, not wherever the last one was
+        // scrolled to — except the roadmap, which goes to your next section.
+        if (tab !== 'learn' || !scrollToUpNext(false)) window.scrollTo(0, 0);
       });
     });
+  }
+
+  // The topbar is sticky and its height changes (its tabs drop to a second
+  // row on phones), so anything pinned below it reads the height from here.
+  function trackTopbarHeight() {
+    const topbar = document.querySelector('.topbar');
+    if (!topbar) return;
+    function update() {
+      document.documentElement.style.setProperty('--topbar-h', topbar.offsetHeight + 'px');
+    }
+    update();
+    if (window.ResizeObserver) new ResizeObserver(update).observe(topbar);
+    else window.addEventListener('resize', update);
   }
 
   /* ---- Content loading: shared baseline + this account's private additions ---- */
@@ -632,6 +668,13 @@
     return { order: 1e9, level: 'My additions' };
   }
 
+  // A word can carry a short "note" in vocab.json — why a phrase looks the
+  // way it does (Platím kartou: karta → kartou). Shown wherever the word is
+  // taught or revealed: Word Lists, the Learn screen and the back of a card.
+  function wordNoteHtml(word) {
+    return word && word.note ? '<div class="word-note">' + escapeHtml(word.note) + '</div>' : '';
+  }
+
   function renderVocab(groups, emptyMessage) {
     const container = document.getElementById('vocab-list');
     if (!groups.length) {
@@ -658,7 +701,9 @@
               escapeHtml(w.sk) +
               '</div><div class="en">' +
               escapeHtml(w.en) +
-              '</div></div>'
+              '</div>' +
+              wordNoteHtml(w) +
+              '</div>'
             );
           })
           .join('');
@@ -861,7 +906,8 @@
     const matchedVocab = vocabData
       .map(function (g) {
         const words = (g.words || []).filter(function (w) {
-          return (w.sk || '').toLowerCase().indexOf(q) !== -1 || (w.en || '').toLowerCase().indexOf(q) !== -1;
+          return (w.sk || '').toLowerCase().indexOf(q) !== -1 || (w.en || '').toLowerCase().indexOf(q) !== -1 ||
+            (w.note || '').toLowerCase().indexOf(q) !== -1;
         });
         return words.length ? { topic: g.topic, words: words } : null;
       })
@@ -1281,14 +1327,55 @@
     if (count === getDailyGoalTarget()) unlockAchievement('daily-goal', 'Daily Goal Reached!');
   }
 
+  function setupStudentViewToggle() {
+    const mascot = document.getElementById('profile-mascot');
+    if (!mascot) return;
+    mascot.addEventListener('click', function () {
+      if (!isDevAccount()) return;
+      try {
+        localStorage.setItem(STUDENT_VIEW_KEY, studentViewOn() ? '0' : '1');
+      } catch (err) {
+        return;
+      }
+      renderRoadmapMap();
+      // Redraw the Tests round picker's locks too, unless a round is open
+      // there (redrawing would throw it away).
+      if (!document.getElementById('round-map').classList.contains('hidden')) renderRoundMap(currentRoundTopic);
+      renderProfile();
+    });
+  }
+
+  // Tapping the "x / y today" line opens a row of goal sizes to pick from
+  // (a typed number in a browser prompt box looked out of place, and
+  // phones show it as a full-screen dialog).
+  const DAILY_GOAL_OPTIONS = [5, 10, 20, 30];
+
   function setupDailyGoal() {
     const btn = document.getElementById('daily-goal-label');
-    if (!btn) return;
+    const picker = document.getElementById('daily-goal-picker');
+    if (!btn || !picker) return;
+
+    picker.innerHTML = DAILY_GOAL_OPTIONS.map(function (n) {
+      return '<button type="button" class="daily-goal-option" data-goal="' + n + '">' + n + '</button>';
+    }).join('');
+
+    function setOpen(open) {
+      picker.classList.toggle('hidden', !open);
+      btn.setAttribute('aria-expanded', String(open));
+      const target = getDailyGoalTarget();
+      picker.querySelectorAll('.daily-goal-option').forEach(function (o) {
+        o.classList.toggle('active', Number(o.dataset.goal) === target);
+      });
+    }
+
     btn.addEventListener('click', function () {
-      const input = window.prompt('Set your daily word goal:', String(getDailyGoalTarget()));
-      if (input === null) return;
-      const n = parseInt(input, 10);
-      if (Number.isFinite(n) && n > 0) setDailyGoalTarget(n);
+      setOpen(picker.classList.contains('hidden'));
+    });
+    picker.addEventListener('click', function (e) {
+      const opt = e.target.closest('.daily-goal-option');
+      if (!opt) return;
+      setDailyGoalTarget(Number(opt.dataset.goal));
+      setOpen(false);
     });
   }
 
@@ -1504,8 +1591,9 @@
 
   // Deliberately separate from vocab stats: a word lands in vocab stats the
   // first time it's practised at all, which is "seen", not "known". Mastery is
-  // only awarded by getting the word right on a checkpoint test, days or weeks
-  // after first meeting it — that's the number worth showing on the Profile.
+  // only awarded for remembering a word later — right on a checkpoint test,
+  // or right again on a later day (see recordWordResult) — so that's the
+  // number worth showing on the Profile.
   const MASTERED_KEY = 'slovencina_mastered_words';
 
   function loadMasteredWords() {
@@ -1526,6 +1614,27 @@
 
   function masteredWordCount() {
     return Object.keys(loadMasteredWords()).length;
+  }
+
+  // Every graded answer for a word goes through here (lesson cards, quizzes,
+  // checkpoints, Tests practice, Revise).
+  //
+  // Mastery means remembering a word later, not just after learning it. It
+  // used to come only from checkpoints, which ask 12 of the ~70 words they
+  // cover — so most words could never be mastered. Now a right answer also
+  // masters a word when it was already answered right on an earlier day.
+  function recordWordResult(word, gotIt) {
+    if (!word || !word.sk) return;
+    const stats = loadVocabStats();
+    const entry = stats[word.sk] || { misses: 0 };
+    entry.misses = gotIt ? Math.max(0, (entry.misses || 0) - 1) : (entry.misses || 0) + 1;
+    if (gotIt) {
+      const today = todayStr();
+      if (entry.firstRight && entry.firstRight < today) markWordMastered(word.sk);
+      if (!entry.firstRight) entry.firstRight = today;
+    }
+    stats[word.sk] = entry;
+    saveVocabStats(stats);
   }
 
   // Word stats and mastery are keyed by the Slovak text, so correcting a
@@ -1712,7 +1821,7 @@
       rounds
         .map(function (round, i) {
           const cleared = isRoundCleared(topic, i);
-          const locked = !isDevAccount() && i > 0 && !isRoundCleared(topic, i - 1);
+          const locked = !devUnlocked() && i > 0 && !isRoundCleared(topic, i - 1);
           const isCurrent = !cleared && !locked;
           const stateClass = cleared ? 'cleared' : locked ? 'locked' : 'current';
 
@@ -1762,6 +1871,60 @@
     practiceQueue = [];
     document.getElementById('round-map').classList.remove('hidden');
     renderRoundMap(currentRoundTopic);
+  }
+
+  /* ---- Flashcard direction (shared by every flashcard screen) ---- */
+
+  // Slovak → English checks you recognise a word; English → Slovak checks
+  // you can produce it, which is harder and what you need to speak. The
+  // choice is remembered on this device.
+  const CARD_DIRECTION_KEY = 'slovencina_card_direction';
+
+  function cardDirection() {
+    try {
+      return localStorage.getItem(CARD_DIRECTION_KEY) === 'en-sk' ? 'en-sk' : 'sk-en';
+    } catch (err) {
+      return 'sk-en';
+    }
+  }
+
+  function cardDirectionToggleHtml() {
+    const d = cardDirection();
+    return (
+      '<div class="card-direction" role="group" aria-label="Card direction">' +
+      '<button type="button" class="card-direction-btn' + (d === 'sk-en' ? ' active' : '') + '" data-direction="sk-en">Slovak → English</button>' +
+      '<button type="button" class="card-direction-btn' + (d === 'en-sk' ? ' active' : '') + '" data-direction="en-sk">English → Slovak</button>' +
+      '</div>'
+    );
+  }
+
+  // Flips the card on screen in place (front, and the answer if it's
+  // showing) rather than redrawing it, so switching can't reset a card
+  // that's already been graded.
+  function wireCardDirection(container, word, answerId) {
+    const buttons = container.querySelectorAll('.card-direction-btn');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        try {
+          localStorage.setItem(CARD_DIRECTION_KEY, btn.dataset.direction);
+        } catch (err) {
+          /* storage unavailable — the choice just won't be remembered */
+        }
+        buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
+        container.querySelector('.practice-word').innerHTML = cardFrontHtml(word);
+        const answer = document.getElementById(answerId);
+        if (answer && answer.innerHTML) answer.innerHTML = cardBackHtml(word);
+      });
+    });
+  }
+
+  function cardFrontHtml(word) {
+    return cardDirection() === 'en-sk' ? escapeHtml(word.en) : speakerButtonHtml(word.sk) + escapeHtml(word.sk);
+  }
+
+  function cardBackHtml(word) {
+    return (cardDirection() === 'en-sk' ? speakerButtonHtml(word.sk) + escapeHtml(word.sk) : escapeHtml(word.en)) +
+      wordNoteHtml(word);
   }
 
   function startRound(topic, roundIndex) {
@@ -1835,8 +1998,9 @@
     stage.innerHTML =
       backToRoundsLinkHtml() +
       '<div class="practice-progress">Card ' + (practiceIndex + 1) + ' of ' + practiceQueue.length + '</div>' +
+      cardDirectionToggleHtml() +
       '<div class="practice-card" id="practice-card">' +
-      '<div class="practice-word">' + speakerButtonHtml(word.sk) + escapeHtml(word.sk) + '</div>' +
+      '<div class="practice-word">' + cardFrontHtml(word) + '</div>' +
       '<div class="practice-answer" id="practice-answer"></div>' +
       '<button class="btn btn-secondary" id="practice-reveal-btn">Show Answer</button>' +
       '<div class="practice-grade-row hidden" id="practice-grade-row">' +
@@ -1847,10 +2011,11 @@
       '</div>';
 
     document.getElementById('back-to-rounds-btn').addEventListener('click', goBackToRounds);
+    wireCardDirection(stage, word, 'practice-answer');
 
     document.getElementById('practice-reveal-btn').addEventListener('click', function () {
       practiceRevealed = true;
-      document.getElementById('practice-answer').textContent = word.en;
+      document.getElementById('practice-answer').innerHTML = cardBackHtml(word);
       document.getElementById('practice-reveal-btn').classList.add('hidden');
       document.getElementById('practice-grade-row').classList.remove('hidden');
       document.getElementById('practice-sentence-wrap').classList.remove('hidden');
@@ -1871,11 +2036,7 @@
     const gradeRow = document.getElementById('practice-grade-row');
     if (gradeRow) gradeRow.style.pointerEvents = 'none';
 
-    const stats = loadVocabStats();
-    const entry = stats[word.sk] || { misses: 0 };
-    entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
-    stats[word.sk] = entry;
-    saveVocabStats(stats);
+    recordWordResult(word, gotIt);
 
     if (gotIt) practiceCorrect++;
     playTone(gotIt ? 'correct' : 'incorrect');
@@ -1943,8 +2104,9 @@
     const word = reviewQueue[reviewIndex];
     stage.innerHTML =
       '<div class="practice-progress">Reviewing ' + (reviewIndex + 1) + ' of ' + reviewQueue.length + '</div>' +
+      cardDirectionToggleHtml() +
       '<div class="practice-card" id="review-card">' +
-      '<div class="practice-word">' + speakerButtonHtml(word.sk) + escapeHtml(word.sk) + '</div>' +
+      '<div class="practice-word">' + cardFrontHtml(word) + '</div>' +
       '<div class="practice-answer" id="review-answer"></div>' +
       '<button class="btn btn-secondary" id="review-reveal-btn">Show Answer</button>' +
       '<div class="practice-grade-row hidden" id="review-grade-row">' +
@@ -1954,8 +2116,9 @@
       '<div class="hidden" id="review-sentence-wrap">' + sentenceUiHtml(word) + '</div>' +
       '</div>';
 
+    wireCardDirection(stage, word, 'review-answer');
     document.getElementById('review-reveal-btn').addEventListener('click', function () {
-      document.getElementById('review-answer').textContent = word.en;
+      document.getElementById('review-answer').innerHTML = cardBackHtml(word);
       document.getElementById('review-reveal-btn').classList.add('hidden');
       document.getElementById('review-grade-row').classList.remove('hidden');
       document.getElementById('review-sentence-wrap').classList.remove('hidden');
@@ -1971,11 +2134,7 @@
     const gradeRow = document.getElementById('review-grade-row');
     if (gradeRow) gradeRow.style.pointerEvents = 'none';
 
-    const stats = loadVocabStats();
-    const entry = stats[word.sk] || { misses: 0 };
-    entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
-    stats[word.sk] = entry;
-    saveVocabStats(stats);
+    recordWordResult(word, gotIt);
 
     playTone(gotIt ? 'correct' : 'incorrect');
     recordPracticeToday();
@@ -2266,6 +2425,7 @@
         const mode = btn.dataset.learnMode;
         roadmapEl.classList.toggle('hidden', mode !== 'roadmap');
         browseEl.classList.toggle('hidden', mode !== 'browse');
+        if (mode === 'roadmap') scrollToUpNext(false);
       });
     });
 
@@ -2300,25 +2460,86 @@
   function lockedSectionFlags() {
     const furthestCleared = furthestClearedIndex();
     return roadmapSections.map(function (s, i) {
-      if (isDevAccount() || i === 0 || s.level === MY_ADDITIONS_LEVEL) return false;
+      if (devUnlocked() || i === 0 || s.level === MY_ADDITIONS_LEVEL) return false;
       if (isSectionCleared(s.id) || i < furthestCleared) return false;
       return !isSectionCleared(roadmapSections[i - 1].id);
     });
   }
 
+  // "Up next" is where you left off: the first open section after the
+  // furthest one you've cleared. Sections added behind that point later are
+  // open on the roadmap, but shouldn't drag you back to them. Only once
+  // nothing is left ahead does it fall back to anything skipped. -1 when
+  // everything is cleared.
+  function upNextIndex() {
+    const progress = loadRoadmapProgress();
+    const lockedFlags = lockedSectionFlags();
+    function firstOpenFrom(start) {
+      for (let i = start; i < roadmapSections.length; i++) {
+        if (!progress[roadmapSections[i].id] && !lockedFlags[i]) return i;
+      }
+      return -1;
+    }
+    const ahead = firstOpenFrom(furthestClearedIndex() + 1);
+    return ahead !== -1 ? ahead : firstOpenFrom(0);
+  }
+
   function levelHeaderHtml(level) {
     if (level === MY_ADDITIONS_LEVEL) {
       return (
-        '<div class="roadmap-level-header"><div class="roadmap-level-name">My additions</div>' +
+        '<div class="roadmap-level-header" data-level="' + escapeHtml(level) + '"><div class="roadmap-level-name">My additions</div>' +
         '<div class="roadmap-level-progress">From Add Content · always open</div></div>'
       );
     }
     const inLevel = roadmapSections.filter(function (s) { return s.level === level; });
     const cleared = inLevel.filter(function (s) { return isSectionCleared(s.id); }).length;
     return (
-      '<div class="roadmap-level-header"><div class="roadmap-level-name">' + escapeHtml(level) + '</div>' +
+      '<div class="roadmap-level-header" data-level="' + escapeHtml(level) + '"><div class="roadmap-level-name">' + escapeHtml(level) + '</div>' +
       '<div class="roadmap-level-progress">' + cleared + ' / ' + inLevel.length + ' cleared</div></div>'
     );
+  }
+
+  // The roadmap is over a hundred sections long, so a bar of shortcuts stays pinned
+  // above it: "Up next" plus the start of each level.
+  function renderRoadmapJump(nextIdx) {
+    const bar = document.getElementById('roadmap-jump');
+    if (!bar) return;
+    const levels = [];
+    roadmapSections.forEach(function (s) { if (levels.indexOf(s.level) === -1) levels.push(s.level); });
+    bar.innerHTML =
+      (nextIdx !== -1 ? '<button type="button" class="roadmap-jump-btn current" data-jump="next">Up next</button>' : '') +
+      levels
+        .map(function (level) {
+          const label = level === MY_ADDITIONS_LEVEL ? 'My additions' : level;
+          return '<button type="button" class="roadmap-jump-btn" data-jump-level="' + escapeHtml(level) + '">' + escapeHtml(label) + '</button>';
+        })
+        .join('');
+    bar.querySelectorAll('.roadmap-jump-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.dataset.jump === 'next') {
+          scrollToUpNext(true);
+          return;
+        }
+        const header = [].find.call(document.querySelectorAll('#roadmap-map .roadmap-level-header'), function (h) {
+          return h.dataset.level === btn.dataset.jumpLevel;
+        });
+        if (header) header.scrollIntoView({ behavior: smoothScroll(), block: 'start' });
+      });
+    });
+  }
+
+  function smoothScroll() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  }
+
+  // Brings the "Up next" node to the middle of the screen. Without this the
+  // Learn tab always opened at section 1, and anyone past the first few
+  // sections had to scroll through everything they'd done to continue.
+  function scrollToUpNext(smooth) {
+    const node = document.querySelector('#roadmap-map .round-node.up-next');
+    if (!node || document.getElementById('roadmap-view').classList.contains('hidden')) return false;
+    node.scrollIntoView({ behavior: smooth ? smoothScroll() : 'auto', block: 'center' });
+    return true;
   }
 
   function renderRoadmapMap() {
@@ -2329,6 +2550,7 @@
     }
 
     const lockedFlags = lockedSectionFlags();
+    const nextIdx = upNextIndex();
     const LANES = ['align-center', 'align-end', 'align-start'];
     const LOCK_ICON =
       '<svg class="round-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
@@ -2346,7 +2568,8 @@
           const stateClass =
             (cleared ? 'cleared' : locked ? 'locked' : 'current') +
             (isCheckpoint ? ' checkpoint' : '') +
-            (section.isFinalTest ? ' final-test' : '');
+            (section.isFinalTest ? ' final-test' : '') +
+            (i === nextIdx ? ' up-next' : '');
           const startsLevel = i === 0 || section.level !== roadmapSections[i - 1].level;
           const inner = cleared
             ? STAR_ICON
@@ -2362,7 +2585,13 @@
             '<div class="round-node-slot">' +
             '<div class="round-node ' + stateClass + '" data-section-index="' + i + '" data-locked="' + locked + '">' +
             inner +
-            '<div class="round-label">' + escapeHtml(section.title) + '</div>' +
+            (i === nextIdx ? '<span class="round-up-next-tag">Up next</span>' : '') +
+            '<div class="round-label">' +
+            (section.kind === 'grammar' || section.kind === 'dialogue' || section.kind === 'alphabet'
+              ? '<span class="round-kind">' + kindLabel(section) + '</span>'
+              : '') +
+            // The tag already says "Dialogue", so the title doesn't repeat it.
+            escapeHtml(section.title.replace(/^Dialogue:\s*/, '')) + '</div>' +
             '</div>' +
             '</div>' +
             '</div>'
@@ -2377,6 +2606,8 @@
         startLesson(Number(node.dataset.sectionIndex));
       });
     });
+
+    renderRoadmapJump(nextIdx);
   }
 
   /* ---- Full-screen lesson flow: Learn -> Practice -> Voice -> Quiz ---- */
@@ -2407,7 +2638,7 @@
       const tag = (e.target.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
       if (document.getElementById('lesson-overlay').classList.contains('hidden')) return;
-      if (!isDevAccount()) return;
+      if (!devUnlocked()) return;
       e.preventDefault();
       skipCurrentLessonItem();
     });
@@ -2480,6 +2711,14 @@
     document.getElementById('lesson-overlay').classList.add('hidden');
     renderRoadmapMap();
     renderProfile();
+
+    // Land back on the section you were in — or on the next one, if this
+    // lesson just opened it.
+    if (!document.getElementById('panel-learn').classList.contains('active')) return;
+    const next = upNextIndex();
+    const target = next === lessonSectionIndex + 1 ? next : lessonSectionIndex;
+    const node = document.querySelector('#roadmap-map .round-node[data-section-index="' + target + '"]');
+    if (node) node.scrollIntoView({ behavior: smoothScroll(), block: 'center' });
   }
 
   function updateLessonChrome(label, stepIndex) {
@@ -2488,7 +2727,7 @@
 
     const topbar = document.querySelector('.lesson-topbar');
     let hint = document.getElementById('dev-skip-hint');
-    if (isDevAccount()) {
+    if (devUnlocked()) {
       if (!hint) {
         hint = document.createElement('div');
         hint.id = 'dev-skip-hint';
@@ -2580,7 +2819,9 @@
                 escapeHtml(it.sk) +
                 '</span><span class="en">' +
                 escapeHtml(it.en) +
-                '</span></div>'
+                '</span>' +
+                wordNoteHtml(it) +
+                '</div>'
               );
             })
             .join('') +
@@ -2621,6 +2862,17 @@
       return others.slice(0, n);
     }
 
+    // Letters that sound the same, so "which do you hear?" can't tell them
+    // apart: i/y and í/ý are identical in speech, and most speakers say ä
+    // like e and ľ like l.
+    const SOUNDS_ALIKE = [['i', 'y'], ['í', 'ý'], ['ä', 'e'], ['ľ', 'l']];
+    function soundsAlike(a, b) {
+      return SOUNDS_ALIKE.some(function (p) { return p.indexOf(a) !== -1 && p.indexOf(b) !== -1; });
+    }
+    function baseLetter(x) {
+      return x.normalize('NFD').replace(/[̀-ͯ]/g, '').charAt(0);
+    }
+
     const exercises = [];
     section.letters.forEach(function (l) {
       const explain = l.letter + ' — ' + l.hint + ', as in ' + l.example.sk + ' (' + l.example.en + ').';
@@ -2629,7 +2881,8 @@
       // a beginner is looking at. The old sound -> letter direction asked
       // people to reverse-engineer a phonetics description ("a glide, 'uo' —
       // starts at u and slides into o") into a letter they'd never seen,
-      // which is a linguistics exercise, not an alphabet one.
+      // which is a linguistics exercise, not an alphabet one. The speaker
+      // plays the example word, so the sound can be heard, not just read.
       const hintPool = allLetters.map(function (x) { return x.hint; });
       exercises.push({
         prompt: l.letter,
@@ -2637,7 +2890,35 @@
         options: [l.hint].concat(distractors(hintPool, l.hint, 3)),
         answer: l.hint,
         explain: explain,
+        audio: l.example.sk,
       });
+
+      // Listening first: the example word plays with the letter blanked out,
+      // and you pick the letter you heard. The wrong options are the letters
+      // easiest to mix up with it (same base letter, same unit), minus any
+      // that sound identical.
+      const word = l.example.sk;
+      const lower = l.letter.toLowerCase();
+      if (word.toLowerCase().indexOf(lower) !== -1) {
+        const letters = allLetters.map(function (x) { return x.letter.toLowerCase(); });
+        const usable = letters.filter(function (x) { return x !== lower && !soundsAlike(x, lower); });
+        const close = usable.filter(function (x) {
+          return baseLetter(x) === baseLetter(lower) ||
+            section.letters.some(function (s) { return s.letter.toLowerCase() === x; });
+        });
+        const picked = shuffleArray(close).slice(0, 3);
+        const rest = usable.filter(function (x) { return picked.indexOf(x) === -1; });
+        const options = [lower].concat(picked, distractors(rest, lower, 3 - picked.length));
+        exercises.push({
+          prompt: word.split(new RegExp(lower, 'gi')).join('_'),
+          question: 'Which letter do you hear?',
+          options: options,
+          answer: lower,
+          explain: explain,
+          audio: word,
+          autoplay: true,
+        });
+      }
 
       // Spotting the letter inside a real word — the other half of actually
       // knowing an alphabet. Distractors must genuinely not contain it.
@@ -2691,10 +2972,15 @@
     if (inFinalTest) updateLessonChrome(kindLabel(section), 4 * ((stepNum - 1) / Math.max(1, stepTotal)));
     const eyebrow = inFinalTest ? kindLabel(section) : isPractice ? 'Practice' : 'Quiz';
 
+    // A listening question puts a big play button first; otherwise the
+    // speaker sits next to the prompt.
     body.innerHTML =
       '<div class="lesson-stage">' +
       '<div class="lesson-eyebrow">' + eyebrow + ' · ' + stepNum + ' / ' + stepTotal + '</div>' +
-      '<h2 class="lesson-heading exercise-prompt">' + escapeHtml(ex.prompt) + '</h2>' +
+      (ex.audio && ex.autoplay ? '<div class="exercise-audio">' + speakerButtonHtml(ex.audio) + '</div>' : '') +
+      '<h2 class="lesson-heading exercise-prompt">' +
+      (ex.audio && !ex.autoplay ? speakerButtonHtml(ex.audio) : '') +
+      escapeHtml(ex.prompt) + '</h2>' +
       '<p class="lesson-sub">' + escapeHtml(ex.question) + '</p>' +
       '<div class="quiz-choice-list">' +
       options
@@ -2706,6 +2992,7 @@
       '<div class="exercise-explain" id="exercise-explain"></div>' +
       '</div>';
     body.scrollTop = 0;
+    if (ex.audio && ex.autoplay) speak(ex.audio);
 
     body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -2808,9 +3095,10 @@
     body.innerHTML =
       '<div class="lesson-stage">' +
       '<div class="lesson-eyebrow">Practice · ' + (lessonQueueIndex + 1) + ' / ' + lessonQueue.length + '</div>' +
+      cardDirectionToggleHtml() +
       '<div class="practice-card" id="lesson-practice-card" style="max-width:460px;">' +
       (isExtra ? '<div class="review-tag">Hard word · revision</div>' : '') +
-      '<div class="practice-word">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</div>' +
+      '<div class="practice-word">' + cardFrontHtml(item) + '</div>' +
       '<div class="practice-answer" id="lesson-practice-answer"></div>' +
       '<button class="btn btn-secondary" id="lesson-reveal-btn">Show Answer</button>' +
       '<div class="practice-grade-row hidden" id="lesson-grade-row">' +
@@ -2822,8 +3110,9 @@
       '</div>';
     body.scrollTop = 0;
 
+    wireCardDirection(body, item, 'lesson-practice-answer');
     document.getElementById('lesson-reveal-btn').addEventListener('click', function () {
-      document.getElementById('lesson-practice-answer').textContent = item.en;
+      document.getElementById('lesson-practice-answer').innerHTML = cardBackHtml(item);
       document.getElementById('lesson-reveal-btn').classList.add('hidden');
       document.getElementById('lesson-grade-row').classList.remove('hidden');
       // Offered after the answer is out, so it can't be used as a hint before
@@ -2842,11 +3131,7 @@
     // "words practiced" on the Profile tab and the word-count achievements
     // count roadmap practice too, not just the standalone practice picker.
     if (lessonCurrentPracticeItem) {
-      const stats = loadVocabStats();
-      const entry = stats[lessonCurrentPracticeItem.sk] || { misses: 0 };
-      entry.misses = gotIt ? Math.max(0, entry.misses - 1) : entry.misses + 1;
-      stats[lessonCurrentPracticeItem.sk] = entry;
-      saveVocabStats(stats);
+      recordWordResult(lessonCurrentPracticeItem, gotIt);
       incrementDailyCount();
     }
 
@@ -3026,10 +3311,13 @@
       return;
     }
 
-    // Capped at 5 items so this phase stays quick even for a big section.
-    // Natural order, matching how the Learn/Practice steps just presented
-    // this same content.
-    voiceQueue = roadmapSections[lessonSectionIndex].items.slice(0, 5);
+    // Capped at 5 items so this phase stays quick even for a big section —
+    // picked at random, so across retries every word gets said, not just
+    // the first five. A dialogue is a role-play instead.
+    const section = roadmapSections[lessonSectionIndex];
+    voiceQueue = section.kind === 'dialogue'
+      ? dialogueRoleLines(section)
+      : shuffleArray(section.items.slice()).slice(0, 5);
     voiceIndex = 0;
     lessonVoiceCorrect = 0;
     lessonVoiceTotal = voiceQueue.length;
@@ -3047,11 +3335,33 @@
 
     const item = voiceQueue[voiceIndex];
 
+    const prompt = item.role
+      ? '<p class="lesson-sub">You’re <strong>' + escapeHtml(item.role) + '</strong>. ' +
+        (item.context ? 'Listen to ' + escapeHtml(item.context.who) + ', then say your line.' : 'You start — say your line.') +
+        '</p>' +
+        '<div class="dialogue roleplay">' +
+        (item.context
+          ? '<div class="dialogue-line side-a">' +
+            '<div class="dialogue-who">' + escapeHtml(item.context.who) + '</div>' +
+            '<div class="dialogue-bubble">' +
+            '<div class="sk">' + speakerButtonHtml(item.context.sk) + escapeHtml(item.context.sk) + '</div>' +
+            '<div class="en">' + escapeHtml(item.context.en) + '</div>' +
+            '</div></div>'
+          : '') +
+        '<div class="dialogue-line side-b mine">' +
+        '<div class="dialogue-who">You · ' + escapeHtml(item.role) + '</div>' +
+        '<div class="dialogue-bubble">' +
+        '<div class="sk">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</div>' +
+        '<div class="en">' + escapeHtml(item.en) + '</div>' +
+        '</div></div>' +
+        '</div>'
+      : '<h2 class="lesson-heading">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</h2>' +
+        '<p class="lesson-sub">Listen, tap the mic, say it, then tap again to check.</p>';
+
     body.innerHTML =
       '<div class="lesson-stage">' +
       '<div class="lesson-eyebrow">Voice · ' + (voiceIndex + 1) + ' / ' + voiceQueue.length + '</div>' +
-      '<h2 class="lesson-heading">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</h2>' +
-      '<p class="lesson-sub">Listen, tap the mic, say it, then tap again to check.</p>' +
+      prompt +
       '<button class="mic-btn" id="lesson-mic-btn" aria-label="Start recording">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 19v3"/></svg>' +
       '</button>' +
@@ -3061,9 +3371,31 @@
       '</div>';
     body.scrollTop = 0;
 
+    // The other speaker's line plays by itself, the way it would in a
+    // real conversation; you answer it.
+    if (item.context) speak(item.context.sk);
+
     document.getElementById('lesson-mic-btn').addEventListener('click', function () {
       toggleVoiceRecording(item);
     });
+  }
+
+  // Dialogues are practised as a role-play: you take one part — the one
+  // with less to say, which is also the learner's side in these scenes
+  // (the customer, the patient, the tourist) — hear the other speaker, and
+  // answer with your line, in the order of the conversation.
+  function dialogueRoleLines(section) {
+    const lines = section.lines || [];
+    const totals = {};
+    lines.forEach(function (l) { totals[l.who] = (totals[l.who] || 0) + l.sk.length; });
+    const role = Object.keys(totals).sort(function (a, b) { return totals[a] - totals[b]; })[0];
+    const out = [];
+    lines.forEach(function (l, i) {
+      if (l.who !== role || out.length >= 5) return;
+      const prev = lines[i - 1];
+      out.push({ sk: l.sk, en: l.en, role: role, context: prev && prev.who !== role ? prev : null });
+    });
+    return out;
   }
 
   // Ends the voice phase early, counting only the items actually attempted
@@ -3237,6 +3569,41 @@
   let quizQueue = [];
   let quizIndex = 0;
   let quizAnswered = false;
+  // Per question: true = English → Slovak (say it), false = Slovak → English
+  // (recognise it). Recognising a word is much easier than producing it, so
+  // about half the questions go each way.
+  let quizReverse = [];
+
+  function mixedDirections(n) {
+    const flags = [];
+    for (let i = 0; i < n; i++) flags.push(i < Math.floor(n / 2));
+    return shuffleArray(flags);
+  }
+
+  // Up to n wrong answers for a word question: never the right answer, never
+  // something that also means it (same English), and no option twice.
+  function quizDistractors(correct, sectionItems, n) {
+    function pickFrom(pool, taken) {
+      const out = [];
+      shuffleArray(pool.slice()).forEach(function (w) {
+        if (out.length >= n || !w || !w.sk || !w.en) return;
+        if (w.sk === correct.sk || w.en === correct.en) return;
+        if (taken[w.sk] || taken['en:' + w.en]) return;
+        taken[w.sk] = true;
+        taken['en:' + w.en] = true;
+        out.push(w);
+      });
+      return out;
+    }
+    const taken = {};
+    let picked = pickFrom(sectionItems, taken);
+    if (picked.length < n) {
+      const all = [];
+      vocabData.forEach(function (g) { (g.words || []).forEach(function (w) { all.push(w); }); });
+      picked = picked.concat(pickFrom(all, taken).slice(0, n - picked.length));
+    }
+    return picked;
+  }
 
   function renderQuizPhase() {
     const section = roadmapSections[lessonSectionIndex];
@@ -3247,7 +3614,14 @@
     // each grammar section (a random handful, if there are more than fit).
     if (section.kind === 'checkpoint') {
       const isFinal = !!section.isFinalTest;
-      quizQueue = shuffleArray(section.items.slice()).slice(0, isFinal ? FINAL_TEST_WORD_QUESTIONS : CHECKPOINT_MAX_QUESTIONS);
+      // Words not yet mastered come first, so each test (and each retake)
+      // works through more of the vocabulary instead of re-asking words
+      // already known.
+      const mastered = loadMasteredWords();
+      const fresh = shuffleArray(section.items.filter(function (w) { return !mastered[w.sk]; }));
+      const known = shuffleArray(section.items.filter(function (w) { return mastered[w.sk]; }));
+      quizQueue = shuffleArray(fresh.concat(known).slice(0, isFinal ? FINAL_TEST_WORD_QUESTIONS : CHECKPOINT_MAX_QUESTIONS));
+      quizReverse = mixedDirections(quizQueue.length);
       exerciseQueue = isFinal
         ? shuffleArray(
             (section.grammarPools || []).map(function (pool) { return shuffleArray(pool.slice())[0]; })
@@ -3277,11 +3651,12 @@
       return;
     }
 
-    const count = Math.min(5, section.items.length);
-    // Natural order for the same reason as Practice: this is a first pass
-    // through the section, and sequential content (numbers, days) should
-    // stay in the order it was just taught.
-    quizQueue = section.items.slice(0, count);
+    // Every word in the section, in random order. Taking just the first five
+    // left the rest of a section never tested (July to December, in the
+    // months section), and keeping the taught order let sequences like
+    // numbers or days be answered by counting.
+    quizQueue = shuffleArray(section.items.slice());
+    quizReverse = mixedDirections(quizQueue.length);
     quizIndex = 0;
     lessonQuizCorrect = 0;
     lessonQuizTotal = quizQueue.length;
@@ -3313,28 +3688,25 @@
     // tracks its own progress through the questions instead.
     if (isCheckpoint) updateLessonChrome(kindLabel(section), 4 * (quizIndex / Math.max(1, testLength)));
 
-    let distractorPool = section.items.filter(function (it) { return it.en !== correct.en; });
-    if (distractorPool.length < 3) {
-      const allPairs = [];
-      vocabData.forEach(function (g) { (g.words || []).forEach(function (w) { allPairs.push(w); }); });
-      distractorPool = allPairs.filter(function (w) { return w.en !== correct.en; });
-    }
-    const distractors = shuffleArray(distractorPool.slice()).slice(0, 3);
-    const options = shuffleArray([correct].concat(distractors));
+    const reverse = !!quizReverse[quizIndex];
+    const options = shuffleArray([correct].concat(quizDistractors(correct, section.items, 3)));
 
     body.innerHTML =
       '<div class="lesson-stage">' +
       '<div class="lesson-eyebrow">' + (isCheckpoint ? kindLabel(section) : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + testLength + '</div>' +
-      '<h2 class="lesson-heading">' + speakerButtonHtml(correct.sk) + escapeHtml(correct.sk) + '</h2>' +
-      '<p class="lesson-sub">What does this mean?</p>' +
+      (reverse
+        ? '<h2 class="lesson-heading">' + escapeHtml(correct.en) + '</h2>' +
+          '<p class="lesson-sub">How do you say this in Slovak?</p>'
+        : '<h2 class="lesson-heading">' + speakerButtonHtml(correct.sk) + escapeHtml(correct.sk) + '</h2>' +
+          '<p class="lesson-sub">What does this mean?</p>') +
       '<div class="quiz-choice-list">' +
       options
         .map(function (opt) {
           return (
             '<button type="button" class="quiz-choice-btn" data-correct="' +
-            (opt.en === correct.en) +
+            (opt.sk === correct.sk) +
             '">' +
-            escapeHtml(opt.en) +
+            escapeHtml(reverse ? opt.sk : opt.en) +
             '</button>'
           );
         })
@@ -3364,24 +3736,17 @@
     if (isCorrect) lessonQuizCorrect++;
     playTone(isCorrect ? 'correct' : 'incorrect');
 
-    // Checkpoint answers are the only thing that awards mastery. A word missed
-    // here is demonstrably not known, so it goes back into the review queue
-    // instead — that's what feeds "hard words" everywhere else.
+    // Every quiz answer counts towards the word's record: a miss sends it to
+    // Revise, a right answer can master it (see recordWordResult). A right
+    // answer on a checkpoint or final test masters the word straight away —
+    // those come sections after the word was taught.
     const section = roadmapSections[lessonSectionIndex];
-    if (section && section.kind === 'checkpoint') {
-      const word = quizQueue[quizIndex];
-      if (word && word.sk) {
-        if (isCorrect) {
-          if (!loadMasteredWords()[word.sk]) checkpointMastered++;
-          markWordMastered(word.sk);
-        } else {
-          const stats = loadVocabStats();
-          const entry = stats[word.sk] || { misses: 0 };
-          entry.misses = entry.misses + 1;
-          stats[word.sk] = entry;
-          saveVocabStats(stats);
-        }
-      }
+    const word = quizQueue[quizIndex];
+    if (section && word && word.sk) {
+      const wasMastered = !!loadMasteredWords()[word.sk];
+      recordWordResult(word, isCorrect);
+      if (section.kind === 'checkpoint' && isCorrect) markWordMastered(word.sk);
+      if (section.kind === 'checkpoint' && isCorrect && !wasMastered) checkpointMastered++;
     }
 
     setTimeout(function () {
@@ -3538,6 +3903,8 @@
     if (mascot) {
       const show = isDevAccount();
       mascot.classList.toggle('hidden', !show);
+      mascot.classList.toggle('student-view', studentViewOn());
+      mascot.setAttribute('aria-pressed', String(studentViewOn()));
       const img = document.getElementById('profile-mascot-img');
       if (show && img && !img.getAttribute('src')) img.src = 'img/elephant.png';
     }
@@ -3582,20 +3949,7 @@
     updateReviewCountBadge();
     renderReviseCard();
 
-    // "Up next" is where you left off: the first open section after the
-    // furthest one you've cleared. Sections added behind that point later
-    // are open on the roadmap, but shouldn't drag this card back to them.
-    // Only once nothing is left ahead does it fall back to anything skipped.
-    const lockedFlags = lockedSectionFlags();
-    function firstOpenFrom(start) {
-      for (let i = start; i < totalSections; i++) {
-        if (!progress[roadmapSections[i].id] && !lockedFlags[i]) return i;
-      }
-      return -1;
-    }
-    let nextIdx = firstOpenFrom(furthestClearedIndex() + 1);
-    if (nextIdx === -1) nextIdx = firstOpenFrom(0);
-
+    const nextIdx = upNextIndex();
     const nextCard = document.getElementById('profile-next-card');
     if (totalSections === 0) {
       nextCard.innerHTML = '<div class="next-info"><div class="next-label">Loading…</div></div>';

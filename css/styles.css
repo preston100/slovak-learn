@@ -227,7 +227,7 @@ button {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(247, 247, 251, 0.85);
+  background: rgba(250, 245, 239, 0.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-border);
 }
@@ -422,19 +422,42 @@ main {
   position: relative;
 }
 
-/* Dev-account easter egg — perched on the corner of the greeting card. */
+/* Dev-account easter egg — perched on the corner of the greeting card.
+   Tapping it toggles student view, shown by the tag underneath. */
 .profile-mascot {
   position: absolute;
-  top: -46px;
+  top: -28px;
   right: 16px;
   width: 92px;
   height: 92px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
   animation: mascot-bob 3.2s ease-in-out infinite;
 }
 .profile-mascot img {
   width: 100%;
   height: 100%;
   display: block;
+}
+.profile-mascot.student-view::after {
+  content: 'Student view';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 @keyframes mascot-bob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
@@ -449,7 +472,7 @@ main {
   .profile-mascot {
     width: 68px;
     height: 68px;
-    top: -34px;
+    top: -20px;
     right: 10px;
   }
 }
@@ -644,7 +667,7 @@ main {
   position: relative;
   display: flex;
   z-index: 1;
-  margin-bottom: 34px;
+  margin-bottom: 44px; /* room for a label wrapped onto two or three lines */
 }
 .round-row.align-start { justify-content: flex-start; }
 .round-row.align-end { justify-content: flex-end; }
@@ -692,6 +715,7 @@ main {
   color: var(--color-accent);
 }
 
+/* Long titles wrap instead of running out sideways over the path. */
 .round-node .round-label {
   position: absolute;
   top: 100%;
@@ -699,12 +723,31 @@ main {
   transform: translateX(-50%);
   margin-top: 10px;
   width: max-content;
-  max-width: 120px;
+  max-width: 160px;
   text-align: center;
+  text-wrap: balance;
   font-size: 11.5px;
   font-weight: 700;
+  line-height: 1.3;
   color: var(--color-text-muted);
-  white-space: nowrap;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+/* So the dashed path runs behind a centred label, not through it. */
+.round-row.align-center .round-label {
+  background: var(--color-bg);
+}
+
+/* "Grammar", "Dialogue", "Alphabet" above the title; vocabulary is the
+   default and checkpoints have their trophy, so those carry no tag. */
+.round-kind {
+  display: block;
+  margin-bottom: 1px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--warm);
 }
 
 /* Level headers (A1.1, A1.2…) sit on the path itself, with a solid
@@ -736,6 +779,66 @@ main {
 .round-row + .roadmap-level-header {
   margin-top: 40px;
 }
+/* Jumping to a level stops below the sticky topbar and shortcut bar. */
+.roadmap-level-header {
+  scroll-margin-top: calc(var(--topbar-h, 64px) + 64px);
+}
+
+/* Shortcut bar pinned above the roadmap: Up next + the start of each level. */
+.roadmap-jump {
+  position: sticky;
+  top: calc(var(--topbar-h, 64px) + 10px);
+  z-index: 5;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 12px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-md);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.roadmap-jump::-webkit-scrollbar { display: none; }
+.roadmap-jump:empty { display: none; }
+
+.roadmap-jump-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.roadmap-jump-btn:hover { color: var(--color-text); background: var(--color-surface-alt); }
+.roadmap-jump-btn.current { background: var(--color-accent); color: white; }
+
+/* Marks the section to do next, on top of its node. */
+.round-up-next-tag {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+}
 
 /* A level's final test is the gate into the next level — bigger than a
    checkpoint so it reads as the end of the level. */
@@ -749,14 +852,10 @@ main {
 }
 
 /* On a phone a long title on the outer lanes ran past the screen edge and
-   made the whole page scroll sideways — wrap it inside its 120px instead. */
+   made the whole page scroll sideways — it wraps inside 120px there. */
 @media (max-width: 600px) {
   .round-node .round-label {
-    white-space: normal;
-    line-height: 1.3;
-  }
-  .round-row {
-    margin-bottom: 44px;
+    max-width: 120px;
   }
 }
 
@@ -839,6 +938,33 @@ main {
   margin-bottom: 16px;
   font-weight: 600;
 }
+
+/* Slovak → English / English → Slovak switch above every flashcard. */
+.card-direction {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 3px;
+  margin-bottom: 14px;
+  max-width: 100%;
+}
+
+.card-direction-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.card-direction-btn:hover { color: var(--color-text); }
+.card-direction-btn.active { background: var(--color-accent); color: white; }
 
 .practice-card {
   width: 100%;
@@ -1131,6 +1257,26 @@ main {
   text-underline-offset: 2px;
 }
 .daily-goal-label:hover { color: white; }
+
+.daily-goal-picker {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+.daily-goal-option {
+  min-width: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.daily-goal-option:hover { background: rgba(255, 255, 255, 0.3); }
+.daily-goal-option.active { background: white; color: var(--color-accent); border-color: white; }
 
 .badges-tile,
 .leaderboard-tile {
@@ -1562,6 +1708,20 @@ main {
   margin-bottom: 8px;
 }
 
+/* Big play button for "Which letter do you hear?" */
+.exercise-audio {
+  margin-bottom: 12px;
+}
+.exercise-audio .speak-btn {
+  width: 64px;
+  height: 64px;
+  background: var(--color-accent-soft);
+}
+.exercise-audio .speak-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
 .lesson-sub {
   font-size: 14.5px;
   color: var(--color-text-muted);
@@ -1602,6 +1762,29 @@ main {
   color: var(--color-text-muted);
   font-size: 13.5px;
   text-align: right;
+}
+.lesson-learn-row {
+  flex-wrap: wrap;
+}
+.lesson-learn-row .word-note {
+  flex-basis: 100%;
+  margin-top: -4px;
+}
+
+/* A short grammar note under a word ("karta → kartou"). */
+.word-note {
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-align: left;
+}
+.practice-answer .word-note {
+  max-width: 34ch;
+  margin: 6px auto 0;
+  text-align: center;
 }
 
 .lesson-grammar-explanation {
@@ -1835,6 +2018,17 @@ main {
   font-size: 13.5px;
   color: var(--color-text-muted);
   margin-top: 2px;
+}
+
+/* Voice role-play: the other speaker's line, then the one you say. */
+.dialogue.roleplay {
+  margin: 8px 0 20px;
+}
+.dialogue-line.mine .dialogue-bubble {
+  border: 2px solid var(--color-accent);
+}
+.dialogue-line.mine .dialogue-who {
+  color: var(--color-accent);
 }
 
 .lesson-grammar-tables {
@@ -2637,14 +2831,38 @@ input[type='password']:focus {
   }
 }
 
-@media (max-width: 640px) {
-  .topbar-inner {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 12px 16px;
+/* Short tab labels ("Guide", "Add") from tablet width down — the long
+   ones wrapped onto two lines inside their pills there. */
+@media (max-width: 900px) {
+  .tab-label-long {
+    display: none;
   }
+  .tab-label-short {
+    display: inline;
+  }
+}
 
+/* Logo and the icon buttons share the top row, tabs get the second —
+   the bar stays pinned while scrolling, so every row it saves counts. */
+@media (max-width: 760px) {
+  .topbar-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 12px;
+    padding: 10px 16px;
+  }
+  .topbar-inner .tabs {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .tab-btn {
+    flex: 1 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
   main {
     padding: 28px 16px 64px;
   }
@@ -2661,20 +2879,11 @@ input[type='password']:focus {
     display: none;
   }
   .tab-btn {
-    flex: 1 0 auto;
     padding: 8px 10px;
     font-size: 13.5px;
-    white-space: nowrap;
-  }
-  .tab-label-long {
-    display: none;
-  }
-  .tab-label-short {
-    display: inline;
   }
 
   .test-mode-switch {
     flex-direction: column;
   }
-
 }

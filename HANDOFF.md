@@ -13,7 +13,7 @@ A website for learning Slovak from scratch to the end of **A1**, behind two lock
 - **Tests** — an AI-written quiz (Gemini) on any topic, free practice rounds per word topic, and **Revise** for words you keep missing.
 - **Add Content** — upload a photo of notes; Gemini proposes vocab/grammar, you approve it, and it appears under "My additions" for your account only. Also home to the **pronunciation audio** generator.
 
-**Dev accounts** (`prestonandersen100@gmail.com`, `mravikovamartina@gmail.com`) see every section unlocked, and can press **P** in a lesson to skip a question.
+**Dev accounts** (`prestonandersen100@gmail.com`, `mravikovamartina@gmail.com`) see every section unlocked, and can press **P** in a lesson to skip a question. Tapping the elephant on the Profile switches **student view** on and off (locks and no P-skip, exactly as a student sees it; remembered on that device).
 
 **Content lives in plain files** in `data/`: `curriculum.json` (the order of the course and each unit's level), `vocab.json`, `grammar.json`, `dialogues.json`, `alphabet.json`, plus `audio-manifest.json` → the clips in `audio/`.
 
@@ -89,9 +89,45 @@ Also in this round: on phones the tabs read "Guide" and "Add" so the bar fits (n
 - **Days (65–67)**: days of the week | all twelve months | *deň, týždeň, mesiac, rok, ročné obdobie* + the seasons. A vocab topic can now fix its own parts with `"split": [8, 12, 9]` in `vocab.json`. *mesiac* moved here from A1.1's Time.
 - **Colours** are listed in the feminine (*červená, modrá…*), because *farba* is feminine; the grammar section explains that and still shows how they match a noun (*červený dom*).
 
+## Round 4: learning improvements (October 2026)
+
+From an outside review of the site, the changes that were worth making:
+
+- **Quizzes test every word**, in random order (it used to be the first five, so July–December were never tested). About half the questions go **English → Slovak** ("How do you say this in Slovak?"), which is harder than recognising a word and closer to speaking. Voice uses 5 random words from the section.
+- **Flashcards can be flipped**: a *Slovak → English / English → Slovak* switch above every card (lessons, Tests practice, Revise), remembered on the device.
+- **Words mastered** no longer gets stuck: checkpoints and final tests ask words you haven't mastered yet first, so each retake covers new ground, and a word you get right again on a later day counts as mastered too.
+- **Learn opens at your next section** instead of section 1, marked *Up next*, with a pinned bar of shortcuts: *Up next · A1.1 · A1.2*. After a lesson you land back on that section (or the next one, if you just opened it).
+- **Dialogues: role-play voice.** You take one part (the customer, the patient, the tourist…), hear the other person's line, and say yours.
+- **Alphabet: listening questions.** *Which letter do you hear?* plays a word with the letter blanked out (*\_aj* → č). Letters that sound the same (i/y, í/ý, and ä/e, ľ/l for most speakers) are never offered against each other. The letter questions also have a speaker.
+- **Notes on phrases**: a word can have a short `note` in `data/vocab.json`, shown on the Learn screen, the back of the card and in Word Lists (searchable).
+- **Smaller things**: roadmap titles wrap instead of running sideways, Grammar / Dialogue / Alphabet tags on the roadmap, a daily goal picker (5 / 10 / 20 / 30) instead of a pop-up box, a warmer top bar, a shorter top bar on phones (logo and buttons on one row), short tab names on tablets, and switching tabs starts at the top of the page.
+
+**For the teacher to check** — the new notes (first time these explanations appear on the site):
+
+| Phrase | Note |
+|---|---|
+| dobrú noc | noc is feminine, and a wish ends in -ú: dobrá noc → (prajem) dobrú noc. |
+| Dobrú chuť! | A wish, so -ú: dobrá chuť → (prajem) dobrú chuť. |
+| Šťastnú cestu! | A wish: šťastná cesta → (prajem) šťastnú cestu. |
+| Idem do obchodu. | do (to) changes the ending: obchod → do obchodu. Compare v obchode (in the shop). |
+| Platím kartou. | kartou = by card: karta → kartou (paying with something). |
+| Platím v hotovosti. | hotovosť (cash) → v hotovosti after v. |
+| Tašku si neprosím. | taška → tašku: the thing you ask for (or don't) changes -a to -u. |
+| Záleží od počasia. | počasie (weather) → od počasia after od. |
+| Teší ma. // Rád Vás / ťa spoznávam. | Rád if you're a man, rada if you're a woman. Vás is formal, ťa informal. |
+| Ja mám osemnásť. | Age is said with mať (to have): literally "I have eighteen". |
+| Koľko máš rokov? | Literally "how many years do you have?" — after koľko, rok becomes rokov. |
+| Volám sa... | Literally "I call myself…" (volať sa). |
+| Som unavený. / Som plný. | unavený / plný if you're a man, unavená / plná if you're a woman. |
+| Už si to povedala. | Said to a woman. To a man: Už si to povedal. |
+| s ľadom / bez ľadu | s (with) / bez (without) change the ending: ľad → s ľadom, bez ľadu. |
+| o jednej | hodina (hour) is left out: o jednej (hodine). The other hours work the same way. |
+| Učím sa po slovensky. | po slovensky = in Slovak, like hovorím po anglicky (I speak English). |
+| Môžeš / Môžete … | Môžeš is informal, Môžete formal. |
+
 ## Quick reference
 
-- **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself.
+- **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.
 - **Two voices**: recordings use Google's Slovak voice (female). Anything without a recording yet falls back to the browser's own voice, which varies by device and is often male — Add Content → "Check & Generate Missing Audio" replaces it. Slashes in entries (*ujo / strýko*) are spoken as a pause, not "lomka".
 - **Levels**: every entry in `data/curriculum.json` has a `level` (`"A1.1"`, `"A1.2"`…). Checkpoints and each level's final test are generated from that — nothing else to set.
 - **To change the password**: Netlify → Site configuration → Environment variables → edit `SITE_PASSWORD` → Trigger deploy.

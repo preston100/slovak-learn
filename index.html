@@ -116,10 +116,11 @@
       <section id="panel-profile" class="panel active">
         <div class="panel-header">
           <!-- src is set from JS for dev accounts only, so nobody else
-               downloads the image just to have it hidden. -->
-          <div class="profile-mascot hidden" id="profile-mascot" aria-hidden="true">
+               downloads the image just to have it hidden. Tapping it
+               switches student view on and off. -->
+          <button type="button" class="profile-mascot hidden" id="profile-mascot" aria-pressed="false" aria-label="Student view" title="Student view: see the locks as a student does">
             <img id="profile-mascot-img" alt="" />
-          </div>
+          </button>
           <p class="profile-greeting" id="profile-greeting"></p>
           <h2>Your Progress</h2>
           <p>A quick look at how far you've come.</p>
@@ -150,7 +151,8 @@
             <div class="stat-label">Day streak</div>
             <div class="daily-goal-row">
               <div class="daily-goal-track"><div class="daily-goal-fill" id="daily-goal-fill"></div></div>
-              <button type="button" class="daily-goal-label" id="daily-goal-label" title="Click to change your daily goal">0 / 10 today</button>
+              <button type="button" class="daily-goal-label" id="daily-goal-label" title="Change your daily goal" aria-expanded="false" aria-controls="daily-goal-picker">0 / 10 today</button>
+              <div class="daily-goal-picker hidden" id="daily-goal-picker" role="group" aria-label="Daily goal"></div>
             </div>
           </div>
 
@@ -183,6 +185,7 @@
         </div>
 
         <div id="roadmap-view">
+          <nav id="roadmap-jump" class="roadmap-jump" aria-label="Jump to"></nav>
           <div id="roadmap-map" class="round-map"></div>
         </div>
 

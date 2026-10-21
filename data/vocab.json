@@ -28,7 +28,8 @@
       },
       {
         "sk": "dobrú noc",
-        "en": "good night"
+        "en": "good night",
+        "note": "noc is feminine, and a wish ends in -ú: dobrá noc → (prajem) dobrú noc."
       },
       {
         "sk": "prosím",
@@ -69,15 +70,18 @@
       },
       {
         "sk": "Volám sa...",
-        "en": "My name is..."
+        "en": "My name is...",
+        "note": "Literally “I call myself…” (volať sa)."
       },
       {
         "sk": "Ja mám osemnásť.",
-        "en": "I am 18."
+        "en": "I am 18.",
+        "note": "Age is said with mať (to have): literally “I have eighteen”."
       },
       {
         "sk": "Koľko máš rokov?",
-        "en": "How old are you?"
+        "en": "How old are you?",
+        "note": "Literally “how many years do you have?” — after koľko, rok becomes rokov."
       },
       {
         "sk": "V pohode",
@@ -105,15 +109,18 @@
       },
       {
         "sk": "Záleží od počasia.",
-        "en": "Depends on the weather."
+        "en": "Depends on the weather.",
+        "note": "počasie (weather) → od počasia after od."
       },
       {
         "sk": "Učím sa po slovensky.",
-        "en": "I am learning Slovak."
+        "en": "I am learning Slovak.",
+        "note": "po slovensky = in Slovak, like hovorím po anglicky (I speak English)."
       },
       {
         "sk": "Idem do obchodu.",
-        "en": "I'm going to the shop."
+        "en": "I'm going to the shop.",
+        "note": "do (to) changes the ending: obchod → do obchodu. Compare v obchode (in the shop)."
       },
       {
         "sk": "Čo hľadáš?",
@@ -121,11 +128,13 @@
       },
       {
         "sk": "Už si to povedala.",
-        "en": "You already told me."
+        "en": "You already told me.",
+        "note": "Said to a woman. To a man: Už si to povedal."
       },
       {
         "sk": "Som unavený.",
-        "en": "I am tired."
+        "en": "I am tired.",
+        "note": "unavený if you’re a man, unavená if you’re a woman."
       }
     ]
   },
@@ -138,7 +147,8 @@
       },
       {
         "sk": "Teší ma. // Rád Vás / ťa spoznávam.",
-        "en": "Nice to meet you."
+        "en": "Nice to meet you.",
+        "note": "Rád if you’re a man, rada if you’re a woman. Vás is formal, ťa informal."
       },
       {
         "sk": "Nerozumiem.",
@@ -150,7 +160,8 @@
       },
       {
         "sk": "Môžeš / Môžete hovoriť pomalšie?",
-        "en": "Can you speak more slowly?"
+        "en": "Can you speak more slowly?",
+        "note": "Môžeš is informal, Môžete formal."
       },
       {
         "sk": "Ešte raz, prosím.",
@@ -158,11 +169,13 @@
       },
       {
         "sk": "Môžeš / Môžete to zopakovať, prosím?",
-        "en": "Can you repeat it, please?"
+        "en": "Can you repeat it, please?",
+        "note": "Môžeš is informal, Môžete formal."
       },
       {
         "sk": "Dobrú chuť!",
-        "en": "Enjoy your meal!"
+        "en": "Enjoy your meal!",
+        "note": "A wish, so -ú: dobrá chuť → (prajem) dobrú chuť."
       },
       {
         "sk": "Na zdravie!",
@@ -174,7 +187,8 @@
       },
       {
         "sk": "Som plný.",
-        "en": "I am full."
+        "en": "I am full.",
+        "note": "plný if you’re a man, plná if you’re a woman."
       },
       {
         "sk": "Už mi stačí.",
@@ -186,11 +200,13 @@
       },
       {
         "sk": "Platím kartou. / Kartou, prosím.",
-        "en": "I am paying by card."
+        "en": "I am paying by card.",
+        "note": "kartou = by card: karta → kartou (paying with something)."
       },
       {
         "sk": "Platím v hotovosti.",
-        "en": "I am paying in cash."
+        "en": "I am paying in cash.",
+        "note": "hotovosť (cash) → v hotovosti after v."
       },
       {
         "sk": "Prosím si účet.",
@@ -218,7 +234,8 @@
       },
       {
         "sk": "Tašku si neprosím.",
-        "en": "I don't want a bag."
+        "en": "I don't want a bag.",
+        "note": "taška → tašku: the thing you ask for (or don’t) changes -a to -u."
       },
       {
         "sk": "Vystupujem.",
@@ -254,7 +271,8 @@
       },
       {
         "sk": "Šťastnú cestu!",
-        "en": "Have a safe trip!"
+        "en": "Have a safe trip!",
+        "note": "A wish: šťastná cesta → (prajem) šťastnú cestu."
       }
     ]
   },
@@ -444,11 +462,13 @@
       },
       {
         "sk": "s ľadom",
-        "en": "with ice"
+        "en": "with ice",
+        "note": "s (with) changes the ending: ľad → s ľadom."
       },
       {
         "sk": "bez ľadu",
-        "en": "without ice"
+        "en": "without ice",
+        "note": "bez (without) changes the ending: ľad → bez ľadu."
       }
     ]
   },
@@ -685,7 +705,8 @@
       },
       {
         "sk": "o jednej",
-        "en": "at one o'clock"
+        "en": "at one o'clock",
+        "note": "hodina (hour) is left out: o jednej (hodine). The other hours work the same way."
       },
       {
         "sk": "o druhej",
