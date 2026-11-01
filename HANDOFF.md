@@ -150,6 +150,16 @@ From "Slovak website notes 4" (section numbers as she wrote them; from 75 on, ev
 
 New Slovak text needs recordings: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
 
+### Her three bigger suggestions (built November 2026, for her to review)
+
+- **Cases**: a new **What Are Cases?** section opens A1.2 (section 61): what a case is, the six cases with their question words (*Kto? Čo?*, *Koho? Čoho?*…), the prepositions that bring each one, and *mama / škola / brat* through all six. Numbered the Slovak school way, **1, 2, 3, 4, 6, 7** (the old 5th, the vocative, left out), to match the Six Cases reference. From there on, the A1.2 sections that use a case say which one in a **"Which case?"** line: prices and degrees (*päť eur* — genitive plural), dates (*v pondelok* — accusative, *v máji* — locative, *prvého mája* — genitive), where from (*z Ameriky* — genitive), objects and likes (accusative), *Kde? / Kam?* (locative / genitive / accusative with *na*, and *autobusom* — instrumental).
+- **More kinds of question** in each word section's quiz, next to the two multiple-choice directions:
+  - **Write it in Slovak** — about a quarter of the questions, only for short words and phrases. There are buttons for *á ä č ď é í ĺ ľ ň ó ô ŕ š ť ú ý ž*. Capitals and punctuation don't matter; either half of a slash entry counts. Right apart from the accents counts as right, with "Almost — watch the accents" and the correct spelling. A wrong answer shows the spelling and waits on Next.
+  - **Which letter is missing?** — a word plays with one of its trickier letters blanked (*spál_a* → ň), with similar letters as the choices (never ones that sound identical). One or two per quiz, for single words that have such a letter.
+- **"Use it" sections** after the room and clothes words (sections 100 and 103), with their own blue tag: *Use It: At Home* (*Mám malý byt. V obývačke pozerám televíziu. Nemám televízor.*, and the *v kuchyni / do kuchyne* pairs) and *Use It: What I'm Wearing* (*Mám na sebe…, Nosím čiapku…*). Sentences use only words and grammar taught by then. They're left out of the Grammar Guide (they're practice, not rules) but appear in the AI quiz topics.
+
+Section numbers from 61 on moved again (the cases section, then two Use it sections).
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.

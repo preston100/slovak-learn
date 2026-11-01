@@ -844,12 +844,14 @@
         html: function () { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); },
       };
     }
+    // "Use it" sections are sentence practice, not rules to look up, so
+    // they're left out.
     orderedIds
       .map(function (id) { return grammarData.find(function (t) { return t.id === id; }); })
-      .filter(Boolean)
+      .filter(function (t) { return t && !t.use; })
       .forEach(function (t) { entries.push(grammarEntry(t, 'Grammar — ' + levelOf[t.id])); });
     grammarData
-      .filter(function (t) { return orderedIds.indexOf(t.id) === -1; })
+      .filter(function (t) { return orderedIds.indexOf(t.id) === -1 && !t.use; })
       .forEach(function (t) { entries.push(grammarEntry(t, 'More')); });
     return entries;
   }
@@ -2288,6 +2290,9 @@
           tables: t.tables || [],
           exercises: t.exercises || [],
           items: t.examples || [],
+          // "Use it" sections put a block of new words into sentences with
+          // grammar already taught; they run like grammar sections.
+          useIt: !!t.use,
         });
         return;
       }
@@ -2753,10 +2758,10 @@
             (i === nextIdx ? '<span class="round-up-next-tag">Up next</span>' : '') +
             '<div class="round-label">' +
             (section.kind === 'grammar' || section.kind === 'dialogue' || section.kind === 'alphabet'
-              ? '<span class="round-kind kind-' + section.kind + '">' + kindLabel(section) + '</span>'
+              ? '<span class="round-kind kind-' + (section.useIt ? 'use' : section.kind) + '">' + kindLabel(section) + '</span>'
               : '') +
-            // The tag already says "Dialogue", so the title doesn't repeat it.
-            escapeHtml(section.title.replace(/^Dialogue:\s*/, '')) + '</div>' +
+            // The tag already says "Dialogue" / "Use it", so the title doesn't repeat it.
+            escapeHtml(section.title.replace(/^(Dialogue|Use It):\s*/, '')) + '</div>' +
             '</div>' +
             '</div>' +
             '</div>'
@@ -2836,6 +2841,10 @@
     // on, without taking it out of the score it already counts towards.
     if (exerciseAnswered && document.getElementById('exercise-next-btn') && (usesExercises || inFinalTestGrammar)) {
       nextExercise();
+      return;
+    }
+    if (quizAnswered && document.getElementById('quiz-next-btn')) {
+      nextQuizQuestion();
       return;
     }
 
@@ -2927,6 +2936,7 @@
   function kindLabel(section) {
     if (section.isFinalTest) return 'Final Test';
     if (section.kind === 'alphabet') return 'Alphabet';
+    if (section.useIt) return 'Use it';
     if (section.kind === 'grammar') return 'Grammar';
     if (section.kind === 'dialogue') return 'Dialogue';
     if (section.kind === 'checkpoint') return 'Checkpoint';
@@ -3039,6 +3049,30 @@
 
   /* ---- Exercises (alphabet + grammar): multiple choice, auto-graded ---- */
 
+  // Letters that sound the same, so "which do you hear?" can't tell them
+  // apart: i/y and í/ý are identical in speech, and most speakers say ä
+  // like e and ľ like l.
+  const SOUNDS_ALIKE = [['i', 'y'], ['í', 'ý'], ['ä', 'e'], ['ľ', 'l']];
+  function soundsAlike(a, b) {
+    return SOUNDS_ALIKE.some(function (p) { return p.indexOf(a) !== -1 && p.indexOf(b) !== -1; });
+  }
+  function baseLetter(x) {
+    return x.normalize('NFD').replace(/[̀-ͯ]/g, '').charAt(0);
+  }
+
+  // Options for "which letter do you hear?": the right letter, then the
+  // ones easiest to mix up with it — the same base letter (c, č) or the same
+  // alphabet unit — minus any that sound identical, topped up at random.
+  function heardLetterOptions(letter, groupLetters) {
+    const all = [];
+    alphabetData.forEach(function (u) { (u.letters || []).forEach(function (l) { all.push(l.letter.toLowerCase()); }); });
+    const usable = all.filter(function (x) { return x !== letter && !soundsAlike(x, letter); });
+    const close = usable.filter(function (x) { return baseLetter(x) === baseLetter(letter) || groupLetters.indexOf(x) !== -1; });
+    const picked = shuffleArray(close).slice(0, 3);
+    const rest = shuffleArray(usable.filter(function (x) { return picked.indexOf(x) === -1; }));
+    return [letter].concat(picked, rest.slice(0, 3 - picked.length));
+  }
+
   // Alphabet drills are generated from the letter data rather than authored,
   // so they stay correct automatically if letters change. Two directions:
   // sound -> letter, and letter -> sound.
@@ -3049,17 +3083,6 @@
     function distractors(pool, correct, n) {
       const others = shuffleArray(pool.filter(function (v) { return v !== correct; }));
       return others.slice(0, n);
-    }
-
-    // Letters that sound the same, so "which do you hear?" can't tell them
-    // apart: i/y and í/ý are identical in speech, and most speakers say ä
-    // like e and ľ like l.
-    const SOUNDS_ALIKE = [['i', 'y'], ['í', 'ý'], ['ä', 'e'], ['ľ', 'l']];
-    function soundsAlike(a, b) {
-      return SOUNDS_ALIKE.some(function (p) { return p.indexOf(a) !== -1 && p.indexOf(b) !== -1; });
-    }
-    function baseLetter(x) {
-      return x.normalize('NFD').replace(/[̀-ͯ]/g, '').charAt(0);
     }
 
     const exercises = [];
@@ -3089,19 +3112,10 @@
       const word = l.example.sk;
       const lower = l.letter.toLowerCase();
       if (word.toLowerCase().indexOf(lower) !== -1) {
-        const letters = allLetters.map(function (x) { return x.letter.toLowerCase(); });
-        const usable = letters.filter(function (x) { return x !== lower && !soundsAlike(x, lower); });
-        const close = usable.filter(function (x) {
-          return baseLetter(x) === baseLetter(lower) ||
-            section.letters.some(function (s) { return s.letter.toLowerCase() === x; });
-        });
-        const picked = shuffleArray(close).slice(0, 3);
-        const rest = usable.filter(function (x) { return picked.indexOf(x) === -1; });
-        const options = [lower].concat(picked, distractors(rest, lower, 3 - picked.length));
         exercises.push({
           prompt: word.split(new RegExp(lower, 'gi')).join('_'),
           question: 'Which letter do you hear?',
-          options: options,
+          options: heardLetterOptions(lower, section.letters.map(function (s) { return s.letter.toLowerCase(); })),
           answer: lower,
           explain: explain,
           audio: word,
@@ -3774,15 +3788,105 @@
   let quizQueue = [];
   let quizIndex = 0;
   let quizAnswered = false;
-  // Per question: true = English → Slovak (say it), false = Slovak → English
-  // (recognise it). Recognising a word is much easier than producing it, so
-  // about half the questions go each way.
-  let quizReverse = [];
+  // How each question is asked:
+  //   'sk-en'  — Slovak shown, pick the English (recognise it)
+  //   'en-sk'  — English shown, pick the Slovak (produce it)
+  //   'type'   — English shown, write the Slovak
+  //   'letter' — hear a word with one letter blanked out, pick the letter
+  // Recognising a word is much easier than producing it, so the choice
+  // questions go about half each way.
+  let quizModes = [];
 
   function mixedDirections(n) {
-    const flags = [];
-    for (let i = 0; i < n; i++) flags.push(i < Math.floor(n / 2));
-    return shuffleArray(flags);
+    const modes = [];
+    for (let i = 0; i < n; i++) modes.push(i < Math.floor(n / 2) ? 'en-sk' : 'sk-en');
+    return shuffleArray(modes);
+  }
+
+  // A section quiz mixes in the other two kinds: about a quarter of the
+  // words to write (the short ones — nobody should type a whole sentence),
+  // and a missing-letter question or two for words with a letter worth
+  // listening for (č, ô, dž…). The rest are choice questions.
+  function assignQuizModes(words) {
+    const n = words.length;
+    const modes = mixedDirections(n);
+    const order = shuffleArray(words.map(function (w, i) { return i; }));
+    let letters = Math.min(2, Math.floor(n / 4));
+    let typed = Math.round(n / 4);
+    order.forEach(function (i) {
+      if (letters > 0 && missingLetterQuestion(words[i])) {
+        modes[i] = 'letter';
+        letters--;
+      } else if (typed > 0 && typedAnswers(words[i]).length) {
+        modes[i] = 'type';
+        typed--;
+      }
+    });
+    return modes;
+  }
+
+  // What counts as writing a word correctly: any of its alternatives
+  // ("čau / maj sa"), without bracketed extras ("zoo (zoologická záhrada)"),
+  // ignoring capitals and punctuation. Only short answers can be written —
+  // an empty list means "don't ask for this one".
+  function typedAnswers(word) {
+    const answers = String(word.sk)
+      .split(/\s*\/\/?\s*/)
+      .map(function (a) { return a.replace(/\([^)]*\)/g, '').trim(); })
+      .filter(Boolean);
+    const short = answers.every(function (a) { return a.length <= 22 && a.split(/\s+/).length <= 3; });
+    return short ? answers : [];
+  }
+
+  function typedKey(text) {
+    return String(text).toLowerCase().replace(/[.,!?¿;:"„“'’…-]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function withoutAccents(text) {
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  // 'right', 'accents' (right apart from the accents — counted as right, with
+  // the spelling shown), or 'wrong'.
+  function markTyped(input, word) {
+    const said = typedKey(input);
+    const answers = typedAnswers(word).map(typedKey);
+    if (!said) return 'wrong';
+    if (answers.indexOf(said) !== -1) return 'right';
+    if (answers.some(function (a) { return withoutAccents(a) === withoutAccents(said); })) return 'accents';
+    return 'wrong';
+  }
+
+  // Splits a word into letters the way the alphabet counts them, so "ch",
+  // "dz" and "dž" are one letter each.
+  function letterTokens(word) {
+    return String(word).match(/ch|dž|dz|[\s\S]/gi) || [];
+  }
+
+  const LETTERS_WORTH_HEARING = ['á', 'ä', 'č', 'ď', 'dz', 'dž', 'é', 'ch', 'í', 'ĺ', 'ľ', 'ň', 'ó', 'ô', 'ŕ', 'š', 'ť', 'ú', 'ý', 'ž'];
+
+  // A missing-letter question for a single word: one of its letters worth
+  // listening for is blanked out everywhere it appears. null if the word
+  // has none (or is a phrase).
+  function missingLetterQuestion(word) {
+    const sk = String(word.sk);
+    if (/[\s\/()]/.test(sk)) return null;
+    const tokens = letterTokens(sk);
+    const found = [];
+    tokens.forEach(function (t) {
+      const lower = t.toLowerCase();
+      if (LETTERS_WORTH_HEARING.indexOf(lower) !== -1 && found.indexOf(lower) === -1) found.push(lower);
+    });
+    if (!found.length) return null;
+    const letter = found[Math.floor(Math.random() * found.length)];
+    const unit = alphabetData.find(function (u) {
+      return (u.letters || []).some(function (l) { return l.letter.toLowerCase() === letter; });
+    });
+    return {
+      letter: letter,
+      blanked: tokens.map(function (t) { return t.toLowerCase() === letter ? '_' : t; }).join(''),
+      options: shuffleArray(heardLetterOptions(letter, unit ? unit.letters.map(function (l) { return l.letter.toLowerCase(); }) : [])),
+    };
   }
 
   // Up to n wrong answers for a word question: never the right answer, never
@@ -3826,7 +3930,7 @@
       const fresh = shuffleArray(section.items.filter(function (w) { return !mastered[w.sk]; }));
       const known = shuffleArray(section.items.filter(function (w) { return mastered[w.sk]; }));
       quizQueue = shuffleArray(fresh.concat(known).slice(0, isFinal ? FINAL_TEST_WORD_QUESTIONS : CHECKPOINT_MAX_QUESTIONS));
-      quizReverse = mixedDirections(quizQueue.length);
+      quizModes = mixedDirections(quizQueue.length);
       exerciseQueue = isFinal
         ? shuffleArray(
             (section.grammarPools || []).map(function (pool) { return shuffleArray(pool.slice())[0]; })
@@ -3861,7 +3965,7 @@
     // months section), and keeping the taught order let sequences like
     // numbers or days be answered by counting.
     quizQueue = shuffleArray(section.items.slice());
-    quizReverse = mixedDirections(quizQueue.length);
+    quizModes = assignQuizModes(quizQueue);
     quizIndex = 0;
     lessonQuizCorrect = 0;
     lessonQuizTotal = quizQueue.length;
@@ -3893,12 +3997,42 @@
     // tracks its own progress through the questions instead.
     if (isCheckpoint) updateLessonChrome(kindLabel(section), 4 * (quizIndex / Math.max(1, testLength)));
 
-    const reverse = !!quizReverse[quizIndex];
+    const mode = quizModes[quizIndex] || 'sk-en';
+    const eyebrow = '<div class="lesson-eyebrow">' + (isCheckpoint ? kindLabel(section) : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + testLength + '</div>';
+    if (mode === 'type') {
+      renderTypedQuestion(correct, eyebrow);
+      return;
+    }
+    const letterQ = mode === 'letter' ? missingLetterQuestion(correct) : null;
+    if (letterQ) {
+      body.innerHTML =
+        '<div class="lesson-stage">' +
+        eyebrow +
+        '<div class="exercise-audio">' + speakerButtonHtml(correct.sk) + '</div>' +
+        '<h2 class="lesson-heading">' + escapeHtml(letterQ.blanked) + '</h2>' +
+        '<p class="lesson-sub">Which letter is missing? Listen to the word.</p>' +
+        '<div class="quiz-choice-list">' +
+        letterQ.options
+          .map(function (opt) {
+            return '<button type="button" class="quiz-choice-btn" data-correct="' + (opt === letterQ.letter) + '">' + escapeHtml(opt) + '</button>';
+          })
+          .join('') +
+        '</div>' +
+        '</div>';
+      body.scrollTop = 0;
+      speak(correct.sk);
+      body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { gradeQuizChoice(btn); });
+      });
+      return;
+    }
+
+    const reverse = mode === 'en-sk';
     const options = shuffleArray([correct].concat(quizDistractors(correct, section.items, 3)));
 
     body.innerHTML =
       '<div class="lesson-stage">' +
-      '<div class="lesson-eyebrow">' + (isCheckpoint ? kindLabel(section) : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + testLength + '</div>' +
+      eyebrow +
       (reverse
         ? '<h2 class="lesson-heading">' + escapeHtml(correct.en) + '</h2>' +
           '<p class="lesson-sub">How do you say this in Slovak?</p>'
@@ -3938,13 +4072,23 @@
       else if (b === btn) b.classList.add('incorrect');
     });
 
+    recordQuizAnswer(isCorrect);
+    setTimeout(nextQuizQuestion, 700);
+  }
+
+  function nextQuizQuestion() {
+    quizIndex++;
+    renderQuizStep();
+  }
+
+  // Every quiz answer counts towards the word's record: a miss sends it to
+  // Revise, a right answer can master it (see recordWordResult). A right
+  // answer on a checkpoint or final test masters the word straight away —
+  // those come sections after the word was taught.
+  function recordQuizAnswer(isCorrect) {
     if (isCorrect) lessonQuizCorrect++;
     playTone(isCorrect ? 'correct' : 'incorrect');
 
-    // Every quiz answer counts towards the word's record: a miss sends it to
-    // Revise, a right answer can master it (see recordWordResult). A right
-    // answer on a checkpoint or final test masters the word straight away —
-    // those come sections after the word was taught.
     const section = roadmapSections[lessonSectionIndex];
     const word = quizQueue[quizIndex];
     if (section && word && word.sk) {
@@ -3953,11 +4097,79 @@
       if (section.kind === 'checkpoint' && isCorrect) markWordMastered(word.sk);
       if (section.kind === 'checkpoint' && isCorrect && !wasMastered) checkpointMastered++;
     }
+  }
 
-    setTimeout(function () {
-      quizIndex++;
-      renderQuizStep();
-    }, 700);
+  // Slovak letters a phone keyboard may not have to hand.
+  const ACCENT_KEYS = ['á', 'ä', 'č', 'ď', 'é', 'í', 'ĺ', 'ľ', 'ň', 'ó', 'ô', 'ŕ', 'š', 'ť', 'ú', 'ý', 'ž'];
+
+  // "Write it": the English is shown and the Slovak is typed. Right apart
+  // from the accents still counts, with the correct spelling shown. A wrong
+  // or nearly-right answer waits on Next, so the spelling can be read.
+  function renderTypedQuestion(word, eyebrowHtml) {
+    const body = document.getElementById('lesson-body');
+    body.innerHTML =
+      '<div class="lesson-stage">' +
+      eyebrowHtml +
+      '<h2 class="lesson-heading">' + escapeHtml(word.en) + '</h2>' +
+      '<p class="lesson-sub">Write it in Slovak.</p>' +
+      '<form class="type-answer" id="type-answer-form" autocomplete="off">' +
+      '<input type="text" id="type-answer-input" class="type-answer-input" lang="sk" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Your answer in Slovak" />' +
+      '<div class="accent-keys" aria-label="Slovak letters">' +
+      ACCENT_KEYS.map(function (k) { return '<button type="button" class="accent-key" data-key="' + k + '">' + k + '</button>'; }).join('') +
+      '</div>' +
+      '<button type="submit" class="btn btn-primary" id="type-answer-check">Check</button>' +
+      '</form>' +
+      '<div class="type-feedback" id="type-feedback"></div>' +
+      '</div>';
+    body.scrollTop = 0;
+
+    const form = document.getElementById('type-answer-form');
+    const input = document.getElementById('type-answer-input');
+    input.focus({ preventScroll: true });
+
+    // Accent buttons type into the box where the cursor is, and keep the
+    // box focused (so a phone's keyboard stays up).
+    form.querySelectorAll('.accent-key').forEach(function (key) {
+      key.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      key.addEventListener('click', function () {
+        const start = input.selectionStart == null ? input.value.length : input.selectionStart;
+        const end = input.selectionEnd == null ? start : input.selectionEnd;
+        input.value = input.value.slice(0, start) + key.dataset.key + input.value.slice(end);
+        input.setSelectionRange(start + 1, start + 1);
+        input.focus({ preventScroll: true });
+      });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (quizAnswered || !input.value.trim()) return;
+      quizAnswered = true;
+
+      const result = markTyped(input.value, word);
+      const isCorrect = result !== 'wrong';
+      input.disabled = true;
+      form.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+      document.getElementById('type-answer-check').classList.add('hidden');
+      form.classList.add(isCorrect ? 'correct' : 'incorrect');
+      recordQuizAnswer(isCorrect);
+
+      const feedback = document.getElementById('type-feedback');
+      const spelling = speakerButtonHtml(word.sk) + '<strong>' + escapeHtml(word.sk) + '</strong>';
+      if (result === 'right') {
+        feedback.innerHTML = '<div class="type-result correct">Correct!</div>';
+        setTimeout(nextQuizQuestion, 900);
+        return;
+      }
+      feedback.innerHTML =
+        (result === 'accents'
+          ? '<div class="type-result correct">Almost — watch the accents:</div>'
+          : '<div class="type-result incorrect">The answer is:</div>') +
+        '<div class="type-spelling">' + spelling + '</div>' +
+        '<button type="button" class="btn btn-primary exercise-next-btn" id="quiz-next-btn">Next</button>';
+      const next = document.getElementById('quiz-next-btn');
+      next.addEventListener('click', nextQuizQuestion);
+      next.focus({ preventScroll: true });
+    });
   }
 
   function renderFinishPhase() {

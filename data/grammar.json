@@ -625,7 +625,7 @@
   {
     "id": "cases-overview",
     "topic": "The Six Cases",
-    "summary": "Reference only — not part of the lessons. Slovak changes noun endings depending on their role in the sentence.",
+    "summary": "The full reference. The lessons introduce cases at the start of A1.2 (What Are Cases?).",
     "explanation": "Slovak changes the **ending** of a noun depending on its **role** in the sentence. Traditionally there are seven cases; the 5th (vocative, for calling someone) is rarely used today, which is why the numbering skips from 4 to 6.\n\nMany prepositions **always** take the same case — that's the easiest way in.",
     "examples": [
       {
@@ -2825,7 +2825,7 @@
     "id": "prices-age",
     "topic": "Prices & Age",
     "summary": "Koľko to stojí? Koľko máš rokov? — jedno euro, dve eurá, päť eur.",
-    "explanation": "**Koľko to stojí?** — How much is it?\n**Koľko máš rokov?** — How old are you? (*Koľko máte rokov?* to someone you'd say *vy* to.)\n\nPrices and ages follow the same **1 / 2–4 / 5+** pattern as *hodina*:\n- **1** → *jedno euro*, *jeden rok*\n- **2, 3, 4** → *dve eurá*, *dva roky*\n- **5 and up** → *päť eur*, *päť rokov*\n\nNumbers built from two parts, like 21 or 32, take the **5+** form: *dvadsaťjeden eur*, *tridsaťdva rokov*.\n\nIn Slovak you **have** your age: *Mám dvadsaťpäť rokov.* — I'm 25 (literally: I have 25 years).",
+    "explanation": "**Koľko to stojí?** — How much is it?\n**Koľko máš rokov?** — How old are you? (*Koľko máte rokov?* to someone you'd say *vy* to.)\n\nPrices and ages follow the same **1 / 2–4 / 5+** pattern as *hodina*:\n- **1** → *jedno euro*, *jeden rok*\n- **2, 3, 4** → *dve eurá*, *dva roky*\n- **5 and up** → *päť eur*, *päť rokov*\n\nNumbers built from two parts, like 21 or 32, take the **5+** form: *dvadsaťjeden eur*, *tridsaťdva rokov*.\n\nIn Slovak you **have** your age: *Mám dvadsaťpäť rokov.* — I'm 25 (literally: I have 25 years).\n\n**Which case?** After 5 and up, the noun is in the **genitive** (2nd case) plural: *päť eur, päť rokov*.",
     "tables": [
       {
         "title": "1 / 2–4 / 5+",
@@ -2976,7 +2976,7 @@
     "id": "days-dates",
     "topic": "Days, Months & Dates",
     "summary": "On Monday (v pondelok), in May (v máji), in summer (v lete) — and how to say the date.",
-    "explanation": "Days, months and seasons are written with a **small letter**: *pondelok, január, leto*.\n\n**On** a day → **v** + day: *v pondelok, v piatok*. The three days ending in **-a** change to **-u**: *v stredu, v sobotu, v nedeľu*. Before *š* it's **vo**: *vo štvrtok*.\n\n**In** a month → **v** + month, which takes a new ending: *v januári, v máji, v auguste* (and *vo februári*).\n\n**Seasons:** *na jar, v lete, na jeseň, v zime*.\n\n**Koľkého je dnes?** — What's the date today? Dates use the *of* form of the month: *prvého mája* (the 1st of May).\n\nLearn these as **set phrases** — the grammar behind them comes later.",
+    "explanation": "Days, months and seasons are written with a **small letter**: *pondelok, január, leto*.\n\n**On** a day → **v** + day: *v pondelok, v piatok*. The three days ending in **-a** change to **-u**: *v stredu, v sobotu, v nedeľu*. Before *š* it's **vo**: *vo štvrtok*.\n\n**In** a month → **v** + month, which takes a new ending: *v januári, v máji, v auguste* (and *vo februári*).\n\n**Seasons:** *na jar, v lete, na jeseň, v zime*.\n\n**Koľkého je dnes?** — What's the date today? Dates use the *of* form of the month: *prvého mája* (the 1st of May).\n\nLearn these as **set phrases**.\n\n**Which case?** *v pondelok, v stredu* — **v** + a day takes the **accusative** (4th case). *v januári, v lete* — **v** + a month or season takes the **locative** (6th case). Dates like *prvého mája* are in the **genitive** (2nd case).",
     "tables": [
       {
         "title": "On which day?",
@@ -3666,7 +3666,7 @@
     "id": "where-from",
     "topic": "Where Are You From? What Do You Do?",
     "summary": "Som zo Slovenska. Hovorím po anglicky. Som učiteľka.",
-    "explanation": "**Odkiaľ si? / Odkiaľ ste?** — Where are you from?\n*Som z Ameriky. Som zo Slovenska.* After **z** (from), the country takes a new ending — learn the one you need as a set phrase. Before *s* or *z*, **z** becomes **zo**.\n\n**Languages:** *Hovorím po slovensky / po anglicky / po nemecky.* After **po**, the language ends in **-y**.\n\n**Jobs and nationalities** have a **man's** and a **woman's** form: *učiteľ / učiteľka*, *Slovák / Slovenka*. There's **no word for \"a\"**: *Som učiteľka.* = I'm **a** teacher.\n\n**Čím si? / Čím ste?** — What's your job? **Kde pracuješ?** — Where do you work?",
+    "explanation": "**Odkiaľ si? / Odkiaľ ste?** — Where are you from?\n*Som z Ameriky. Som zo Slovenska.* After **z** (from), the country takes a new ending — learn the one you need as a set phrase. Before *s* or *z*, **z** becomes **zo**.\n\n**Languages:** *Hovorím po slovensky / po anglicky / po nemecky.* After **po**, the language ends in **-y**.\n\n**Jobs and nationalities** have a **man's** and a **woman's** form: *učiteľ / učiteľka*, *Slovák / Slovenka*. There's **no word for \"a\"**: *Som učiteľka.* = I'm **a** teacher.\n\n**Čím si? / Čím ste?** — What's your job? **Kde pracuješ?** — Where do you work?\n\n**Which case?** After **z / zo** (from), the country is in the **genitive** (2nd case): *z Ameriky, zo Slovenska*.",
     "tables": [
       {
         "title": "Where are you from?",
@@ -3889,7 +3889,7 @@
     "id": "objects",
     "topic": "What You Want, Have or Buy (Objects)",
     "summary": "Chcem kávu: a feminine -a noun becomes -u when it is the thing you want, have or buy.",
-    "explanation": "When a noun is the **thing you want, have, buy or eat** (the object), its ending can change:\n- **feminine -a → -u**: *káva → Chcem kávu.*\n- **masculine things and neuter → no change**: *Chcem čaj. Pijem pivo.*\n- **masculine people and animals → -a**: *brat → Mám brata.*, *pes → Mám psa.*\n\nAn adjective in front of a feminine noun changes too, **-á → -ú**: *čierna káva → Chcem čiernu kávu.*\n\nYou already know this from **Dobrú chuť!** — and **Dám si…** (I'll have…) is the usual way to order: *Dám si kávu.*",
+    "explanation": "When a noun is the **thing you want, have, buy or eat** (the object), its ending can change:\n- **feminine -a → -u**: *káva → Chcem kávu.*\n- **masculine things and neuter → no change**: *Chcem čaj. Pijem pivo.*\n- **masculine people and animals → -a**: *brat → Mám brata.*, *pes → Mám psa.*\n\nAn adjective in front of a feminine noun changes too, **-á → -ú**: *čierna káva → Chcem čiernu kávu.*\n\nYou already know this from **Dobrú chuť!** — and **Dám si…** (I'll have…) is the usual way to order: *Dám si kávu.*\n\n**Which case?** The thing you want, have or buy is the **object**, which is the **accusative** (4th case).",
     "tables": [
       {
         "head": [
@@ -4064,7 +4064,7 @@
     "id": "likes",
     "topic": "Saying What You Like: mám rád / rada",
     "summary": "Mám rád kávu (a man), mám rada kávu (a woman) — and rád čítam, I like reading.",
-    "explanation": "**Mám rád** (a man) / **Mám rada** (a woman) + a thing = **I like** it: *Mám rád kávu. Mám rada čaj.* The thing is an **object**, so it takes the object ending (*kávu*).\n\n**Rád / rada + a verb** = I like **doing** it: *Rád čítam.* (I like reading.) *Rada plávam.*\n\nFor **we / you / they**, use **radi**: *Máme radi pizzu.* (A group of only women says *rady*.)\n\nDon't like it? **Nemám rád / rada…**: *Nemám rada pivo.*\n\nYou also know **Páči sa mi…** — mostly for something you see or try: *Páči sa mi tvoje auto.*",
+    "explanation": "**Mám rád** (a man) / **Mám rada** (a woman) + a thing = **I like** it: *Mám rád kávu. Mám rada čaj.* The thing is an **object**, so it takes the object ending (*kávu*).\n\n**Rád / rada + a verb** = I like **doing** it: *Rád čítam.* (I like reading.) *Rada plávam.*\n\nFor **we / you / they**, use **radi**: *Máme radi pizzu.* (A group of only women says *rady*.)\n\nDon't like it? **Nemám rád / rada…**: *Nemám rada pivo.*\n\nYou also know **Páči sa mi…** — mostly for something you see or try: *Páči sa mi tvoje auto.*\n\n**Which case?** What you like is the object, so it takes the **accusative** (4th case): *Mám rád kávu.*",
     "tables": [
       {
         "head": [
@@ -4214,7 +4214,7 @@
     "id": "kde-kam",
     "topic": "Kde? and Kam? (v škole / do školy)",
     "summary": "Kde? asks where something is (v škole); Kam? asks where it is going (do školy).",
-    "explanation": "Slovak has two questions for *where*: **Kde?** (where something **is**) and **Kam?** (where something is **going**) — you met them in Question Words.\n\n**Kde? → v + place**, with a new ending: *Som v škole.*\n**Kam? → do + place**, with a different ending: *Idem do školy.*\n\nSome places use **na** instead — mostly services and open places: *na pošte → na poštu*, *na stanici → na stanicu*.\n\n**Home** is special: *Som doma.* (at home) — *Idem domov.* (going home)\n\n**How?** By bus, train or car: *autobusom, vlakom, autom* — or *pešo* (on foot).\n\nDon't work the endings out yet — learn each place as a **pair**: *v škole / do školy*.",
+    "explanation": "Slovak has two questions for *where*: **Kde?** (where something **is**) and **Kam?** (where something is **going**) — you met them in Question Words.\n\n**Kde? → v + place**, with a new ending: *Som v škole.*\n**Kam? → do + place**, with a different ending: *Idem do školy.*\n\nSome places use **na** instead — mostly services and open places: *na pošte → na poštu*, *na stanici → na stanicu*.\n\n**Home** is special: *Som doma.* (at home) — *Idem domov.* (going home)\n\n**How?** By bus, train or car: *autobusom, vlakom, autom* — or *pešo* (on foot).\n\nDon't work the endings out yet — learn each place as a **pair**: *v škole / do školy*.\n\n**Which case?** *v škole* (Kde?) is the **locative** (6th case). *do školy* (Kam?) is the **genitive** (2nd case); with **na**, Kam? takes the **accusative** (4th case): *na poštu*. *autobusom, vlakom* (how?) are the **instrumental** (7th case).",
     "tables": [
       {
         "head": [
@@ -4818,7 +4818,7 @@
     "id": "weather",
     "topic": "Talking About the Weather",
     "summary": "Prší. Je teplo. Je dvadsať stupňov. — no word for \"it\" needed.",
-    "explanation": "Weather sentences have **no word for \"it\"** — the verb is enough: *Prší.* (It's raining.) *Sneží.* (It's snowing.)\n\n**Je + a describing word** says how it feels outside: *Je teplo. Je zima. Je pekne.*\n\n**Aké je počasie?** — What's the weather like?\n\n**Degrees** follow the **1 / 2–4 / 5+** pattern again: *jeden stupeň, dva stupne, päť stupňov*.\n\nNotice: **zima** means both **winter** and **cold**: *V zime je zima.* — In winter it's cold.",
+    "explanation": "Weather sentences have **no word for \"it\"** — the verb is enough: *Prší.* (It's raining.) *Sneží.* (It's snowing.)\n\n**Je + a describing word** says how it feels outside: *Je teplo. Je zima. Je pekne.*\n\n**Aké je počasie?** — What's the weather like?\n\n**Degrees** follow the **1 / 2–4 / 5+** pattern again: *jeden stupeň, dva stupne, päť stupňov*.\n\nNotice: **zima** means both **winter** and **cold**: *V zime je zima.* — In winter it's cold.\n\n**Which case?** *päť stupňov* — after 5 and up, the **genitive** (2nd case) plural, as with prices.",
     "tables": [
       {
         "title": "What's it doing?",
@@ -5422,6 +5422,553 @@
         ],
         "answer": "budem robiť",
         "explain": "Budem + the dictionary form."
+      }
+    ]
+  },
+  {
+    "id": "cases-intro",
+    "topic": "What Are Cases?",
+    "summary": "Why endings change (kartou, do školy, v škole): six cases, each with its own question words.",
+    "explanation": "You've already seen Slovak words change their endings: *Platím **kartou**. Idem do **obchodu**. Som v **škole**.* That's because of **cases**: a noun's ending shows its **job** in the sentence — the subject, the thing you want, where you are, who you're with…\n\nSlovak has **six cases**. Each one has its own **question words**, which help you work out which case you need. They're numbered the way Slovak schools number them: the old 5th case (for calling someone) is left out, so they go **1, 2, 3, 4, 6, 7**.\n\nYou **don't** need to learn every ending now. The easiest way in:\n- the little words in front (**prepositions**) always ask for the same case: *do* → 2nd, *v* (where?) → 6th, *s* → 7th…\n- learn new words in **pairs and phrases**: *v škole / do školy*, *s mamou*.\n\nFrom here on, the sections tell you which case you're looking at.",
+    "tables": [
+      {
+        "title": "The six cases",
+        "head": [
+          "Case",
+          "Questions",
+          "Comes after",
+          "Example"
+        ],
+        "rows": [
+          [
+            "1. nominative",
+            "Kto? Čo?",
+            "— the subject (the dictionary form)",
+            "To je **mama**."
+          ],
+          [
+            "2. genitive",
+            "Koho? Čoho?",
+            "z, do, od, bez, u",
+            "Darček od **mamy**."
+          ],
+          [
+            "3. dative",
+            "Komu? Čomu?",
+            "k / ku",
+            "Idem k **mame**."
+          ],
+          [
+            "4. accusative",
+            "Koho? Čo?",
+            "the object: what you want, have, see",
+            "Volám **mamu**."
+          ],
+          [
+            "6. locative",
+            "O kom? O čom?",
+            "v, na, o (where? about?)",
+            "Hovorím o **mame**."
+          ],
+          [
+            "7. instrumental",
+            "S kým? S čím?",
+            "s / so; by (bus, card)",
+            "Idem s **mamou**."
+          ]
+        ]
+      },
+      {
+        "title": "One word, six forms",
+        "head": [
+          "Case",
+          "mama (Mum)",
+          "škola (school)",
+          "brat (brother)"
+        ],
+        "rows": [
+          [
+            "1. Kto? Čo?",
+            "mam**a**",
+            "škol**a**",
+            "brat"
+          ],
+          [
+            "2. Koho? Čoho?",
+            "mam**y**",
+            "škol**y**",
+            "brat**a**"
+          ],
+          [
+            "3. Komu? Čomu?",
+            "mam**e**",
+            "škol**e**",
+            "brat**ovi**"
+          ],
+          [
+            "4. Koho? Čo?",
+            "mam**u**",
+            "škol**u**",
+            "brat**a**"
+          ],
+          [
+            "6. O kom? O čom?",
+            "mam**e**",
+            "škol**e**",
+            "brat**ovi**"
+          ],
+          [
+            "7. S kým? S čím?",
+            "mam**ou**",
+            "škol**ou**",
+            "brat**om**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "To je mama.",
+        "en": "That's Mum."
+      },
+      {
+        "sk": "Darček od mamy.",
+        "en": "A present from Mum."
+      },
+      {
+        "sk": "Idem k mame.",
+        "en": "I'm going to Mum's."
+      },
+      {
+        "sk": "Volám mamu.",
+        "en": "I'm calling Mum."
+      },
+      {
+        "sk": "Hovorím o mame.",
+        "en": "I'm talking about Mum."
+      },
+      {
+        "sk": "Idem s mamou.",
+        "en": "I'm going with Mum."
+      },
+      {
+        "sk": "Idem do školy.",
+        "en": "I'm going to school."
+      },
+      {
+        "sk": "Som v škole.",
+        "en": "I'm at school."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Idem s ___. (mama)",
+        "question": "I'm going with Mum.",
+        "options": [
+          "mamou",
+          "mamu",
+          "mame"
+        ],
+        "answer": "mamou",
+        "explain": "s (with) takes the 7th case, the instrumental: s mamou."
+      },
+      {
+        "prompt": "Idem do ___. (škola)",
+        "question": "I'm going to school.",
+        "options": [
+          "školy",
+          "škole",
+          "školu"
+        ],
+        "answer": "školy",
+        "explain": "do takes the 2nd case, the genitive: do školy."
+      },
+      {
+        "prompt": "Som v ___. (škola)",
+        "question": "I'm at school.",
+        "options": [
+          "škole",
+          "školy",
+          "školou"
+        ],
+        "answer": "škole",
+        "explain": "v (where?) takes the 6th case, the locative: v škole."
+      },
+      {
+        "prompt": "Volám ___. (mama)",
+        "question": "I'm calling Mum.",
+        "options": [
+          "mamu",
+          "mama",
+          "mamou"
+        ],
+        "answer": "mamu",
+        "explain": "Mum is the object of volám, so the 4th case, the accusative: mamu."
+      },
+      {
+        "prompt": "To je ___. (mama)",
+        "question": "That's Mum.",
+        "options": [
+          "mama",
+          "mamu",
+          "mamy"
+        ],
+        "answer": "mama",
+        "explain": "After je, the noun stays in the 1st case, the dictionary form."
+      },
+      {
+        "prompt": "S kým? S čím?",
+        "question": "Which case asks this?",
+        "options": [
+          "7. instrumental",
+          "2. genitive",
+          "6. locative"
+        ],
+        "answer": "7. instrumental",
+        "explain": "S kým? S čím? (with whom? with what?) is the 7th case."
+      },
+      {
+        "prompt": "Platím kartou.",
+        "question": "Which case is kartou in?",
+        "options": [
+          "7. instrumental",
+          "4. accusative",
+          "1. nominative"
+        ],
+        "answer": "7. instrumental",
+        "explain": "Paying with something: the instrumental, karta → kartou."
+      },
+      {
+        "prompt": "bez ľadu",
+        "question": "Which case comes after bez?",
+        "options": [
+          "2. genitive",
+          "7. instrumental",
+          "6. locative"
+        ],
+        "answer": "2. genitive",
+        "explain": "bez (without) takes the 2nd case, the genitive: ľad → bez ľadu."
+      }
+    ]
+  },
+  {
+    "id": "use-at-home",
+    "use": true,
+    "topic": "Use It: At Home",
+    "summary": "Mám malý byt. V obývačke pozerám televíziu. — the room words in real sentences.",
+    "explanation": "Time to use the new words with what you already know: **bývať** (to live), **mám / nemám**, adjectives that match the noun (*malý byt, malá izba*), and the **Kde? / Kam?** pairs — *v kuchyni* (locative, 6th case) / *do kuchyne* (genitive, 2nd case).",
+    "tables": [
+      {
+        "title": "Kde? and Kam? with rooms",
+        "head": [
+          "Room",
+          "Kde? (in)",
+          "Kam? (into)"
+        ],
+        "rows": [
+          [
+            "byt",
+            "v byt**e**",
+            "do byt**u**"
+          ],
+          [
+            "izba",
+            "v izb**e**",
+            "do izb**y**"
+          ],
+          [
+            "kuchyňa",
+            "v kuchyn**i**",
+            "do kuchyn**e**"
+          ],
+          [
+            "spálňa",
+            "v spáln**i**",
+            "do spáln**e**"
+          ],
+          [
+            "obývačka",
+            "v obývačk**e**",
+            "do obývačk**y**"
+          ],
+          [
+            "kúpeľňa",
+            "v kúpeľn**i**",
+            "do kúpeľn**e**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Bývam v byte.",
+        "en": "I live in a flat."
+      },
+      {
+        "sk": "Mám malý byt.",
+        "en": "I have a small flat."
+      },
+      {
+        "sk": "Naša kuchyňa je veľká.",
+        "en": "Our kitchen is big."
+      },
+      {
+        "sk": "V obývačke pozerám televíziu.",
+        "en": "I watch TV in the living room."
+      },
+      {
+        "sk": "Nemám televízor.",
+        "en": "I don't have a TV."
+      },
+      {
+        "sk": "Kde je kúpeľňa?",
+        "en": "Where is the bathroom?"
+      },
+      {
+        "sk": "Spím v spálni.",
+        "en": "I sleep in the bedroom."
+      },
+      {
+        "sk": "Idem do kuchyne.",
+        "en": "I'm going to the kitchen."
+      },
+      {
+        "sk": "Moja izba je malá, ale krásna.",
+        "en": "My room is small but beautiful."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Bývam v ___. (byt)",
+        "question": "I live in a flat.",
+        "options": [
+          "byte",
+          "byt",
+          "bytu"
+        ],
+        "answer": "byte",
+        "explain": "Kde? → v + the locative: v byte."
+      },
+      {
+        "prompt": "Idem do ___. (kuchyňa)",
+        "question": "I'm going to the kitchen.",
+        "options": [
+          "kuchyne",
+          "kuchyni",
+          "kuchyňu"
+        ],
+        "answer": "kuchyne",
+        "explain": "Kam? → do + the genitive: do kuchyne."
+      },
+      {
+        "prompt": "V ___ pozerám televíziu. (obývačka)",
+        "question": "I watch TV in the living room.",
+        "options": [
+          "obývačke",
+          "obývačku",
+          "obývačka"
+        ],
+        "answer": "obývačke",
+        "explain": "Kde? → v obývačke."
+      },
+      {
+        "prompt": "Nemám ___.",
+        "question": "I don't have a balcony.",
+        "options": [
+          "balkón",
+          "balkóna",
+          "balkónom"
+        ],
+        "answer": "balkón",
+        "explain": "A masculine thing like balkón stays the same as the object: nemám balkón."
+      },
+      {
+        "prompt": "Mám ___ byt.",
+        "question": "I have a small flat.",
+        "options": [
+          "malý",
+          "malá",
+          "malé"
+        ],
+        "answer": "malý",
+        "explain": "byt is masculine: malý byt."
+      },
+      {
+        "prompt": "Spím v spálni.",
+        "question": "What does this mean?",
+        "options": [
+          "I sleep in the bedroom.",
+          "I sleep in the living room.",
+          "I cook in the kitchen."
+        ],
+        "answer": "I sleep in the bedroom.",
+        "explain": "spálňa = bedroom; v spálni = in the bedroom."
+      },
+      {
+        "prompt": "Kde je ___?",
+        "question": "Where is the bathroom?",
+        "options": [
+          "kúpeľňa",
+          "kúpeľni",
+          "kúpeľňu"
+        ],
+        "answer": "kúpeľňa",
+        "explain": "After je, the word stays in its dictionary form."
+      }
+    ]
+  },
+  {
+    "id": "use-clothes",
+    "use": true,
+    "topic": "Use It: What I'm Wearing",
+    "summary": "Mám na sebe tričko a rifle. Nosím čiapku. — the clothes words in real sentences.",
+    "explanation": "**Mám na sebe…** = I'm wearing… (literally: I have on myself…). **Nosím…** = I (usually) wear…\n\nWhat you wear, need or buy is the **object** — the **accusative** (4th case) — so a feminine **-a** word ends in **-u**: *čiapka → Nosím čiapku.* Words that are only plural, like *rifle, nohavice, šaty*, stay the same.\n\nAdjectives match the noun, as always: *starý kabát, stará bunda, staré tričko*.",
+    "tables": [
+      {
+        "title": "Nosím … (I wear)",
+        "head": [
+          "Word",
+          "Nosím …"
+        ],
+        "rows": [
+          [
+            "čiapka",
+            "čiapk**u**"
+          ],
+          [
+            "sukňa",
+            "sukň**u**"
+          ],
+          [
+            "bunda",
+            "bund**u**"
+          ],
+          [
+            "košeľa",
+            "košeľ**u**"
+          ],
+          [
+            "kabát",
+            "kabát — **no change**"
+          ],
+          [
+            "tričko",
+            "tričko — **no change**"
+          ],
+          [
+            "rifle",
+            "rifle — **no change**"
+          ]
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "sk": "Mám na sebe tričko a rifle.",
+        "en": "I'm wearing a T-shirt and jeans."
+      },
+      {
+        "sk": "Nosím čiapku a šál.",
+        "en": "I wear a hat and a scarf."
+      },
+      {
+        "sk": "Potrebujem bundu.",
+        "en": "I need a jacket."
+      },
+      {
+        "sk": "Táto sukňa je krátka.",
+        "en": "This skirt is short."
+      },
+      {
+        "sk": "Kde sú moje topánky?",
+        "en": "Where are my shoes?"
+      },
+      {
+        "sk": "Mám rada modré šaty.",
+        "en": "I like the blue dress. (a woman)"
+      },
+      {
+        "sk": "Koľko stojí táto bunda?",
+        "en": "How much is this jacket?"
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Nosím ___. (čiapka)",
+        "question": "I wear a hat.",
+        "options": [
+          "čiapku",
+          "čiapka",
+          "čiapke"
+        ],
+        "answer": "čiapku",
+        "explain": "What you wear is the object: čiapka → čiapku."
+      },
+      {
+        "prompt": "Potrebujem ___. (bunda)",
+        "question": "I need a jacket.",
+        "options": [
+          "bundu",
+          "bunda",
+          "bunde"
+        ],
+        "answer": "bundu",
+        "explain": "What you need is the object: bunda → bundu."
+      },
+      {
+        "prompt": "___ sukňa je krátka.",
+        "question": "This skirt is short.",
+        "options": [
+          "Táto",
+          "Tento",
+          "Toto"
+        ],
+        "answer": "Táto",
+        "explain": "sukňa is feminine: táto."
+      },
+      {
+        "prompt": "Kde sú moje ___?",
+        "question": "Where are my shoes?",
+        "options": [
+          "topánky",
+          "topánka",
+          "topánku"
+        ],
+        "answer": "topánky",
+        "explain": "More than one shoe: topánky, with sú."
+      },
+      {
+        "prompt": "Mám na sebe tričko.",
+        "question": "What does this mean?",
+        "options": [
+          "I'm wearing a T-shirt.",
+          "I'm buying a T-shirt.",
+          "I like the T-shirt."
+        ],
+        "answer": "I'm wearing a T-shirt.",
+        "explain": "Mám na sebe = I am wearing."
+      },
+      {
+        "prompt": "Mám ___ kabát.",
+        "question": "I have an old coat.",
+        "options": [
+          "starý",
+          "stará",
+          "staré"
+        ],
+        "answer": "starý",
+        "explain": "kabát is masculine: starý kabát."
+      },
+      {
+        "prompt": "Mám rada ___ šaty.",
+        "question": "I like the blue dress. (a woman)",
+        "options": [
+          "modré",
+          "modrý",
+          "modrá"
+        ],
+        "answer": "modré",
+        "explain": "šaty is plural, so modré."
       }
     ]
   }

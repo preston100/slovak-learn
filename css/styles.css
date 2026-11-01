@@ -794,10 +794,15 @@ main {
   color: #3c7350;
   background: #e2efe5;
 }
+.round-kind.kind-use {
+  color: #4f5f8f;
+  background: #e5e9f4;
+}
 @media (prefers-color-scheme: dark) {
   .round-kind { color: var(--warm); }
   .round-kind.kind-dialogue { color: #ef9a90; background: rgba(224, 104, 95, 0.16); }
   .round-kind.kind-alphabet { color: var(--color-success); background: rgba(111, 191, 139, 0.14); }
+  .round-kind.kind-use { color: #aab8e6; background: rgba(170, 184, 230, 0.14); }
 }
 
 /* Level headers (A1.1, A1.2…) are milestone cards on the path, solid so
@@ -2284,6 +2289,69 @@ main {
 .exercise-next-btn {
   max-width: 320px;
   animation: fade-in 0.25s ease;
+}
+
+/* "Write it in Slovak": answer box, Slovak letter keys, feedback. */
+.type-answer {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.type-answer-input {
+  font-size: 20px !important;
+  text-align: center;
+  padding: 12px 14px !important;
+}
+.type-answer.correct .type-answer-input {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+}
+.type-answer.incorrect .type-answer-input {
+  border-color: var(--color-error);
+  background: var(--color-error-soft);
+  animation: head-shake 0.35s ease;
+}
+.accent-keys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+.accent-key {
+  min-width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.accent-key:hover:not(:disabled) { border-color: var(--color-accent); color: var(--color-accent); }
+.accent-key:disabled { opacity: 0.45; cursor: default; }
+.type-answer .btn-primary { max-width: 320px; }
+.type-feedback {
+  margin-top: 16px;
+  min-height: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.type-result { font-weight: 700; font-size: 15px; }
+.type-result.correct { color: var(--color-success); }
+.type-result.incorrect { color: var(--color-error); }
+.type-spelling {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 22px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .type-answer.incorrect .type-answer-input { animation: none; }
 }
 
 .mic-btn {

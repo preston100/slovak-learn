@@ -355,6 +355,12 @@
     "ref": "time-daily-routine"
   },
   {
+    "id": "gram-cases-intro",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "cases-intro"
+  },
+  {
     "id": "gram-numbers-building",
     "level": "A1.2",
     "kind": "grammar",
@@ -587,6 +593,12 @@
     "round": 1
   },
   {
+    "id": "gram-use-at-home",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "use-at-home"
+  },
+  {
     "id": "vocab-clothes-0",
     "level": "A1.2",
     "kind": "vocab",
@@ -599,6 +611,12 @@
     "kind": "vocab",
     "ref": "Clothes",
     "round": 1
+  },
+  {
+    "id": "gram-use-clothes",
+    "level": "A1.2",
+    "kind": "grammar",
+    "ref": "use-clothes"
   },
   {
     "id": "vocab-body-health-0",
