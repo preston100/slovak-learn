@@ -21,6 +21,9 @@ const QUIZ_SCHEMA = {
           },
           correctIndex: { type: 'INTEGER' },
           explanation: { type: 'STRING' },
+          // The Slovak word from the list this question tests (if any), so
+          // the site can count the answer towards that word's progress.
+          word: { type: 'STRING' },
         },
         required: ['question', 'options', 'correctIndex', 'explanation'],
       },
@@ -29,28 +32,106 @@ const QUIZ_SCHEMA = {
   required: ['questions'],
 };
 
-function buildTopicPrompt(topic) {
-  return `You are a Slovak language teacher creating a short quiz for an English-speaking student learning Slovak.
+// A quiz is 10 questions, made as two batches of 5 asked for at the same
+// time: one of translation and meaning questions, one of fill-in-the-blank
+// and word-form questions. That mixes the kinds of question, and takes no
+// longer than the old 5-question quiz — 10 in one go risks Netlify's
+// 10-second limit.
+const BATCH_SIZE = 5;
+const FOCUS = [
+  'translation both ways (Slovak to English and English to Slovak) and what words or phrases mean',
+  'fill in the blank in a short Slovak sentence, choosing the right word form or ending, and using the words in context',
+];
 
-Create exactly 5 multiple-choice questions about this topic: "${topic}".
-
-Rules:
+const RULES = `Rules:
 - Each question must have exactly 4 answer options.
-- Only one option is correct.
-- Mix question types where sensible (translation, fill-in-the-blank, grammar choice).
-- Keep questions clear and appropriate for a learner, not a native speaker.
-- "explanation" should briefly explain why the correct answer is right, in plain English.
+- Only one option is correct, and no option may be a second correct answer.
+- Keep questions clear and appropriate for a beginner (A1), not a native speaker.
+- "explanation" is one short sentence in plain English saying why the answer is right.
 - correctIndex is the zero-based index of the correct option in the "options" array.`;
+
+// What the learner has actually been taught on this topic, sent by the
+// site: the topic's words (the ones not mastered yet come first) or a
+// grammar topic's summary and examples. Questions stick to it. The words
+// are dealt out between the batches, so the two halves of a quiz test
+// different words.
+function materialText(material, batch) {
+  if (!material || typeof material !== 'object') return '';
+  const clean = (v) => String(v || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+  const pairs = (list) =>
+    (Array.isArray(list) ? list : [])
+      .slice(0, 24)
+      .map((x) => x && clean(x.sk) && `- ${clean(x.sk)} = ${clean(x.en)}`)
+      .filter(Boolean)
+      .join('\n');
+  const allWords = Array.isArray(material.words) ? material.words : [];
+  const mine = allWords.filter((w, i) => i % FOCUS.length === batch);
+  const words = pairs(mine.length ? mine : allWords);
+  if (words) {
+    return `Base every question on these words, in this order of priority (the first ones are the ones the student most needs to practise). Each question tests one of them — cover each word before using one again — and "word" must be that word exactly as written below (the Slovak side).\n${words}`;
+  }
+  const examples = pairs(material.examples);
+  const summary = clean(material.summary);
+  if (!examples && !summary) return '';
+  return `This is what the student has been taught on this topic — keep to it:\n${summary ? summary + '\n' : ''}${examples}\nLeave "word" empty.`;
 }
 
-function buildFilePrompt() {
-  return `You are a Slovak language teacher. Based on the attached document, create exactly 5 multiple-choice questions in English that test the reader's understanding of the Slovak language content in it (vocabulary, grammar, or comprehension — whatever fits the material best).
+function buildTopicPrompt(topic, material, batch) {
+  return `You are a Slovak language teacher creating a short quiz for an English-speaking student learning Slovak.
 
-Rules:
-- Each question must have exactly 4 answer options.
-- Only one option is correct.
-- "explanation" should briefly explain why the correct answer is right, in plain English.
-- correctIndex is the zero-based index of the correct option in the "options" array.`;
+Create exactly ${BATCH_SIZE} multiple-choice questions about this topic: "${topic}".
+These questions should be about: ${FOCUS[batch]}.
+
+${materialText(material, batch)}
+
+${RULES}`;
+}
+
+function buildFilePrompt(batch) {
+  return `You are a Slovak language teacher. Based on the attached document, create exactly ${BATCH_SIZE} multiple-choice questions in English that test the reader's understanding of the Slovak language content in it.
+These questions should be about: ${FOCUS[batch]}.
+
+${RULES}
+- Leave "word" empty.`;
+}
+
+// One batch: ask Gemini, then keep only well-formed questions.
+async function generateBatch(geminiKey, parts) {
+  const res = await callGemini(geminiKey, {
+    contents: [{ role: 'user', parts }],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseSchema: QUIZ_SCHEMA,
+    },
+  });
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(friendlyGeminiError(res.status, errText));
+  }
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('Gemini returned an unreadable response.');
+  }
+  const rawText = geminiText(data);
+  if (!rawText) throw new Error('Gemini returned no quiz content. Try again.');
+  let quiz;
+  try {
+    quiz = JSON.parse(rawText);
+  } catch {
+    throw new Error('Gemini returned invalid quiz JSON.');
+  }
+  return (Array.isArray(quiz.questions) ? quiz.questions : []).filter(
+    (q) =>
+      q &&
+      typeof q.question === 'string' &&
+      Array.isArray(q.options) &&
+      q.options.length >= 2 &&
+      Number.isInteger(q.correctIndex) &&
+      q.correctIndex >= 0 &&
+      q.correctIndex < q.options.length
+  );
 }
 
 exports.handler = async function (event) {
@@ -73,15 +154,16 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { mode, topic, filename, mimeType, content, isBase64 } = body;
+  const { mode, topic, filename, mimeType, content, isBase64, material } = body;
 
-  let parts;
+  // The request parts for each batch (0 or 1), each with its own focus.
+  let partsFor;
 
   if (mode === 'topic') {
     if (typeof topic !== 'string' || !topic.trim()) {
       return jsonResponse(400, { error: 'A topic is required.' });
     }
-    parts = [{ text: buildTopicPrompt(topic.trim().slice(0, 200)) }];
+    partsFor = (batch) => [{ text: buildTopicPrompt(topic.trim().slice(0, 200), material, batch) }];
   } else if (mode === 'file') {
     if (typeof content !== 'string' || !content) {
       return jsonResponse(400, { error: 'File content is required.' });
@@ -93,8 +175,8 @@ exports.handler = async function (event) {
     }
 
     if (isBase64) {
-      parts = [
-        { text: buildFilePrompt() },
+      partsFor = (batch) => [
+        { text: buildFilePrompt(batch) },
         {
           inlineData: {
             mimeType: mimeType || 'application/pdf',
@@ -103,52 +185,31 @@ exports.handler = async function (event) {
         },
       ];
     } else {
-      parts = [{ text: `${buildFilePrompt()}\n\nDocument (${filename || 'upload'}):\n\n${content.slice(0, 50000)}` }];
+      partsFor = (batch) => [{ text: `${buildFilePrompt(batch)}\n\nDocument (${filename || 'upload'}):\n\n${content.slice(0, 50000)}` }];
     }
   } else {
     return jsonResponse(400, { error: 'Invalid mode. Expected "topic" or "file".' });
   }
 
-  let geminiRes;
-  try {
-    geminiRes = await callGemini(geminiKey, {
-      contents: [{ role: 'user', parts }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: QUIZ_SCHEMA,
-      },
+  // Both batches at once. If one fails, the other's questions still make a
+  // (shorter) quiz rather than an error.
+  const results = await Promise.allSettled(FOCUS.map((_, batch) => generateBatch(geminiKey, partsFor(batch))));
+  const seen = new Set();
+  const questions = [];
+  results.forEach((r) => {
+    if (r.status !== 'fulfilled') return;
+    r.value.forEach((q) => {
+      const key = q.question.trim().toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      questions.push(q);
     });
-  } catch (err) {
-    return jsonResponse(502, { error: err.message || 'Could not reach the Gemini API.' });
+  });
+
+  if (!questions.length) {
+    const failed = results.find((r) => r.status === 'rejected');
+    return jsonResponse(502, { error: (failed && failed.reason && failed.reason.message) || 'Gemini returned an empty quiz.' });
   }
 
-  if (!geminiRes.ok) {
-    const errText = await geminiRes.text().catch(() => '');
-    return jsonResponse(502, { error: friendlyGeminiError(geminiRes.status, errText) });
-  }
-
-  let geminiData;
-  try {
-    geminiData = await geminiRes.json();
-  } catch {
-    return jsonResponse(502, { error: 'Gemini returned an unreadable response.' });
-  }
-
-  const rawText = geminiText(geminiData);
-  if (!rawText) {
-    return jsonResponse(502, { error: 'Gemini returned no quiz content. Try again.' });
-  }
-
-  let quiz;
-  try {
-    quiz = JSON.parse(rawText);
-  } catch {
-    return jsonResponse(502, { error: 'Gemini returned invalid quiz JSON.' });
-  }
-
-  if (!Array.isArray(quiz.questions) || quiz.questions.length === 0) {
-    return jsonResponse(502, { error: 'Gemini returned an empty quiz.' });
-  }
-
-  return jsonResponse(200, quiz);
+  return jsonResponse(200, { questions });
 };

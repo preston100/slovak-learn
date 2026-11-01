@@ -77,6 +77,7 @@
         <button class="icon-btn" id="lesson-exit-btn" aria-label="Exit lesson">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
+        <div class="lesson-section-num" id="lesson-section-num"></div>
         <div class="lesson-progress-track"><div class="lesson-progress-fill" id="lesson-progress-fill"></div></div>
         <div class="lesson-phase-label" id="lesson-phase-label"></div>
       </div>
@@ -167,6 +168,7 @@
 
           <div class="leaderboard-tile bento-span-3">
             <h3 class="browse-subhead">Leaderboard</h3>
+            <p class="leaderboard-note">Ranked by each person's best streak: the most days in a row they've practised (finished a lesson, a practice card or a quiz).</p>
             <div id="leaderboard-list" class="leaderboard-list"></div>
           </div>
         </div>
@@ -202,7 +204,16 @@
           <p>Every grammar rule in one place, for looking things up — not tied to your progress.</p>
         </div>
 
-        <input type="text" id="guide-search-input" class="browse-search-input" placeholder="Search grammar…" autocomplete="off" />
+        <div class="guide-controls">
+          <div>
+            <label class="field-label" for="guide-topic-select">Topic</label>
+            <select id="guide-topic-select"><option value="">All topics</option></select>
+          </div>
+          <div>
+            <label class="field-label" for="guide-search-input">Or search</label>
+            <input type="text" id="guide-search-input" class="browse-search-input" placeholder="Search grammar…" autocomplete="off" />
+          </div>
+        </div>
         <div id="guide-grammar-list" class="grammar-list"></div>
       </section>
 
@@ -223,7 +234,7 @@
           <div class="test-mode-switch">
             <div class="mode-card">
               <h3>By topic</h3>
-              <p>Pick a topic and get a 5-question quiz.</p>
+              <p>Pick a topic and get a 10-question quiz, focused on the words you haven't mastered yet.</p>
               <label class="field-label" for="topic-select">Topic</label>
               <select id="topic-select"></select>
               <button class="btn btn-secondary" id="generate-topic-btn" style="width:100%">Generate Quiz</button>

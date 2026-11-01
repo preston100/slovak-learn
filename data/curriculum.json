@@ -428,18 +428,25 @@
     "ref": "colors"
   },
   {
-    "id": "vocab-countries-languages-0",
+    "id": "vocab-languages-0",
     "level": "A1.2",
     "kind": "vocab",
-    "ref": "Countries & Languages",
+    "ref": "Languages",
     "round": 0
   },
   {
-    "id": "vocab-countries-languages-1",
+    "id": "vocab-countries-0",
     "level": "A1.2",
     "kind": "vocab",
-    "ref": "Countries & Languages",
-    "round": 1
+    "ref": "Countries",
+    "round": 0
+  },
+  {
+    "id": "vocab-nationalities-0",
+    "level": "A1.2",
+    "kind": "vocab",
+    "ref": "Nationalities",
+    "round": 0
   },
   {
     "id": "vocab-jobs-0",

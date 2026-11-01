@@ -132,6 +132,24 @@ Not in the list she was sent, so not checked yet: *Volám sa...* (literally "I c
 - **Motion**: roadmap rows slide up into place as they scroll into view; a wrong answer gives a small head-shake, a right one a little spring; a card's answer (and its note) eases in when revealed. All of it is switched off for anyone with "reduce motion" set on their device.
 - **Fixes**: in dark mode the patch behind centre titles is gone, and the shortcut bar and card switch are frosted glass like the other surfaces; the roadmap's staggered entrance now actually staggers; renaming a word keeps its first-right day (mastery counts from it); "today" is the learner's own calendar day — it was UTC, so anything done between midnight and 1–2am in Slovakia counted as the day before (streaks, daily goal, mastery).
 
+## Teacher's review, round 4 (November 2026)
+
+From "Slovak website notes 4" (section numbers as she wrote them; from 75 on, everything is now one higher, because Countries & Languages became three sections):
+
+- **Tests → Practice went blank** when you picked another topic in the middle of a round: the round was cleared but the round picker stayed hidden. Fixed; the picked topic is also kept when the topic list reloads.
+- **AI quiz**: 10 questions instead of 5, made as two batches at once (translation/meaning questions and fill-in-the-blank/word-form questions), so it takes no longer than before. For a word topic the quiz is built from that topic's words, **not-yet-mastered and most-missed first**, so each quiz covers new ground like the checkpoints. Each answer counts for its word: a miss goes to Revise, and a right answer can master it. A grammar topic's quiz is built from its summary and examples.
+- **Voice check accepted *pekný* for *pekné***: the recogniser was being told the expected answer, so it wrote down what it was told to expect. It no longer is (Whisper still gets a Slovak sentence so it stays in Slovak; Google gets no hint). Real mistakes now show up — the trade-off is that an unclear recording is more likely to be marked wrong.
+- **Explanations vanished too fast** after answering a grammar/alphabet question. Now the question waits on a **Next** button whenever there's an explanation.
+- **Phrase notes** sit in a "Good to know" table above the words on the Learn screen (still under the word in Word Lists and on the back of the card).
+- **Grammar Guide**: a **Topic** picker next to the search box, grouped like the page, for students who don't know the grammar terms to search for.
+- **Section number** in every lesson's top bar ("Section 54").
+- **Time & Daily Routine (54–58)**: clock times | more clock times | *ráno, dopoludnia*, the other parts of the day and *dnes / zajtra / včera* | *čas, sekundy, minúty, teraz, potom, niekedy, nikdy*. *dovolenka* and *prázdniny* removed. (*dopoludnia* moved with *ráno*, as the same kind of word.)
+- **Languages, Countries, Nationalities (73–75)**, in that order, each its own section. New: *čeština, maďarčina, poľština, ukrajinčina* and *Čech / Češka, Nemec / Nemka, Rakúšan / Rakúšanka, Maďar / Maďarka, Poliak / Poľka, Ukrajinec / Ukrajinka* — for the teacher to check.
+- **Verbs with sa (78)**: sa can change the meaning — *učiť* (to teach) / *učiť sa* (to learn), *volať / volať sa*, *obliekať / obliekať sa*, with two new exercises.
+- **Leaderboard**: says what it counts — each person's best streak, the most days in a row they practised.
+
+New Slovak text needs recordings: Add Content → Pronunciation audio → "Check & Generate Missing Audio".
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.

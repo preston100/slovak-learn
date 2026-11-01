@@ -789,12 +789,8 @@
         "en": "yesterday"
       },
       {
-        "sk": "teraz",
-        "en": "now"
-      },
-      {
-        "sk": "potom",
-        "en": "then"
+        "sk": "čas",
+        "en": "time"
       },
       {
         "sk": "sekundy",
@@ -805,13 +801,27 @@
         "en": "minutes"
       },
       {
-        "sk": "dovolenka",
-        "en": "vacation"
+        "sk": "teraz",
+        "en": "now"
       },
       {
-        "sk": "prázdniny",
-        "en": "holiday (school break)"
+        "sk": "potom",
+        "en": "then"
+      },
+      {
+        "sk": "niekedy",
+        "en": "sometimes"
+      },
+      {
+        "sk": "nikdy",
+        "en": "never"
       }
+    ],
+    "split": [
+      8,
+      6,
+      9,
+      7
     ]
   },
   {
@@ -1298,7 +1308,43 @@
     ]
   },
   {
-    "topic": "Countries & Languages",
+    "topic": "Languages",
+    "words": [
+      {
+        "sk": "slovenčina",
+        "en": "Slovak (the language)"
+      },
+      {
+        "sk": "čeština",
+        "en": "Czech (the language)"
+      },
+      {
+        "sk": "angličtina",
+        "en": "English (the language)"
+      },
+      {
+        "sk": "nemčina",
+        "en": "German (the language)"
+      },
+      {
+        "sk": "maďarčina",
+        "en": "Hungarian (the language)"
+      },
+      {
+        "sk": "poľština",
+        "en": "Polish (the language)"
+      },
+      {
+        "sk": "ukrajinčina",
+        "en": "Ukrainian (the language)"
+      }
+    ]
+  },
+  {
+    "topic": "Countries",
+    "split": [
+      9
+    ],
     "words": [
       {
         "sk": "Slovensko",
@@ -1335,30 +1381,50 @@
       {
         "sk": "Ukrajina",
         "en": "Ukraine"
-      },
-      {
-        "sk": "slovenčina",
-        "en": "Slovak (the language)"
-      },
-      {
-        "sk": "angličtina",
-        "en": "English (the language)"
-      },
-      {
-        "sk": "nemčina",
-        "en": "German (the language)"
-      },
+      }
+    ]
+  },
+  {
+    "topic": "Nationalities",
+    "split": [
+      9
+    ],
+    "words": [
       {
         "sk": "Slovák / Slovenka",
         "en": "a Slovak (man / woman)"
+      },
+      {
+        "sk": "Čech / Češka",
+        "en": "a Czech (man / woman)"
+      },
+      {
+        "sk": "Angličan / Angličanka",
+        "en": "an Englishman / Englishwoman"
       },
       {
         "sk": "Američan / Američanka",
         "en": "an American (man / woman)"
       },
       {
-        "sk": "Angličan / Angličanka",
-        "en": "an Englishman / Englishwoman"
+        "sk": "Nemec / Nemka",
+        "en": "a German (man / woman)"
+      },
+      {
+        "sk": "Rakúšan / Rakúšanka",
+        "en": "an Austrian (man / woman)"
+      },
+      {
+        "sk": "Maďar / Maďarka",
+        "en": "a Hungarian (man / woman)"
+      },
+      {
+        "sk": "Poliak / Poľka",
+        "en": "a Pole (man / woman)"
+      },
+      {
+        "sk": "Ukrajinec / Ukrajinka",
+        "en": "a Ukrainian (man / woman)"
       }
     ]
   },

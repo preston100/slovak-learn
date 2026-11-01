@@ -669,8 +669,9 @@
   }
 
   // A word can carry a short "note" in vocab.json — why a phrase looks the
-  // way it does (Platím kartou: karta → kartou). Shown wherever the word is
-  // taught or revealed: Word Lists, the Learn screen and the back of a card.
+  // way it does (Platím kartou: karta → kartou). Shown under the word in Word
+  // Lists and on the back of its card; the Learn screen gathers a section's
+  // notes into one table above the words.
   function wordNoteHtml(word) {
     return word && word.note ? '<div class="word-note">' + escapeHtml(word.note) + '</div>' : '';
   }
@@ -796,44 +797,36 @@
     return unit ? unit.id : null;
   }
 
-  function renderGrammarGuide(query) {
-    const container = document.getElementById('guide-grammar-list');
-    if (!container) return;
-
-    const q = (query || '').trim().toLowerCase();
-    const blocks = [];
-
-    // Sounds & Spelling comes from the alphabet data — the single most
-    // reference-shaped thing in the app, and absent from Word Lists entirely.
-    const alphabetMatches = alphabetData.filter(function (u) {
-      if (!q) return true;
-      return (
-        u.title.toLowerCase().indexOf(q) !== -1 ||
-        (u.intro || '').toLowerCase().indexOf(q) !== -1 ||
-        u.letters.some(function (l) {
-          return l.letter.toLowerCase().indexOf(q) !== -1 || l.sound.toLowerCase().indexOf(q) !== -1 || l.example.sk.toLowerCase().indexOf(q) !== -1;
-        })
-      );
+  // Every Guide entry in page order, each with the heading it sits under:
+  // Sounds & Spelling (from the alphabet data), then grammar in the order
+  // the roadmap teaches it — split by level to match its headers — and
+  // anything added through Add Content last. The page and its topic picker
+  // are both built from this.
+  function guideEntries() {
+    const entries = [];
+    // Sounds & Spelling: the single most reference-shaped thing in the app,
+    // and absent from Word Lists entirely.
+    alphabetData.forEach(function (u) {
+      entries.push({
+        key: 'alpha:' + u.id,
+        group: 'Sounds & Spelling',
+        title: u.title,
+        matches: function (q) {
+          return (
+            u.title.toLowerCase().indexOf(q) !== -1 ||
+            (u.intro || '').toLowerCase().indexOf(q) !== -1 ||
+            u.letters.some(function (l) {
+              return l.letter.toLowerCase().indexOf(q) !== -1 || l.sound.toLowerCase().indexOf(q) !== -1 || l.example.sk.toLowerCase().indexOf(q) !== -1;
+            })
+          );
+        },
+        html: function () { return guideEntryHtml(u.title, '', 'alpha-' + u.id, letterTableHtml(u.letters)); },
+      });
     });
 
-    if (alphabetMatches.length) {
-      blocks.push(
-        '<div class="guide-category"><h3 class="browse-subhead">Sounds & Spelling</h3>' +
-        alphabetMatches
-          .map(function (u) {
-            return guideEntryHtml(u.title, '', 'alpha-' + u.id, letterTableHtml(u.letters));
-          })
-          .join('') +
-        '</div>'
-      );
-    }
-
-    // Everything past the alphabet follows curriculum.json's order — the
-    // same sequence the roadmap teaches it in — instead of being regrouped
-    // into separate grammatical categories, so looking something up here
-    // means scrolling to roughly where you learned it, not hunting through
-    // an unrelated filing scheme.
-    // Split by level (A1.1, A1.2…) to match the roadmap's headers.
+    // Following curriculum.json's order means looking something up is
+    // scrolling to roughly where you learned it, not hunting through an
+    // unrelated filing scheme.
     const orderedIds = [];
     const levelOf = {};
     curriculumData.forEach(function (u) {
@@ -842,41 +835,77 @@
         levelOf[u.ref] = u.level || 'A1.1';
       }
     });
-    const ordered = orderedIds
+    function grammarEntry(t, group) {
+      return {
+        key: 'gram:' + t.id,
+        group: group,
+        title: t.topic,
+        matches: function (q) { return matchesGrammarQuery(t, q); },
+        html: function () { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); },
+      };
+    }
+    orderedIds
       .map(function (id) { return grammarData.find(function (t) { return t.id === id; }); })
       .filter(Boolean)
-      .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
-
-    const levels = [];
-    ordered.forEach(function (t) {
-      if (levels.indexOf(levelOf[t.id]) === -1) levels.push(levelOf[t.id]);
-    });
-    levels.forEach(function (level) {
-      blocks.push(
-        '<div class="guide-category"><h3 class="browse-subhead">Grammar — ' + escapeHtml(level) + '</h3>' +
-        ordered
-          .filter(function (t) { return levelOf[t.id] === level; })
-          .map(function (t) { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); })
-          .join('') +
-        '</div>'
-      );
-    });
-
-    // Anything not part of the authored curriculum (e.g. topics added via
-    // Add Content) has no natural position in that sequence, so it goes last.
-    const rest = grammarData
+      .forEach(function (t) { entries.push(grammarEntry(t, 'Grammar — ' + levelOf[t.id])); });
+    grammarData
       .filter(function (t) { return orderedIds.indexOf(t.id) === -1; })
-      .filter(function (t) { return !q || matchesGrammarQuery(t, q); });
-    if (rest.length) {
-      blocks.push(
-        '<div class="guide-category"><h3 class="browse-subhead">More</h3>' +
-        rest.map(function (t) { return guideEntryHtml(t.topic, t.summary, unitIdForGrammar(t.id), grammarBodyHtml(t)); }).join('') +
-        '</div>'
-      );
-    }
+      .forEach(function (t) { entries.push(grammarEntry(t, 'More')); });
+    return entries;
+  }
 
-    container.innerHTML = blocks.length
-      ? blocks.join('')
+  // The topic picker's choice ('' = everything), as in Tests > Practice:
+  // students looking something up may not know words like "pronoun" to
+  // search for, but can recognise the topic in a list.
+  let guideTopic = '';
+
+  function renderGuideTopicSelect(entries) {
+    const select = document.getElementById('guide-topic-select');
+    if (!select) return;
+    const groups = [];
+    entries.forEach(function (e) { if (groups.indexOf(e.group) === -1) groups.push(e.group); });
+    select.innerHTML =
+      '<option value="">All topics</option>' +
+      groups
+        .map(function (g) {
+          return (
+            '<optgroup label="' + escapeHtml(g) + '">' +
+            entries
+              .filter(function (e) { return e.group === g; })
+              .map(function (e) { return '<option value="' + escapeHtml(e.key) + '">' + escapeHtml(e.title) + '</option>'; })
+              .join('') +
+            '</optgroup>'
+          );
+        })
+        .join('');
+    select.value = entries.some(function (e) { return e.key === guideTopic; }) ? guideTopic : '';
+  }
+
+  function renderGrammarGuide(query) {
+    const container = document.getElementById('guide-grammar-list');
+    if (!container) return;
+
+    const q = (query || '').trim().toLowerCase();
+    const entries = guideEntries();
+    renderGuideTopicSelect(entries);
+
+    const shown = entries.filter(function (e) {
+      if (guideTopic) return e.key === guideTopic;
+      return !q || e.matches(q);
+    });
+    const groups = [];
+    shown.forEach(function (e) { if (groups.indexOf(e.group) === -1) groups.push(e.group); });
+
+    container.innerHTML = shown.length
+      ? groups
+          .map(function (g) {
+            return (
+              '<div class="guide-category"><h3 class="browse-subhead">' + escapeHtml(g) + '</h3>' +
+              shown.filter(function (e) { return e.group === g; }).map(function (e) { return e.html(); }).join('') +
+              '</div>'
+            );
+          })
+          .join('')
       : '<div class="empty-state">No matches for “' + escapeHtml((query || '').trim()) + '”.</div>';
 
     container.querySelectorAll('.guide-practice-btn').forEach(function (btn) {
@@ -890,6 +919,8 @@
   }
 
   function filterGuideContent(query) {
+    // Typing a search goes back to searching every topic.
+    guideTopic = '';
     renderGrammarGuide(query);
   }
 
@@ -1725,7 +1756,7 @@
     });
 
     document.getElementById('learn-topic-select').addEventListener('change', function (e) {
-      renderRoundMap(e.target.value);
+      showRoundTopic(e.target.value);
     });
   }
 
@@ -1889,9 +1920,17 @@
   }
 
   function goBackToRounds() {
+    showRoundTopic(currentRoundTopic);
+  }
+
+  // Shows a topic's rounds, leaving any round that was open. Picking another
+  // topic in the middle of a round used to clear the round but leave the
+  // round picker hidden, so the screen went blank.
+  function showRoundTopic(topic) {
     practiceQueue = [];
+    currentRoundTopic = topic;
     document.getElementById('round-map').classList.remove('hidden');
-    renderRoundMap(currentRoundTopic);
+    renderRoundMap(topic);
   }
 
   /* ---- Flashcard direction (shared by every flashcard screen) ---- */
@@ -2463,6 +2502,18 @@
         filterGuideContent(e.target.value);
       });
     }
+
+    // Picking a topic shows just that one; the search box is cleared so the
+    // two don't fight over what's on screen.
+    const guideTopicSelect = document.getElementById('guide-topic-select');
+    if (guideTopicSelect) {
+      guideTopicSelect.addEventListener('change', function () {
+        guideTopic = guideTopicSelect.value;
+        if (guideSearchInput) guideSearchInput.value = '';
+        renderGrammarGuide('');
+        window.scrollTo(0, 0);
+      });
+    }
   }
 
   // A section normally opens once the one before it is cleared. It also
@@ -2779,6 +2830,14 @@
     }
 
     const usesExercises = section.kind !== 'vocab' && section.kind !== 'checkpoint';
+    const inFinalTestGrammar = section.kind === 'checkpoint' && quizIndex >= quizQueue.length;
+
+    // An exercise already answered is waiting on Next: skipping just moves
+    // on, without taking it out of the score it already counts towards.
+    if (exerciseAnswered && document.getElementById('exercise-next-btn') && (usesExercises || inFinalTestGrammar)) {
+      nextExercise();
+      return;
+    }
 
     if (lessonPhase === 'practice') {
       lessonPracticeTotal = Math.max(0, lessonPracticeTotal - 1);
@@ -2794,7 +2853,6 @@
 
     if (lessonPhase === 'quiz') {
       lessonQuizTotal = Math.max(0, lessonQuizTotal - 1);
-      const inFinalTestGrammar = section.kind === 'checkpoint' && quizIndex >= quizQueue.length;
       if (usesExercises || inFinalTestGrammar) {
         exerciseIndex++;
         renderExerciseStep();
@@ -2818,6 +2876,8 @@
     lessonVoiceTotal = 0;
     lessonQuizCorrect = 0;
     lessonQuizTotal = 0;
+    // The same number the roadmap shows, so a section can be found again.
+    document.getElementById('lesson-section-num').textContent = 'Section ' + (index + 1);
     document.getElementById('lesson-overlay').classList.remove('hidden');
     renderLessonPhase();
   }
@@ -2935,13 +2995,25 @@
                 escapeHtml(it.sk) +
                 '</span><span class="en">' +
                 escapeHtml(it.en) +
-                '</span>' +
-                wordNoteHtml(it) +
-                '</div>'
+                '</span></div>'
               );
             })
             .join('') +
           '</div>';
+
+    // A word list's notes ("karta → kartou") are gathered into one table
+    // above the words, where they're seen before practising, rather than
+    // tucked under each word in small print.
+    const noted = section.kind === 'vocab' ? section.items.filter(function (it) { return it.note; }) : [];
+    const notesTable = noted.length
+      ? '<div class="lesson-grammar-tables learn-notes">' +
+        grammarTablesHtml([{
+          title: 'Good to know',
+          head: ['Phrase', 'Why it looks like this'],
+          rows: noted.map(function (it) { return ['**' + it.sk + '**', it.note]; }),
+        }]) +
+        '</div>'
+      : '';
 
     body.innerHTML =
       '<div class="lesson-stage">' +
@@ -2950,6 +3022,7 @@
       (section.subtitle ? '<p class="lesson-sub">' + escapeHtml(section.subtitle) + '</p>' : '') +
       (section.explanation ? '<div class="lesson-grammar-explanation rich-text">' + richTextHtml(section.explanation) + '</div>' : '') +
       (section.tables && section.tables.length ? '<div class="lesson-grammar-tables">' + grammarTablesHtml(section.tables) + '</div>' : '') +
+      notesTable +
       (section.items.length || section.kind === 'alphabet' ? content : '') +
       '<button class="btn btn-primary" id="lesson-learn-next-btn" style="width:100%; max-width:320px;">I’m Ready — Start Practice</button>' +
       '</div>';
@@ -3135,12 +3208,28 @@
         if (ex.explain) explainEl.textContent = ex.explain;
         explainEl.classList.add('visible');
 
-        setTimeout(function () {
-          exerciseIndex++;
-          renderExerciseStep();
-        }, right ? 900 : 2200);
+        // With an explanation, you move on when you've read it — moving on
+        // by itself after a second or two left no time to read it. A bare
+        // question still moves on by itself.
+        if (ex.explain) {
+          const nextBtn = document.createElement('button');
+          nextBtn.type = 'button';
+          nextBtn.className = 'btn btn-primary exercise-next-btn';
+          nextBtn.id = 'exercise-next-btn';
+          nextBtn.textContent = 'Next';
+          explainEl.insertAdjacentElement('afterend', nextBtn);
+          nextBtn.addEventListener('click', nextExercise);
+          nextBtn.focus({ preventScroll: true });
+        } else {
+          setTimeout(nextExercise, right ? 900 : 2200);
+        }
       });
     });
+  }
+
+  function nextExercise() {
+    exerciseIndex++;
+    renderExerciseStep();
   }
 
   let lessonQueue = [];
@@ -4125,7 +4214,7 @@
             escapeHtml(e.name) +
             '</span><span class="leaderboard-streak">' +
             e.bestStreak +
-            (e.bestStreak === 1 ? ' day' : ' days') +
+            (e.bestStreak === 1 ? ' day' : ' days in a row') +
             '</span></div>'
           );
         })
@@ -4158,13 +4247,16 @@
     const learnSelect = document.getElementById('learn-topic-select');
     if (learnSelect && vocabData.length) {
       const vocabTopics = vocabData.map(function (g) { return g.topic; }).filter(Boolean);
-      const wasEmpty = !learnSelect.value;
+      const previous = learnSelect.value;
       learnSelect.innerHTML = vocabTopics
         .map(function (t) {
           return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
         })
         .join('');
-      if (wasEmpty && vocabTopics.length) renderRoundMap(vocabTopics[0]);
+      // Rebuilding the list (when your own additions load) keeps the topic
+      // you'd picked instead of quietly jumping back to the first one.
+      if (previous && vocabTopics.indexOf(previous) !== -1) learnSelect.value = previous;
+      else if (vocabTopics.length) showRoundTopic(vocabTopics[0]);
     }
   }
 
@@ -4206,7 +4298,7 @@
         showQuizError('Please choose a topic first.');
         return;
       }
-      requestQuiz({ mode: 'topic', topic: topic });
+      requestQuiz({ mode: 'topic', topic: topic, material: quizMaterial(topic) });
     });
 
     document.getElementById('generate-file-btn').addEventListener('click', function () {
@@ -4216,6 +4308,34 @@
       }
       generateFromFile(selectedFile);
     });
+  }
+
+  // What an AI quiz on a topic is built from. For a word topic: its words,
+  // the ones not mastered yet first (most missed first among them), so each
+  // quiz works on new ground the way checkpoints do. For a grammar topic:
+  // its summary and examples, so the questions match what was taught.
+  const QUIZ_WORDS = 10;
+
+  function quizMaterial(topic) {
+    const group = vocabData.find(function (g) { return g.topic === topic; });
+    if (group) {
+      const mastered = loadMasteredWords();
+      const stats = loadVocabStats();
+      const misses = function (w) { return (stats[w.sk] && stats[w.sk].misses) || 0; };
+      const words = shuffleArray((group.words || []).slice()).sort(function (a, b) {
+        const byMastered = (mastered[a.sk] ? 1 : 0) - (mastered[b.sk] ? 1 : 0);
+        return byMastered || misses(b) - misses(a);
+      });
+      return { words: words.slice(0, QUIZ_WORDS).map(function (w) { return { sk: w.sk, en: w.en }; }) };
+    }
+    const t = grammarData.find(function (x) { return x.topic === topic; });
+    if (t) {
+      return {
+        summary: t.summary || '',
+        examples: (t.examples || []).slice(0, 12).map(function (ex) { return { sk: ex.sk, en: ex.en }; }),
+      };
+    }
+    return null;
   }
 
   function generateFromFile(file) {
@@ -4311,6 +4431,7 @@
       const card = document.createElement('div');
       card.className = 'quiz-question';
       card.dataset.correct = q.correctIndex;
+      if (q.word) card.dataset.word = q.word;
 
       const optionsHtml = (q.options || [])
         .map(function (opt, oi) {
@@ -4362,7 +4483,10 @@
 
   function gradeQuiz(area, total) {
     let correctCount = 0;
+    let wordsAnswered = 0;
     const cards = area.querySelectorAll('.quiz-question');
+    const knownWords = {};
+    vocabData.forEach(function (g) { (g.words || []).forEach(function (w) { knownWords[w.sk] = w; }); });
 
     cards.forEach(function (card) {
       const correctIndex = Number(card.dataset.correct);
@@ -4370,6 +4494,16 @@
       const selectedIndex = selected ? Number(selected.value) : -1;
 
       if (selectedIndex === correctIndex) correctCount++;
+
+      // A question about one of the course's words counts for that word, like
+      // any other answer: a miss sends it to Revise, a right answer can
+      // master it. Questions left blank don't count either way.
+      const word = knownWords[card.dataset.word];
+      if (word && selectedIndex !== -1) {
+        recordWordResult(word, selectedIndex === correctIndex);
+        incrementDailyCount();
+        wordsAnswered++;
+      }
 
       card.querySelectorAll('.q-option').forEach(function (opt) {
         const idx = Number(opt.dataset.optionIndex);
@@ -4383,6 +4517,13 @@
 
       card.querySelector('.q-explanation').classList.add('show');
     });
+
+    if (wordsAnswered) {
+      recordPracticeToday();
+      checkWordCountAchievements();
+      updateReviewCountBadge();
+      scheduleProgressSync();
+    }
 
     const scoreCard = area.querySelector('.quiz-score');
     scoreCard.classList.remove('hidden');

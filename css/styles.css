@@ -596,6 +596,24 @@ main {
   margin-bottom: 20px !important;
 }
 
+/* Grammar Guide: pick a topic from a list, or search. */
+.guide-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 14px;
+  max-width: 640px;
+  margin-bottom: 8px;
+}
+.guide-controls .browse-search-input {
+  max-width: none;
+  margin-bottom: 14px !important;
+}
+@media (max-width: 560px) {
+  .guide-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* ---------- Grammar: focused single-topic view ---------- */
 .topic-pager {
   display: flex;
@@ -1401,6 +1419,14 @@ main {
 .leaderboard-streak {
   font-weight: 700;
   color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.leaderboard-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: -6px 0 14px;
+  max-width: 520px;
 }
 
 .profile-ring-wrap {
@@ -1738,6 +1764,18 @@ main {
   white-space: nowrap;
 }
 
+/* Which roadmap section this lesson is, so you can find it again. */
+.lesson-section-num {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 12.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .lesson-body {
   flex: 1;
   overflow-y: auto;
@@ -1848,10 +1886,6 @@ main {
 .lesson-learn-row {
   flex-wrap: wrap;
 }
-.lesson-learn-row .word-note {
-  flex-basis: 100%;
-  margin-top: -4px;
-}
 
 /* A short grammar note under a word ("karta → kartou"). */
 .word-note {
@@ -1893,6 +1927,15 @@ main {
   padding: 3px 10px;
   white-space: nowrap;
   flex-shrink: 0;
+}
+/* Phones have no P key, and the hint squeezed the progress bar to nothing. */
+@media (max-width: 600px) {
+  .dev-skip-hint { display: none; }
+}
+
+/* A section's "Good to know" notes: keep short phrases on one line. */
+.learn-notes td:first-child {
+  min-width: 6.5em;
 }
 
 /* ---------- Grammar Guide: reference layout ---------- */
@@ -2237,6 +2280,10 @@ main {
 }
 .exercise-explain.visible {
   opacity: 1;
+}
+.exercise-next-btn {
+  max-width: 320px;
+  animation: fade-in 0.25s ease;
 }
 
 .mic-btn {

@@ -3419,7 +3419,7 @@
     "id": "sa-verbs",
     "topic": "Verbs with sa (volať sa, učiť sa…)",
     "summary": "Some verbs come with a little word sa. It never changes, and it usually goes second.",
-    "explanation": "Some verbs come with a little word **sa**. It belongs to the verb — learn them together: *volať sa* (to be called), *učiť sa* (to learn), *mať sa* (to be doing).\n\nThe verb changes as usual; **sa stays the same**: *volám sa, voláš sa, volá sa…*\n\n**Where does sa go?** Usually **second** in the sentence:\n*Volám sa Jana.* — *Ako sa voláš?* — *Moja sestra sa volá Eva.*\n\nYou already know some: *Ako sa máš?* (How are you?), *Páči sa mi.* (I like it.)",
+    "explanation": "Some verbs come with a little word **sa**. It belongs to the verb — learn them together: *volať sa* (to be called), *učiť sa* (to learn), *mať sa* (to be doing).\n\nThe verb changes as usual; **sa stays the same**: *volám sa, voláš sa, volá sa…*\n\n**Where does sa go?** Usually **second** in the sentence:\n*Volám sa Jana.* — *Ako sa voláš?* — *Moja sestra sa volá Eva.*\n\n**Sa can change the meaning.** Some verbs mean something different without it: *učiť* = to teach, but *učiť sa* = to learn. *Učím angličtinu.* (I teach English.) — *Učím sa angličtinu.* (I'm learning English.)\n\nYou already know some: *Ako sa máš?* (How are you?), *Páči sa mi.* (I like it.)",
     "tables": [
       {
         "head": [
@@ -3495,6 +3495,27 @@
             "to be liked (páči sa mi = I like it)"
           ]
         ]
+      },
+      {
+        "title": "With and without sa",
+        "head": [
+          "Without sa",
+          "With sa"
+        ],
+        "rows": [
+          [
+            "učiť — to teach",
+            "učiť **sa** — to learn"
+          ],
+          [
+            "volať — to call (someone)",
+            "volať **sa** — to be called"
+          ],
+          [
+            "obliekať — to dress (someone)",
+            "obliekať **sa** — to get dressed"
+          ]
+        ]
       }
     ],
     "examples": [
@@ -3517,6 +3538,14 @@
       {
         "sk": "Učím sa po slovensky.",
         "en": "I am learning Slovak."
+      },
+      {
+        "sk": "Učím angličtinu.",
+        "en": "I teach English."
+      },
+      {
+        "sk": "Učím sa angličtinu.",
+        "en": "I'm learning English."
       },
       {
         "sk": "Mám sa dobre.",
@@ -3608,6 +3637,28 @@
         ],
         "answer": "I'm in a hurry.",
         "explain": "Ponáhľať sa = to hurry."
+      },
+      {
+        "prompt": "Mama učí v škole.",
+        "question": "What does this mean?",
+        "options": [
+          "Mum teaches at a school.",
+          "Mum is learning at school.",
+          "Mum is called at school."
+        ],
+        "answer": "Mum teaches at a school.",
+        "explain": "Učiť (no sa) = to teach. Učiť sa = to learn."
+      },
+      {
+        "prompt": "Ja ___ po slovensky. (I am learning)",
+        "question": "I'm learning Slovak.",
+        "options": [
+          "sa učím",
+          "učím",
+          "sa učí"
+        ],
+        "answer": "sa učím",
+        "explain": "To learn is učiť sa. Without sa, učím means \"I teach\"."
       }
     ]
   },

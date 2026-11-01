@@ -46,7 +46,7 @@ async function withTimeout(ms, run) {
 
 // Whisper on Groq. Much stronger than Google for smaller languages like
 // Slovak, and the free tier is far beyond what this app can use.
-async function transcribeWithGroq(key, audioBuffer, encoding, expected, budgetMs) {
+async function transcribeWithGroq(key, audioBuffer, encoding, budgetMs) {
   const isOgg = encoding === 'OGG_OPUS';
   const form = new FormData();
   form.append('file', new Blob([audioBuffer], { type: isOgg ? 'audio/ogg' : 'audio/webm' }), isOgg ? 'clip.ogg' : 'clip.webm');
@@ -54,10 +54,11 @@ async function transcribeWithGroq(key, audioBuffer, encoding, expected, budgetMs
   form.append('language', 'sk');
   form.append('response_format', 'verbose_json');
   form.append('temperature', '0');
-  // Whisper's prompt is treated as preceding transcript context, so framing
-  // the target in a Slovak sentence biases both the language and the
-  // vocabulary — more effective than passing the bare word.
-  if (expected) form.append('prompt', 'Nahrávka slovenského slova: ' + String(expected).slice(0, 100) + '.');
+  // Whisper treats the prompt as text that came just before, so a Slovak
+  // sentence keeps it in Slovak. It deliberately doesn't contain the
+  // expected answer: given "pekné", Whisper wrote "pekné" when the learner
+  // said "pekný", and a wrong ending passed the check.
+  form.append('prompt', 'Nahrávka slovenského slova alebo vety.');
 
   const res = await withTimeout(budgetMs, (signal) =>
     fetch(GROQ_URL, {
@@ -81,7 +82,7 @@ async function transcribeWithGroq(key, audioBuffer, encoding, expected, budgetMs
   return (data.text || '').trim();
 }
 
-async function transcribeWithGoogle(key, audioBase64, encoding, expected, budgetMs) {
+async function transcribeWithGoogle(key, audioBase64, encoding, budgetMs) {
   const res = await withTimeout(budgetMs, (signal) =>
     fetch(`${GOOGLE_URL}?key=${encodeURIComponent(key)}`, {
       method: 'POST',
@@ -94,8 +95,9 @@ async function transcribeWithGoogle(key, audioBase64, encoding, expected, budget
           sampleRateHertz: 48000,
           languageCode: 'sk-SK',
           // No `model` — Google's named models aren't offered for sk-SK and
-          // the API hard-fails rather than falling back.
-          speechContexts: expected ? [{ phrases: [String(expected).slice(0, 100)], boost: 20 }] : undefined,
+          // the API hard-fails rather than falling back. No phrase hint
+          // with the expected answer either, for the same reason as Groq's
+          // prompt: it makes a near miss come back as the right answer.
         },
         audio: { content: audioBase64 },
       }),
@@ -138,7 +140,9 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid JSON body.' });
   }
 
-  const { audioBase64, encoding, expected } = body;
+  // The client also sends the expected answer; it's deliberately not used
+  // (see the Groq prompt above).
+  const { audioBase64, encoding } = body;
 
   if (typeof audioBase64 !== 'string' || !audioBase64) {
     return jsonResponse(400, { error: 'No audio was provided.' });
@@ -158,7 +162,6 @@ exports.handler = async function (event) {
         groqKey,
         audioBuffer,
         encoding,
-        expected,
         Math.min(GROQ_MAX_MS, remaining())
       );
       return jsonResponse(200, { ok: true, transcript: transcript, provider: 'groq' });
@@ -171,7 +174,7 @@ exports.handler = async function (event) {
 
   if (googleKey && remaining() > GOOGLE_MIN_MS) {
     try {
-      const transcript = await transcribeWithGoogle(googleKey, audioBase64, encoding, expected, remaining());
+      const transcript = await transcribeWithGoogle(googleKey, audioBase64, encoding, remaining());
       return jsonResponse(200, { ok: true, transcript: transcript, provider: 'google' });
     } catch (err) {
       const message = err.name === 'AbortError' ? 'Transcription took too long. Please try again.' : err.message;
