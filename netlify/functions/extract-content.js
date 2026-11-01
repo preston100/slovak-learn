@@ -1,5 +1,7 @@
 const { jsonResponse, callGemini, geminiText, friendlyGeminiError } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { requireDev } = require('./lib/plans');
+const { countUsage } = require('./lib/usage');
 
 const MAX_TOTAL_BYTES = 4.5 * 1024 * 1024; // stays well under Netlify's 6MB sync function body limit
 const MAX_FILES = 6;
@@ -81,8 +83,10 @@ exports.handler = async function (event) {
     return jsonResponse(500, { error: 'Server is not configured. Missing environment variables.' });
   }
 
-  const auth = requireSession(event);
+  // Content creation is for the developer accounts only.
+  const auth = requireDev(requireSession(event));
   if (auth.error) return auth.error;
+  await countUsage('extract-content');
 
   let body;
   try {

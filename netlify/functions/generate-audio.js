@@ -1,6 +1,8 @@
 const crypto = require('crypto');
 const { jsonResponse, callCloudTTS } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { requireDev } = require('./lib/plans');
+const { countUsage } = require('./lib/usage');
 const { updateJsonFile, putBinaryFile } = require('./lib/github');
 
 // Keeps each invocation comfortably inside Netlify's 10-second function
@@ -50,8 +52,10 @@ exports.handler = async function (event) {
     });
   }
 
-  const auth = requireSession(event);
+  // Content creation is for the developer accounts only.
+  const auth = requireDev(requireSession(event));
   if (auth.error) return auth.error;
+  await countUsage('generate-audio');
 
   let body;
   try {

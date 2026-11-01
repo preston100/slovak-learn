@@ -1,5 +1,7 @@
 const { jsonResponse, callGemini, geminiText, friendlyGeminiError } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { accountFor, hasFullAccess, dailyLimit } = require('./lib/plans');
+const { takeQuota, countUsage } = require('./lib/usage');
 
 // Netlify's synchronous function payload limit is 6MB. Base64 inflates size by
 // ~33%, so we reject files that would risk crossing that ceiling well before
@@ -147,6 +149,14 @@ exports.handler = async function (event) {
   const auth = requireSession(event);
   if (auth.error) return auth.error;
 
+  // AI quizzes come with full access (Pro, beta or dev), 25 a day.
+  const account = await accountFor(auth.session.email);
+  if (!hasFullAccess(account.plan)) {
+    return jsonResponse(403, { error: 'AI quizzes are part of Pro. Upgrade, or enter a beta code in your account.', upgrade: true });
+  }
+  const quota = await takeQuota(auth.session.email, 'quiz', dailyLimit('quiz', account.plan));
+  if (!quota.ok) return jsonResponse(429, { error: "That's today's " + quota.limit + ' AI quizzes. They reset tomorrow.', quota: true });
+
   let body;
   try {
     body = JSON.parse(event.body || '{}');
@@ -194,6 +204,7 @@ exports.handler = async function (event) {
   // Both batches at once. If one fails, the other's questions still make a
   // (shorter) quiz rather than an error.
   const results = await Promise.allSettled(FOCUS.map((_, batch) => generateBatch(geminiKey, partsFor(batch))));
+  await countUsage('generate-quiz');
   const seen = new Set();
   const questions = [];
   results.forEach((r) => {

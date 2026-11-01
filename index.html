@@ -13,61 +13,80 @@
 </head>
 <body>
 
-  <!-- Password gate: this is the ONLY thing visible until a correct code is entered -->
-  <div id="password-gate">
-    <div class="gate-card">
-      <div class="gate-logo">S</div>
-      <h1>Slovenčina</h1>
-      <p class="gate-sub">Enter your 4-digit access code to continue.</p>
-      <form id="gate-form" autocomplete="off">
-        <input
-          id="gate-code"
-          type="password"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          maxlength="4"
-          autocomplete="off"
-          placeholder="••••"
-          aria-label="4-digit access code"
-        />
-        <div class="gate-error" id="gate-error"></div>
-        <button class="btn btn-primary" type="submit" id="gate-submit">Unlock</button>
-      </form>
+  <!-- Onboarding: create an account or sign in, pick a plan, or unlock with
+       an access code. The only thing shown until someone is signed in. -->
+  <div id="onboarding-gate" class="onboarding hidden">
+    <div class="onboarding-inner">
+      <header class="onboarding-head">
+        <div class="gate-logo">S</div>
+        <h1>Slovenčina</h1>
+        <p class="onboarding-tagline">Learn Slovak from the alphabet to A1: lessons, voice practice and help when you're stuck.</p>
+      </header>
+
+      <section class="onboarding-card" id="onboarding-account" aria-labelledby="onboarding-account-title">
+        <div id="onboarding-signed-out">
+          <h2 class="visually-hidden" id="onboarding-account-title">Your account</h2>
+          <div class="content-mode-switch onboarding-tabs" role="tablist" aria-label="Account">
+            <button type="button" class="content-mode-btn active" data-onboarding-mode="register" role="tab">Create Account</button>
+            <button type="button" class="content-mode-btn" data-onboarding-mode="login" role="tab">Sign In</button>
+          </div>
+          <form id="onboarding-form" novalidate>
+            <div class="auth-field" data-only="register">
+              <label class="field-label" for="ob-name">Display name</label>
+              <input type="text" id="ob-name" autocomplete="nickname" maxlength="80" />
+            </div>
+            <div class="auth-field">
+              <label class="field-label" for="ob-email">Email</label>
+              <input type="email" id="ob-email" autocomplete="username" placeholder="you@example.com" />
+            </div>
+            <div class="auth-field">
+              <label class="field-label" for="ob-password">Password</label>
+              <input type="password" id="ob-password" autocomplete="new-password" placeholder="At least 8 characters" />
+            </div>
+            <div class="auth-field" data-only="register">
+              <label class="field-label" for="ob-confirm">Confirm password</label>
+              <input type="password" id="ob-confirm" autocomplete="new-password" />
+            </div>
+            <label class="terms-check" data-only="register">
+              <input type="checkbox" id="ob-terms" />
+              <span>I agree to the <button type="button" class="link-btn" data-legal="terms">Terms of Service</button> and <button type="button" class="link-btn" data-legal="privacy">Privacy Policy</button></span>
+            </label>
+            <div class="gate-error" id="ob-error" role="alert"></div>
+            <button class="btn btn-primary" type="submit" id="ob-submit">Create Account</button>
+          </form>
+        </div>
+        <div id="onboarding-signed-in" class="hidden">
+          <p class="signed-in-line">Signed in as <strong id="ob-signed-name"></strong> <span id="ob-signed-email"></span></p>
+          <p class="onboarding-next">Now choose how you'd like to start.</p>
+          <button type="button" class="link-btn" id="ob-signout">Not you? Sign out</button>
+        </div>
+      </section>
+
+      <section class="onboarding-plans" id="onboarding-plans" aria-labelledby="plans-title">
+        <h2 id="plans-title">Choose your plan</h2>
+        <div class="plan-grid" id="onboarding-plan-grid"></div>
+        <div class="plan-message hidden" id="onboarding-plan-message" role="status"></div>
+      </section>
+
+      <section class="onboarding-card code-box" aria-labelledby="code-title">
+        <h3 id="code-title">Have a developer or beta access code?</h3>
+        <form id="ob-code-form" class="code-form" autocomplete="off">
+          <input id="ob-code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" aria-label="4-digit access code" />
+          <button class="btn btn-secondary" type="submit" id="ob-code-submit">Unlock Full Access</button>
+        </form>
+        <div class="gate-error" id="ob-code-error" role="alert"></div>
+      </section>
+
+      <nav class="legal-links" aria-label="Legal">
+        <button type="button" class="link-btn" data-legal="terms">Terms of Service</button>
+        <button type="button" class="link-btn" data-legal="privacy">Privacy Policy</button>
+        <button type="button" class="link-btn" data-legal="refund">Refund &amp; Cancellation Policy</button>
+        <button type="button" class="link-btn" data-legal="pricing">Pricing Plans</button>
+      </nav>
     </div>
   </div>
 
-  <!-- Account login/signup: shown after the site password, before the app -->
-  <div id="auth-gate" class="hidden">
-    <div class="gate-card">
-      <div class="gate-logo">S</div>
-      <h1 id="auth-gate-title">Log In</h1>
-      <p class="gate-sub" id="auth-gate-sub">Welcome back — log in to see your progress.</p>
-
-      <div class="content-mode-switch">
-        <button type="button" class="content-mode-btn auth-mode-btn active" data-auth-mode="login">Log In</button>
-        <button type="button" class="content-mode-btn auth-mode-btn" data-auth-mode="signup">Sign Up</button>
-      </div>
-
-      <form id="auth-form" autocomplete="off">
-        <div class="auth-field hidden" id="auth-name-field">
-          <label class="field-label" for="auth-name">Name</label>
-          <input type="text" id="auth-name" autocomplete="name" placeholder="Your name" />
-        </div>
-        <div class="auth-field">
-          <label class="field-label" for="auth-email">Email</label>
-          <input type="email" id="auth-email" autocomplete="username" placeholder="you@example.com" />
-        </div>
-        <div class="auth-field">
-          <label class="field-label" for="auth-password">Password</label>
-          <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" />
-        </div>
-        <div class="gate-error" id="auth-error"></div>
-        <button class="btn btn-primary" type="submit" id="auth-submit">Log In</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Main app: hidden until the password gate passes -->
+  <!-- Main app: hidden until someone is signed in -->
   <div id="app" class="hidden">
     <div id="achievement-toast" class="achievement-toast hidden"></div>
 
@@ -94,7 +113,9 @@
           <button class="tab-btn" data-tab="learn" role="tab" aria-selected="false">Learn</button>
           <button class="tab-btn" data-tab="guide" role="tab" aria-selected="false"><span class="tab-label-long">Grammar Guide</span><span class="tab-label-short">Guide</span></button>
           <button class="tab-btn" data-tab="tests" role="tab" aria-selected="false">Tests</button>
-          <button class="tab-btn" data-tab="add-content" role="tab" aria-selected="false"><span class="tab-label-long">Add Content</span><span class="tab-label-short">Add</span></button>
+          <!-- Developer accounts only (shown from app.js). -->
+          <button class="tab-btn hidden" data-tab="add-content" role="tab" aria-selected="false"><span class="tab-label-long">Add Content</span><span class="tab-label-short">Add</span></button>
+          <button class="tab-btn hidden" data-tab="analytics" role="tab" aria-selected="false"><span class="tab-label-long">Analytics</span><span class="tab-label-short">Stats</span></button>
         </nav>
         <div class="topbar-right">
           <div class="streak-badge zero" id="streak-badge">
@@ -105,8 +126,8 @@
             <svg id="sound-on-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>
             <svg id="sound-off-icon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
           </button>
-          <button class="icon-btn" id="logout-btn" aria-label="Log out" title="Log out">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          <button class="icon-btn" id="account-btn" aria-label="Account" title="Account">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
           </button>
         </div>
       </div>
@@ -187,6 +208,13 @@
         </div>
 
         <div id="roadmap-view">
+          <div id="free-preview-banner" class="free-banner hidden">
+            <p><strong>Free Preview:</strong> sections 1–5 are open. Sections 6+ need Pro or a beta code.</p>
+            <div class="free-banner-actions">
+              <button type="button" class="btn btn-primary" data-upsell="code">Enter a beta code</button>
+              <button type="button" class="btn btn-secondary" data-legal="pricing">See plans</button>
+            </div>
+          </div>
           <nav id="roadmap-jump" class="roadmap-jump" aria-label="Jump to"></nav>
           <div id="roadmap-map" class="round-map"></div>
         </div>
@@ -306,9 +334,94 @@
           <div id="audio-gen-error" class="error-banner hidden"></div>
         </div>
       </section>
+
+      <!-- Analytics: developer accounts only -->
+      <section id="panel-analytics" class="panel">
+        <div class="panel-header analytics-header">
+          <div>
+            <h2>Analytics</h2>
+            <p>Accounts, activity, API usage and where learners get stuck. Developer accounts only.</p>
+          </div>
+          <button type="button" class="btn btn-secondary" id="analytics-refresh">Refresh</button>
+        </div>
+        <div id="analytics-body"></div>
+      </section>
     </main>
+
+    <footer class="app-footer">
+      <nav class="legal-links" aria-label="Legal">
+        <button type="button" class="link-btn" data-legal="terms">Terms of Service</button>
+        <button type="button" class="link-btn" data-legal="privacy">Privacy Policy</button>
+        <button type="button" class="link-btn" data-legal="refund">Refund &amp; Cancellation Policy</button>
+        <button type="button" class="link-btn" data-legal="pricing">Pricing Plans</button>
+      </nav>
+      <p class="footer-line" id="footer-line"></p>
+    </footer>
   </div>
 
+  <!-- Account: plan, access code, log out -->
+  <div id="account-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="account-title">
+    <div class="modal-card">
+      <button type="button" class="icon-btn modal-close" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h2 id="account-title">Your account</h2>
+      <p class="account-who"><strong id="acct-name"></strong><span id="acct-email"></span></p>
+      <div class="account-plan">
+        <span class="plan-badge" id="acct-plan-badge"></span>
+        <p id="acct-plan-desc"></p>
+      </div>
+      <div id="acct-upgrade" class="hidden">
+        <button type="button" class="btn btn-primary" id="acct-see-plans">See plans</button>
+        <form id="acct-code-form" class="code-form" autocomplete="off">
+          <label class="field-label" for="acct-code">Have a developer or beta access code?</label>
+          <div class="code-row">
+            <input id="acct-code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
+            <button class="btn btn-secondary" type="submit" id="acct-code-submit">Unlock Full Access</button>
+          </div>
+        </form>
+        <div class="gate-error" id="acct-code-error" role="alert"></div>
+      </div>
+      <nav class="legal-links" aria-label="Legal">
+        <button type="button" class="link-btn" data-legal="terms">Terms</button>
+        <button type="button" class="link-btn" data-legal="privacy">Privacy</button>
+        <button type="button" class="link-btn" data-legal="refund">Refunds &amp; cancelling</button>
+        <button type="button" class="link-btn" data-legal="pricing">Pricing</button>
+      </nav>
+      <button type="button" class="btn btn-secondary account-logout" id="acct-logout">Log out</button>
+    </div>
+  </div>
+
+  <!-- Terms, Privacy, Refunds, Pricing -->
+  <div id="legal-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+    <div class="modal-card modal-wide">
+      <button type="button" class="icon-btn modal-close" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="content-mode-switch legal-tabs" role="tablist" aria-label="Documents">
+        <button type="button" class="content-mode-btn" data-legal-tab="terms">Terms</button>
+        <button type="button" class="content-mode-btn" data-legal-tab="privacy">Privacy</button>
+        <button type="button" class="content-mode-btn" data-legal-tab="refund">Refunds</button>
+        <button type="button" class="content-mode-btn" data-legal-tab="pricing">Pricing</button>
+      </div>
+      <h2 id="legal-title"></h2>
+      <div class="legal-body" id="legal-body"></div>
+    </div>
+  </div>
+
+  <!-- Short messages: "Pro Plan Required", "launching soon"… -->
+  <div id="notice-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="notice-title">
+    <div class="modal-card modal-small">
+      <button type="button" class="icon-btn modal-close" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h2 id="notice-title"></h2>
+      <p id="notice-message"></p>
+      <div class="notice-actions" id="notice-actions"></div>
+    </div>
+  </div>
+
+  <script src="js/progress-merge.js" defer></script>
   <script src="js/app.js" defer></script>
 </body>
 </html>

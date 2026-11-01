@@ -1,89 +1,85 @@
 (function () {
   'use strict';
 
-  const SESSION_KEY = 'slovencina_pw';
+  /* ---------------- Who runs the service, and the plans ---------------- */
 
-  /* ---------------- Password gate ---------------- */
+  // The operator and contact shown in the legal pages and the footer. Change
+  // them here — e.g. to a registered company name and business address
+  // before turning on live Stripe billing — and every page follows.
+  const LEGAL_CONFIG = {
+    serviceName: 'Slovenčina',
+    siteUrl: 'https://slovaklearn.netlify.app/',
+    operator: 'Slovenčina Team',
+    contactEmail: 'prestonandersen100@gmail.com',
+    lastUpdated: 'November 1, 2026',
+  };
 
-  const gateEl = document.getElementById('password-gate');
-  const appEl = document.getElementById('app');
-  const gateForm = document.getElementById('gate-form');
-  const gateInput = document.getElementById('gate-code');
-  const gateError = document.getElementById('gate-error');
-  const gateSubmit = document.getElementById('gate-submit');
+  // The three plans, as shown on the sign-up screen and under Pricing Plans.
+  // Paid checkout isn't live yet: picking a paid plan explains that.
+  const PLAN_INFO = [
+    {
+      id: 'free',
+      name: 'Free Preview',
+      price: '€0',
+      period: 'forever',
+      features: [
+        'Roadmap sections 1–5, alphabet & sounds',
+        'Core flashcards',
+        'Up to 15 voice pronunciation checks a day',
+      ],
+      cta: 'Start Free Preview',
+    },
+    {
+      id: 'monthly',
+      name: 'Monthly Pro',
+      price: '€11.99',
+      period: '/ month',
+      features: [
+        'All 104+ roadmap sections, 27+ vocabulary groups, 32+ grammar guides, dialogues & tests',
+        'AI sentence breakdowns & up to 150 voice checks a day',
+        '14-day money-back guarantee, cancel anytime',
+      ],
+      cta: 'Select Monthly (€11.99/mo)',
+    },
+    {
+      id: 'annual',
+      name: 'Annual Pro',
+      price: '€79.00',
+      period: '/ year',
+      note: '€6.58/mo — Save 45%',
+      badge: 'Best Value',
+      features: [
+        'Everything in Monthly Pro',
+        'Priority new curriculum chapters & custom review decks',
+        '14-day money-back guarantee',
+      ],
+      cta: 'Select Annual (€79/yr)',
+    },
+  ];
 
-  function getStoredPassword() {
-    return sessionStorage.getItem(SESSION_KEY) || '';
-  }
+  const PAID_SOON_MESSAGE =
+    'Paid subscriptions launching soon! Start with the Free Preview or enter your Beta/Dev Code below for full access.';
 
-  function showApp() {
-    gateEl.classList.add('hidden');
-    resolveSession();
-  }
+  // What the Free Preview includes: the first five roadmap sections (the
+  // start of the alphabet), the Sounds & Spelling guide, and these word
+  // topics' flashcards in Tests > Practice.
+  const FREE_SECTIONS = 5;
+  const FREE_PRACTICE_TOPICS = ['Greetings & Basics', 'Everyday Phrases'];
+  const PRO_REQUIRED = 'Pro Plan Required — Upgrade or enter a Beta Code in Account Settings';
 
-  async function checkPassword(pw) {
-    const res = await fetch('/.netlify/functions/verify-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw }),
-    });
-    return res.ok;
-  }
-
-  gateForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const pw = gateInput.value.trim();
-    if (!pw) return;
-
-    gateError.textContent = '';
-    gateSubmit.disabled = true;
-    gateSubmit.textContent = 'Checking…';
-
-    try {
-      const ok = await checkPassword(pw);
-      if (ok) {
-        sessionStorage.setItem(SESSION_KEY, pw);
-        showApp();
-      } else {
-        gateError.textContent = 'Incorrect code. Try again.';
-        gateInput.value = '';
-        gateInput.focus();
-      }
-    } catch (err) {
-      gateError.textContent = 'Could not reach the server. Please try again.';
-    } finally {
-      gateSubmit.disabled = false;
-      gateSubmit.textContent = 'Unlock';
-    }
-  });
-
-  // If a password was already verified this session, skip straight to the app.
-  (function tryAutoUnlock() {
-    const stored = getStoredPassword();
-    if (!stored) return;
-    checkPassword(stored).then(function (ok) {
-      if (ok) showApp();
-      else sessionStorage.removeItem(SESSION_KEY);
-    });
-  })();
-
-  /* ---------------- Accounts (sits between the site password and the app) ---------------- */
+  /* ---------------- Session ---------------- */
 
   const SESSION_TOKEN_KEY = 'slovencina_session_token';
   const SESSION_USER_KEY = 'slovencina_session_user';
   const MIGRATED_KEY = 'slovencina_migrated';
+  // Whose progress is in this browser's storage — so signing in as someone
+  // else replaces it, while signing back in as the same person merges it.
+  const PROGRESS_OWNER_KEY = 'slovencina_progress_owner';
+  const PLAN_KEY = 'sk_plan';
+  const BETA_KEY = 'sk_beta_unlocked';
 
-  const authGateEl = document.getElementById('auth-gate');
-  const authForm = document.getElementById('auth-form');
-  const authNameField = document.getElementById('auth-name-field');
-  const authNameInput = document.getElementById('auth-name');
-  const authEmailInput = document.getElementById('auth-email');
-  const authPasswordInput = document.getElementById('auth-password');
-  const authError = document.getElementById('auth-error');
-  const authSubmit = document.getElementById('auth-submit');
-  const authTitle = document.getElementById('auth-gate-title');
-  const authSub = document.getElementById('auth-gate-sub');
-  const authModeButtons = document.querySelectorAll('.auth-mode-btn');
+  const appEl = document.getElementById('app');
+  const onboardingEl = document.getElementById('onboarding-gate');
 
   function getSessionToken() {
     return localStorage.getItem(SESSION_TOKEN_KEY) || '';
@@ -105,6 +101,10 @@
     } catch (err) {
       return null;
     }
+  }
+
+  function authHeaders() {
+    return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + getSessionToken() };
   }
 
   // Dev/preview accounts: every roadmap section, level and practice round
@@ -152,14 +152,34 @@
     return isDevAccount() && !studentViewOn();
   }
 
-  function showAuthGate() {
-    authGateEl.classList.remove('hidden');
+  /* ---------------- Plans ---------------- */
+
+  // dev / beta / paid have full access; free is the Free Preview. The server
+  // decides (and enforces it for the AI and voice features); this copy is
+  // what the page shows.
+  let currentPlan = 'free';
+  try {
+    currentPlan = localStorage.getItem(PLAN_KEY) || 'free';
+  } catch (err) {
+    /* storage unavailable */
   }
 
-  function showAuthenticatedApp() {
-    authGateEl.classList.add('hidden');
-    appEl.classList.remove('hidden');
-    initApp();
+  function setPlan(plan) {
+    currentPlan = plan || 'free';
+    try {
+      localStorage.setItem(PLAN_KEY, currentPlan);
+      if (currentPlan === 'beta') localStorage.setItem(BETA_KEY, '1');
+    } catch (err) {
+      /* storage unavailable */
+    }
+  }
+
+  function hasFullAccess() {
+    return isDevAccount() || currentPlan !== 'free';
+  }
+
+  function planLabel(plan) {
+    return { dev: 'Developer', beta: 'Beta access', paid: 'Pro', free: 'Free Preview' }[plan] || 'Free Preview';
   }
 
   // Pulls the 9 progress-related localStorage keys into one snapshot object,
@@ -190,17 +210,21 @@
     };
   }
 
-  // The inverse of collectProgressSnapshot: writes a progress object fetched
-  // from the server back into the same localStorage keys, overwriting
-  // whatever was there — correct both for a fresh browser (nothing to lose)
-  // and for switching accounts on a browser that already has a different
-  // account's leftover data.
-  function hydrateFromProgress(progress) {
-    if (!progress) return;
+
+  // The inverse of collectProgressSnapshot: writes this account's progress
+  // from the server into localStorage. If this browser already holds this
+  // same account's progress, the two are merged (js/progress-merge.js) so
+  // anything not yet saved here isn't lost; if it holds someone else's, or
+  // nothing, the server's copy simply replaces it.
+  function hydrateFromProgress(serverProgress, email, signedInAtLoad) {
+    if (!serverProgress) return;
+    const owner = localStorage.getItem(PROGRESS_OWNER_KEY);
+    // Before owners were recorded, a browser already signed in when the
+    // page loads holds that account's progress.
+    const mine = owner ? owner === email : signedInAtLoad;
+    const progress = mine ? window.SlovakProgressMerge.mergeProgress(collectProgressSnapshot(), serverProgress) : serverProgress;
+
     const streakCount = progress.streakCount || 0;
-    // longestStreak didn't exist before this account may have already built
-    // a streak, so back-fill it from the current streak rather than showing
-    // an existing streak-holder as 0 on the leaderboard until their next practice.
     localStorage.setItem(STREAK_COUNT_KEY, String(streakCount));
     localStorage.setItem(LONGEST_STREAK_KEY, String(Math.max(progress.longestStreak || 0, streakCount)));
     if (progress.streakLastDate) localStorage.setItem(STREAK_DATE_KEY, progress.streakLastDate);
@@ -209,10 +233,11 @@
     localStorage.setItem(MASTERED_KEY, JSON.stringify(progress.masteredWords || {}));
     localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(progress.achievements || []));
     localStorage.setItem(ROUND_PROGRESS_KEY, JSON.stringify(progress.roundProgress || {}));
-    localStorage.setItem(ROADMAP_PROGRESS_KEY, JSON.stringify(progress.roadmapProgress || []));
+    localStorage.setItem(ROADMAP_PROGRESS_KEY, JSON.stringify(progress.roadmapProgress || {}));
     localStorage.setItem(TIME_SPENT_KEY, String(progress.timeSpentMs || 0));
     localStorage.setItem(DAILY_GOAL_TARGET_KEY, String(progress.dailyGoalTarget || DEFAULT_DAILY_GOAL));
     localStorage.setItem(DAILY_COUNT_KEY, JSON.stringify(progress.dailyPracticeCount || { date: null, count: 0 }));
+    localStorage.setItem(PROGRESS_OWNER_KEY, email);
   }
 
   let progressSyncTimer = null;
@@ -242,152 +267,460 @@
     if (document.visibilityState === 'hidden') flushProgressSync();
   });
 
-  // Fetches this account's saved progress and writes it into localStorage,
-  // then shows the app. Shared by the token-already-in-localStorage path
-  // (page load) and right after a fresh login/signup.
-  async function finishLogin(token, user) {
+  /* ---------------- Onboarding: account → plan → app ---------------- */
+
+  function showOnboarding(step) {
+    appEl.classList.add('hidden');
+    onboardingEl.classList.remove('hidden');
+    const signedIn = step === 'plans';
+    document.getElementById('onboarding-signed-out').classList.toggle('hidden', signedIn);
+    document.getElementById('onboarding-signed-in').classList.toggle('hidden', !signedIn);
+    if (signedIn) {
+      const user = getSessionUser() || {};
+      document.getElementById('ob-signed-name').textContent = user.name || '';
+      document.getElementById('ob-signed-email').textContent = user.email ? '(' + user.email + ')' : '';
+    }
+    renderPlanCards(document.getElementById('onboarding-plan-grid'), 'gate');
+    hidePlanMessage();
+  }
+
+  function enterApp() {
+    onboardingEl.classList.add('hidden');
+    appEl.classList.remove('hidden');
+    if (appInitialized) refreshForPlan();
+    else initApp();
+  }
+
+  // Signed in (just now, or still from last time): load this account's
+  // progress, then go to the app — or to the plan step, for a new account
+  // that hasn't picked one yet.
+  async function finishLogin(token, user, account, signedInAtLoad) {
     setSession(token, user);
-    // Marks this browser as "already has an account on it" — the signup
-    // handler uses this so only the very first account ever created here
-    // can inherit pre-existing localStorage progress. Without it, a second
-    // signup in the same browser would re-send whatever the first account
-    // just hydrated and silently clone that account's progress onto the
-    // new one.
+    // Only the very first account ever created in a browser may take over
+    // progress already stored in it (see the register request).
     localStorage.setItem(MIGRATED_KEY, '1');
+    if (account) setPlan(account.plan);
     try {
-      const res = await fetch('/.netlify/functions/progress', {
-        headers: { Authorization: 'Bearer ' + token },
-      });
+      const res = await fetch('/.netlify/functions/progress', { headers: { Authorization: 'Bearer ' + token } });
+      if (res.status === 401) {
+        clearSessionToken();
+        showOnboarding('account');
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
-        hydrateFromProgress(data.progress);
-        // Backfilling longestStreak in hydrateFromProgress only touches
-        // localStorage — push it back so the leaderboard picks it up too,
-        // not just this browser.
+        hydrateFromProgress(data.progress, (user && user.email) || sessionEmail(), signedInAtLoad);
+        if (data.account) {
+          account = data.account;
+          setPlan(account.plan);
+        }
+        // Push the merged copy back, so the server has it too.
         scheduleProgressSync();
       }
     } catch (err) {
-      // Network hiccup: fall through with whatever's already in localStorage
-      // rather than blocking the user from getting into the app at all.
+      // Offline or a network hiccup: carry on with what this browser has.
     }
-    showAuthenticatedApp();
+    if (isDevAccount() || !account || account.planChosen) enterApp();
+    else showOnboarding('plans');
   }
 
   async function resolveSession() {
     const token = getSessionToken();
     if (!token) {
-      showAuthGate();
+      showOnboarding('account');
+      return;
+    }
+    await finishLogin(token, getSessionUser() || { email: sessionEmail() }, null, true);
+  }
+
+  function showPlanMessage(text) {
+    const el = document.getElementById('onboarding-plan-message');
+    el.textContent = text;
+    el.classList.remove('hidden');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hidePlanMessage() {
+    document.getElementById('onboarding-plan-message').classList.add('hidden');
+  }
+
+  // Plan cards, on the onboarding screen ('gate') and under Pricing Plans
+  // ('pricing').
+  function renderPlanCards(container, context) {
+    if (!container) return;
+    const signedInPlan = getSessionToken() && context === 'pricing' ? currentPlan : null;
+    container.innerHTML = PLAN_INFO.map(function (plan) {
+      const isCurrent = signedInPlan && ((plan.id === 'free' && signedInPlan === 'free') || (plan.id !== 'free' && signedInPlan === 'paid'));
+      return (
+        '<div class="plan-card' + (plan.badge ? ' featured' : '') + '">' +
+        (plan.badge ? '<div class="plan-badge-top">' + escapeHtml(plan.badge) + '</div>' : '') +
+        '<h3>' + escapeHtml(plan.name) + '</h3>' +
+        '<div class="plan-price"><span class="plan-amount">' + escapeHtml(plan.price) + '</span> <span class="plan-period">' + escapeHtml(plan.period) + '</span></div>' +
+        (plan.note ? '<div class="plan-note">' + escapeHtml(plan.note) + '</div>' : '') +
+        '<ul class="plan-features">' + plan.features.map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') + '</ul>' +
+        '<button type="button" class="btn ' + (plan.badge ? 'btn-primary' : 'btn-secondary') + ' plan-cta" data-plan="' + plan.id + '"' + (isCurrent ? ' disabled' : '') + '>' +
+        escapeHtml(isCurrent ? 'Your plan' : plan.cta) +
+        '</button>' +
+        '</div>'
+      );
+    }).join('');
+    container.querySelectorAll('.plan-cta').forEach(function (btn) {
+      btn.addEventListener('click', function () { choosePlan(btn.dataset.plan, context); });
+    });
+  }
+
+  async function choosePlan(planId, context) {
+    const signedIn = !!getSessionToken();
+    if (planId !== 'free') {
+      if (context === 'gate') showPlanMessage(PAID_SOON_MESSAGE + (signedIn ? '' : ' (Create your account above first.)'));
+      else showNotice('Coming soon', PAID_SOON_MESSAGE, [{ label: 'Enter a beta code', primary: true, onClick: goToCodeEntry }]);
+      return;
+    }
+    if (context === 'pricing') {
+      closeModal('legal-modal');
+      return;
+    }
+    if (!signedIn) {
+      showPlanMessage('Create your account above first — then press Start Free Preview.');
+      document.getElementById('ob-name').focus();
       return;
     }
     try {
-      const res = await fetch('/.netlify/functions/progress', {
-        headers: { Authorization: 'Bearer ' + token },
+      const res = await fetch('/.netlify/functions/account', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ action: 'start-free' }),
       });
-      if (!res.ok) {
-        clearSessionToken();
-        showAuthGate();
-        return;
-      }
-      const data = await res.json();
-      hydrateFromProgress(data.progress);
-      scheduleProgressSync();
-      showAuthenticatedApp();
+      const data = await res.json().catch(function () { return {}; });
+      if (res.ok && data.ok) setPlan(data.plan);
     } catch (err) {
-      showAuthGate();
+      // The choice is only remembered for next time; carry on regardless.
+    }
+    enterApp();
+  }
+
+  // The access code: unlocks full access (beta) for the signed-in account.
+  async function redeemAccessCode(code, errorEl, button) {
+    errorEl.textContent = '';
+    if (!getSessionToken()) {
+      errorEl.textContent = 'Create an account or sign in first, then enter your code.';
+      return false;
+    }
+    if (!code) {
+      errorEl.textContent = 'Please enter your code.';
+      return false;
+    }
+    button.disabled = true;
+    try {
+      const res = await fetch('/.netlify/functions/verify-password', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ password: code }),
+      });
+      const data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.ok) {
+        errorEl.textContent = data.error || 'That code is not right.';
+        return false;
+      }
+      setPlan(data.plan);
+      return true;
+    } catch (err) {
+      errorEl.textContent = 'Could not reach the server. Please try again.';
+      return false;
+    } finally {
+      button.disabled = false;
     }
   }
 
-  function setupAuthGate() {
-    let mode = 'login';
+  function setupOnboarding() {
+    let mode = 'register';
+    const form = document.getElementById('onboarding-form');
+    const errorEl = document.getElementById('ob-error');
+    const submit = document.getElementById('ob-submit');
+    const passwordInput = document.getElementById('ob-password');
 
     function applyMode() {
-      authModeButtons.forEach(function (b) { b.classList.toggle('active', b.dataset.authMode === mode); });
-      authNameField.classList.toggle('hidden', mode !== 'signup');
-      authTitle.textContent = mode === 'signup' ? 'Create Account' : 'Log In';
-      authSub.textContent =
-        mode === 'signup'
-          ? 'Set up your account to start tracking your own progress.'
-          : 'Welcome back — log in to see your progress.';
-      authSubmit.textContent = mode === 'signup' ? 'Sign Up' : 'Log In';
-      authPasswordInput.autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
-      authError.textContent = '';
+      document.querySelectorAll('[data-onboarding-mode]').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.onboardingMode === mode);
+        b.setAttribute('aria-selected', String(b.dataset.onboardingMode === mode));
+      });
+      form.querySelectorAll('[data-only="register"]').forEach(function (el) { el.classList.toggle('hidden', mode !== 'register'); });
+      submit.textContent = mode === 'register' ? 'Create Account' : 'Sign In';
+      passwordInput.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+      passwordInput.placeholder = mode === 'register' ? 'At least 8 characters' : '';
+      errorEl.textContent = '';
     }
 
-    authModeButtons.forEach(function (btn) {
+    document.querySelectorAll('[data-onboarding-mode]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        mode = btn.dataset.authMode;
+        mode = btn.dataset.onboardingMode;
         applyMode();
       });
     });
 
-    authForm.addEventListener('submit', async function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      const email = authEmailInput.value.trim();
-      const password = authPasswordInput.value;
-      const name = authNameInput.value.trim();
+      const name = document.getElementById('ob-name').value.trim();
+      const email = document.getElementById('ob-email').value.trim();
+      const password = passwordInput.value;
+      const confirm = document.getElementById('ob-confirm').value;
+      const terms = document.getElementById('ob-terms').checked;
 
-      if (!email || !password || (mode === 'signup' && !name)) {
-        authError.textContent = 'Please fill in all fields.';
-        return;
+      if (mode === 'register') {
+        if (!name || !email || !password || !confirm) return (errorEl.textContent = 'Please fill in all the fields.');
+        if (password.length < 8) return (errorEl.textContent = 'Your password needs at least 8 characters.');
+        if (password !== confirm) return (errorEl.textContent = "The two passwords don't match.");
+        if (!terms) return (errorEl.textContent = 'Please agree to the Terms of Service and Privacy Policy.');
+      } else if (!email || !password) {
+        return (errorEl.textContent = 'Please enter your email and password.');
       }
 
-      authError.textContent = '';
-      authSubmit.disabled = true;
-      authSubmit.textContent = mode === 'signup' ? 'Creating account…' : 'Logging in…';
-
+      errorEl.textContent = '';
+      submit.disabled = true;
+      submit.textContent = mode === 'register' ? 'Creating account…' : 'Signing in…';
       try {
-        const endpoint = mode === 'signup' ? 'signup' : 'login';
-        const payload = { sitePassword: getStoredPassword(), email: email, password: password };
-        if (mode === 'signup') {
-          payload.name = name;
-          // Only the first account ever created on this browser can inherit
-          // pre-existing localStorage progress — every account after that
-          // starts at zero, even signed up from the same browser.
-          if (!localStorage.getItem(MIGRATED_KEY)) {
-            payload.progressSnapshot = collectProgressSnapshot();
-          }
-        }
+        const payload = mode === 'register'
+          ? { action: 'register', name: name, email: email, password: password, confirmPassword: confirm, acceptTerms: true }
+          : { action: 'login', email: email, password: password };
+        // Only the first account ever created in this browser may take over
+        // progress already stored in it.
+        if (mode === 'register' && !localStorage.getItem(MIGRATED_KEY)) payload.progressSnapshot = collectProgressSnapshot();
 
-        const res = await fetch('/.netlify/functions/' + endpoint, {
+        const res = await fetch('/.netlify/functions/auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
         const data = await res.json().catch(function () { return {}; });
-
         if (!res.ok || !data.ok) {
-          authError.textContent = data.error || 'Something went wrong. Please try again.';
+          errorEl.textContent = data.error || 'Something went wrong. Please try again.';
           return;
         }
-
-        authForm.reset();
-        await finishLogin(data.token, data.user);
+        form.reset();
+        await finishLogin(data.token, data.user, data.account, false);
       } catch (err) {
-        authError.textContent = 'Could not reach the server. Please try again.';
+        errorEl.textContent = 'Could not reach the server. Please try again.';
       } finally {
-        authSubmit.disabled = false;
-        authSubmit.textContent = mode === 'signup' ? 'Sign Up' : 'Log In';
+        submit.disabled = false;
+        submit.textContent = mode === 'register' ? 'Create Account' : 'Sign In';
+      }
+    });
+
+    document.getElementById('ob-signout').addEventListener('click', function () {
+      clearSessionToken();
+      showOnboarding('account');
+    });
+
+    const codeForm = document.getElementById('ob-code-form');
+    codeForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const ok = await redeemAccessCode(
+        document.getElementById('ob-code').value.trim(),
+        document.getElementById('ob-code-error'),
+        document.getElementById('ob-code-submit')
+      );
+      if (ok) {
+        codeForm.reset();
+        enterApp();
       }
     });
 
     applyMode();
   }
 
-  setupAuthGate();
+  /* ---------------- Modals: account, legal pages, notices ---------------- */
 
-  function setupLogout() {
-    const btn = document.getElementById('logout-btn');
-    if (!btn) return;
-    const user = getSessionUser();
-    if (user && user.name) btn.title = 'Log out (' + user.name + ')';
-    btn.addEventListener('click', function () {
+  // One window at a time, except a short notice, which can sit on top of the
+  // window it came from (e.g. "Coming soon" over Pricing Plans).
+  function openModal(id) {
+    if (id !== 'notice-modal') {
+      document.querySelectorAll('.modal:not(.hidden)').forEach(function (m) {
+        if (m.id !== id) m.classList.add('hidden');
+      });
+    }
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+  }
+
+  function setupModals() {
+    document.querySelectorAll('.modal').forEach(function (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal || e.target.closest('[data-close-modal]')) modal.classList.add('hidden');
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      document.querySelectorAll('.modal:not(.hidden)').forEach(function (m) { m.classList.add('hidden'); });
+    });
+    // Legal links anywhere on the page (onboarding, footer, account), and
+    // "Enter a beta code" buttons.
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest ? e.target.closest('[data-legal]') : null;
+      if (link) openLegal(link.dataset.legal);
+      const upsell = e.target.closest ? e.target.closest('[data-upsell="code"]') : null;
+      if (upsell) goToCodeEntry();
+    });
+    document.querySelectorAll('[data-legal-tab]').forEach(function (tab) {
+      tab.addEventListener('click', function () { openLegal(tab.dataset.legalTab); });
+    });
+    document.getElementById('footer-line').innerHTML =
+      '© 2026 ' + escapeHtml(LEGAL_CONFIG.operator) + ' · <a href="mailto:' + escapeHtml(LEGAL_CONFIG.contactEmail) + '">' + escapeHtml(LEGAL_CONFIG.contactEmail) + '</a>';
+  }
+
+  function showNotice(title, message, actions) {
+    document.getElementById('notice-title').textContent = title;
+    document.getElementById('notice-message').textContent = message;
+    const box = document.getElementById('notice-actions');
+    box.innerHTML = '';
+    (actions || []).forEach(function (a) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn ' + (a.primary ? 'btn-primary' : 'btn-secondary');
+      btn.textContent = a.label;
+      btn.addEventListener('click', function () {
+        closeModal('notice-modal');
+        a.onClick();
+      });
+      box.appendChild(btn);
+    });
+    openModal('notice-modal');
+  }
+
+  // Shown wherever the Free Preview stops: a locked section, a Pro topic, an
+  // AI feature.
+  function showUpsell(what) {
+    showNotice(
+      'Pro Plan Required',
+      (what ? what + ' — part of Pro. ' : '') + 'Upgrade or enter a Beta Code in Account Settings.',
+      [
+        { label: 'Enter a beta code', primary: true, onClick: goToCodeEntry },
+        { label: 'See plans', onClick: function () { openLegal('pricing'); } },
+      ]
+    );
+  }
+
+  // "Enter a beta code": the account window once signed in; on the sign-up
+  // screen, the code box there.
+  function goToCodeEntry() {
+    if (onboardingEl.classList.contains('hidden')) {
+      openAccountModal(true);
+      return;
+    }
+    document.querySelectorAll('.modal:not(.hidden)').forEach(function (m) { m.classList.add('hidden'); });
+    const input = document.getElementById('ob-code');
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.focus({ preventScroll: true });
+  }
+
+  function openAccountModal(focusCode) {
+    const user = getSessionUser() || {};
+    document.getElementById('acct-name').textContent = user.name || '';
+    document.getElementById('acct-email').textContent = user.email || sessionEmail();
+    const plan = isDevAccount() ? 'dev' : currentPlan;
+    const badge = document.getElementById('acct-plan-badge');
+    badge.textContent = planLabel(plan);
+    badge.className = 'plan-badge plan-' + plan;
+    document.getElementById('acct-plan-desc').textContent = {
+      dev: 'Everything unlocked, plus Add Content and Analytics.',
+      beta: 'Full access to every section and feature, unlocked with an access code.',
+      paid: 'Full access to every section and feature.',
+      free: 'Sections 1–5, the alphabet guide, core flashcards and 15 voice checks a day. Upgrade, or enter a beta code, for everything.',
+    }[plan];
+    document.getElementById('acct-upgrade').classList.toggle('hidden', plan !== 'free');
+    document.getElementById('acct-code-error').textContent = '';
+    openModal('account-modal');
+    if (focusCode && plan === 'free') document.getElementById('acct-code').focus();
+  }
+
+  function setupAccountModal() {
+    document.getElementById('account-btn').addEventListener('click', function () { openAccountModal(false); });
+    document.getElementById('acct-see-plans').addEventListener('click', function () { openLegal('pricing'); });
+    document.getElementById('acct-logout').addEventListener('click', function () {
       flushProgressSync();
       clearSessionToken();
       location.reload();
     });
+    const codeForm = document.getElementById('acct-code-form');
+    codeForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const ok = await redeemAccessCode(
+        document.getElementById('acct-code').value.trim(),
+        document.getElementById('acct-code-error'),
+        document.getElementById('acct-code-submit')
+      );
+      if (!ok) return;
+      codeForm.reset();
+      closeModal('account-modal');
+      refreshForPlan();
+      showAchievementToast('Full access unlocked');
+    });
   }
 
-  /* ---------------- App (only runs after unlock) ---------------- */
+  /* ---------------- Legal pages ---------------- */
+
+  function legalDocs() {
+    const c = LEGAL_CONFIG;
+    const mail = '<a href="mailto:' + c.contactEmail + '">' + c.contactEmail + '</a>';
+    const site = '<a href="' + c.siteUrl + '" target="_blank" rel="noopener">' + c.siteUrl + '</a>';
+    return {
+      terms: {
+        title: 'Terms of Service',
+        html:
+          '<p class="legal-meta"><strong>Service:</strong> ' + c.serviceName + ' (' + site + ')<br><strong>Operated by:</strong> ' + c.operator + ' (' + mail + ')<br><strong>Last updated:</strong> ' + c.lastUpdated + '</p>' +
+          '<h3>1. Agreement to Terms</h3><p>By creating an account, entering an access code, or using ' + c.serviceName + ' (the "Service"), operated by the ' + c.operator + ' ("we", "us", or "our"), you agree to be bound by these Terms of Service.</p>' +
+          '<h3>2. Description of Service</h3><p>' + c.serviceName + ' is an interactive digital language-learning platform designed to teach the Slovak language through structured curriculum units, vocabulary flashcards, grammar lessons, interactive dialogues, speech pronunciation checks, and AI-assisted study explanations.</p>' +
+          '<h3>3. Accounts &amp; Access Codes</h3><p>You must provide accurate registration information and keep your login credentials secure. Developer and beta access codes issued by us grant complimentary access to designated features and may be modified or revoked at any time.</p>' +
+          '<h3>4. Subscriptions, Billing &amp; Cancellation</h3><p>Introductory sections (Sections 1–5) are available free of charge ("Free Preview"). Full access requires an active paid subscription (Monthly Pro at €11.99/month or Annual Pro at €79.00/year) or a valid beta/dev access code. Paid subscriptions renew automatically at the end of each billing cycle unless cancelled beforehand. You may cancel anytime in Account Settings or by emailing ' + mail + '; access continues until the end of the current paid period, after which your account reverts to Free Preview with all progress preserved.</p>' +
+          '<h3>5. Fair Use &amp; API Quotas</h3><p>To prevent automated abuse, Free Preview accounts include up to 15 voice checks/day and Pro/Beta accounts include up to 150 voice checks/day and 25 custom AI quizzes/day. Automated scraping, bulk downloading, or credential sharing is prohibited.</p>' +
+          '<h3>6. Intellectual Property</h3><p>All curriculum content, lesson structures, audio, and code are the exclusive property of the ' + c.operator + ' and its creators, licensed to you solely for personal, non-commercial study.</p>' +
+          '<h3>7. Disclaimer &amp; Limitation of Liability</h3><p>The Service is provided "AS IS". AI grammar explanations and automated speech scoring may occasionally contain errors. To the maximum extent permitted by applicable law, our total liability shall not exceed the amount paid by you for the Service in the preceding 12 months.</p>' +
+          '<h3>8. Contact</h3><p>For support or questions, email ' + mail + '.</p>',
+      },
+      privacy: {
+        title: 'Privacy Policy',
+        html:
+          '<p class="legal-meta"><strong>Data controller:</strong> ' + c.operator + ', contact: ' + mail + ', website: ' + site + '<br><strong>Last updated:</strong> ' + c.lastUpdated + '</p>' +
+          '<h3>1. Personal Data We Collect</h3><ul>' +
+          '<li><em>Account Data:</em> Email address, display name, encrypted password hash, creation date, and plan/access tier.</li>' +
+          '<li><em>Learning Progress &amp; Analytics:</em> Completed roadmap sections, daily streaks, XP, flashcard mastery scores, missed vocabulary words, and feature usage counts.</li>' +
+          '<li><em>Voice Pronunciation Audio (Transient Processing):</em> When you use the microphone pronunciation check, short audio clips are sent securely to our speech-to-text processor solely to score your pronunciation. We do not permanently store raw voice recordings after transcription completes.</li></ul>' +
+          '<h3>2. Legal Basis (GDPR Art. 6)</h3><p>Performance of a contract (Art. 6(1)(b)) to provide the learning platform and sync progress; legitimate interests (Art. 6(1)(f)) for aggregated, de-identified curriculum analytics and API cost monitoring; legal obligation (Art. 6(1)(c)) for tax/billing records when applicable.</p>' +
+          '<h3>3. Sub-Processors</h3><p>Netlify, Inc. (hosting, serverless functions, and encrypted Netlify Blobs storage), Google Cloud Platform / AI providers (real-time speech-to-text, text-to-speech, and AI sentence explanations), and Stripe/Paddle (payment processing when billing is active — we never store raw card numbers).</p>' +
+          '<h3>4. Data Retention &amp; Your Privacy Rights</h3><p>We retain your account data while your account is active. You have the right to access, rectify, erase ("Right to be Forgotten"), or export your personal data at any time by emailing ' + mail + '. Requests are completed within 30 days.</p>',
+      },
+      refund: {
+        title: 'Refund, Cancellation & 14-Day Money-Back Policy',
+        html:
+          '<h3>1. Cancel Anytime</h3><p>Cancel your Monthly Pro or Annual Pro subscription anytime in Account Settings or by emailing ' + mail + '. You will never be billed again after cancelling, and your progress remains saved.</p>' +
+          '<h3>2. 14-Day Money-Back Guarantee</h3><p>In accordance with and exceeding EU consumer protection standards, ' + c.serviceName + ' offers a full, no-questions-asked 14-day money-back guarantee on your initial Monthly or Annual subscription purchase, even if you have already begun accessing digital lessons. Email ' + mail + ' within 14 calendar days of your initial payment for a 100% refund.</p>' +
+          '<h3>3. Renewals</h3><p>Monthly renewals after the first 14 days are non-refundable (cancelling stops future charges). If you forget to cancel an Annual renewal and contact us within 7 days of the renewal charge, we will refund the annual renewal in full.</p>',
+      },
+      pricing: {
+        title: 'Pricing Plans',
+        html: '<div class="plan-grid" id="pricing-plan-grid"></div>',
+      },
+    };
+  }
+
+  function openLegal(id) {
+    const docs = legalDocs();
+    const doc = docs[id] || docs.terms;
+    document.getElementById('legal-title').textContent = doc.title;
+    document.getElementById('legal-body').innerHTML = doc.html;
+    document.querySelectorAll('[data-legal-tab]').forEach(function (t) { t.classList.toggle('active', t.dataset.legalTab === id); });
+    if (id === 'pricing') renderPlanCards(document.getElementById('pricing-plan-grid'), 'pricing');
+    closeModal('notice-modal');
+    openModal('legal-modal');
+    document.getElementById('legal-body').scrollTop = 0;
+  }
+
+  setupModals();
+  setupOnboarding();
+
+  /* ---------------- App (only runs once signed in) ---------------- */
 
   let appInitialized = false;
   let grammarData = [];
@@ -398,8 +731,10 @@
     appInitialized = true;
 
     setupTabs();
+    applyDevTabs();
     trackTopbarHeight();
-    setupLogout();
+    setupAccountModal();
+    setupAnalytics();
     loadContent();
     setupTests();
     setupTestsModes();
@@ -414,6 +749,198 @@
     setupTimeTracking();
     loadAudioManifest();
     setupAudioGeneration();
+  }
+
+  // Add Content and Analytics are for the developer accounts only.
+  function applyDevTabs() {
+    const dev = isDevAccount();
+    document.querySelectorAll('[data-tab="add-content"], [data-tab="analytics"]').forEach(function (btn) {
+      btn.classList.toggle('hidden', !dev);
+    });
+    if (!dev) {
+      ['panel-add-content', 'panel-analytics'].forEach(function (id) { document.getElementById(id).classList.remove('active'); });
+    }
+  }
+
+  // After the plan changes (an access code, the Free Preview): redraw
+  // everything that depends on it.
+  function refreshForPlan() {
+    applyDevTabs();
+    renderRoadmapMap();
+    renderGrammarGuide(document.getElementById('guide-search-input').value);
+    filterBrowseContent(document.getElementById('browse-search-input').value);
+    populateTopicSelect();
+    if (!document.getElementById('round-map').classList.contains('hidden')) renderRoundMap(currentRoundTopic);
+    renderProfile();
+  }
+
+  /* ---- Analytics (developer accounts only) ---- */
+
+  function setupAnalytics() {
+    document.getElementById('analytics-refresh').addEventListener('click', renderAnalytics);
+  }
+
+  // What each endpoint is, for the usage table. Free-tier notes are a guide
+  // to what to keep an eye on, not billing data.
+  const API_ROWS = [
+    { key: 'transcribe-audio', name: 'Voice checks', detail: 'transcribe-audio · Groq Whisper, Google Speech as fallback' },
+    { key: 'word-sentence', name: 'Example sentences', detail: 'word-sentence · Gemini, only on a cache miss' },
+    { key: 'generate-quiz', name: 'AI quizzes', detail: 'generate-quiz · Gemini, 2 requests per quiz' },
+    { key: 'speak', name: 'Sentence audio', detail: 'speak · Google Text-to-Speech' },
+    { key: 'extract-content', name: 'Add Content: read notes', detail: 'extract-content · Gemini (developers)' },
+    { key: 'generate-audio', name: 'Add Content: make audio', detail: 'generate-audio · Google Text-to-Speech (developers)' },
+  ];
+  // Google Speech is only the fallback; its free tier is 60 minutes a month,
+  // and a voice check records at most 6 seconds.
+  const STT_FREE_MINUTES = 60;
+  const STT_MINUTES_PER_CALL = 0.1;
+  const STT_PRICE_PER_MINUTE = 0.024;
+
+  function relativeDay(ms) {
+    if (!ms) return '—';
+    const days = Math.floor((Date.now() - ms) / 86400000);
+    if (days <= 0) return 'today';
+    if (days === 1) return 'yesterday';
+    if (days < 31) return days + ' days ago';
+    return new Date(ms).toISOString().slice(0, 10);
+  }
+
+  async function renderAnalytics() {
+    const body = document.getElementById('analytics-body');
+    if (!isDevAccount()) {
+      body.innerHTML = '';
+      return;
+    }
+    body.innerHTML = '<div class="empty-state">Loading…</div>';
+    let data;
+    try {
+      const res = await fetch('/.netlify/functions/analytics', { headers: { Authorization: 'Bearer ' + getSessionToken() } });
+      data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Could not load analytics.');
+    } catch (err) {
+      body.innerHTML = '<div class="error-banner">' + escapeHtml(err.message || 'Could not load analytics.') + '</div>';
+      return;
+    }
+
+    const today = data.usage.today || {};
+    const month = data.usage.month || {};
+    const callsToday = API_ROWS.reduce(function (n, r) { return n + (today[r.key] || 0); }, 0);
+    const callsMonth = API_ROWS.reduce(function (n, r) { return n + (month[r.key] || 0); }, 0);
+    const sttMinutes = (month['stt-google'] || 0) * STT_MINUTES_PER_CALL;
+    const sttCost = Math.max(0, sttMinutes - STT_FREE_MINUTES) * STT_PRICE_PER_MINUTE;
+    const costLine = sttCost === 0 ? '$0.00 — Within Free Tier' : '≈ $' + sttCost.toFixed(2) + ' — Google speech over its free tier';
+    const plans = data.accounts.byPlan;
+
+    // Where each section sits, and which section first teaches each word.
+    const sectionIndex = {};
+    const wordSection = {};
+    const wordEn = {};
+    roadmapSections.forEach(function (sec, i) {
+      sectionIndex[sec.id] = i;
+      if (sec.kind === 'checkpoint') return;
+      (sec.items || []).forEach(function (w) {
+        if (w && w.sk && !(w.sk in wordSection)) {
+          wordSection[w.sk] = i;
+          wordEn[w.sk] = w.en;
+        }
+      });
+    });
+    function sectionName(i) {
+      return i === undefined || i < 0 ? '—' : (i + 1) + '. ' + escapeHtml(roadmapSections[i].title);
+    }
+
+    const kpis =
+      '<div class="kpi-grid">' +
+      kpi('Registered accounts', data.accounts.total, 'Dev ' + plans.dev + ' · Beta ' + plans.beta + ' · Free ' + plans.free + ' · Paid ' + plans.paid) +
+      kpi('Active learners', data.active.last7 + ' <span class="kpi-unit">in 7 days</span>', data.active.last30 + ' in the last 30 days') +
+      kpi('Sections cleared', data.sectionsCleared, 'across all learners') +
+      kpi('API calls today', callsToday, callsMonth + ' this month · <span class="kpi-cost' + (sttCost ? ' over' : '') + '">' + escapeHtml(costLine) + '</span>') +
+      '</div>';
+
+    const hits = month['sentence-cache-hit'] || 0;
+    const misses = month['word-sentence'] || 0;
+    const hitRate = hits + misses ? Math.round((hits / (hits + misses)) * 100) + '%' : '—';
+    const usageRows = API_ROWS.map(function (r) {
+      let note = '';
+      if (r.key === 'transcribe-audio') {
+        note = 'Google fallback this month: ' + (month['stt-google'] || 0) + ' calls ≈ ' + sttMinutes.toFixed(1) + ' of ' + STT_FREE_MINUTES + ' free minutes';
+      }
+      if (r.key === 'word-sentence') {
+        note = 'Served from the cache this month: ' + hits + ' (hit rate ' + hitRate + ')';
+      }
+      return (
+        '<tr><td><strong>' + escapeHtml(r.name) + '</strong><div class="cell-sub">' + escapeHtml(r.detail) + '</div></td>' +
+        '<td class="num">' + (today[r.key] || 0) + '</td><td class="num">' + (month[r.key] || 0) + '</td>' +
+        '<td class="cell-sub">' + escapeHtml(note) + '</td></tr>'
+      );
+    }).join('');
+    const usage =
+      '<h3 class="browse-subhead">API usage & cost protection</h3>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Feature</th><th class="num">Today</th><th class="num">This month</th><th>Notes</th></tr></thead><tbody>' +
+      usageRows +
+      '<tr><td><strong>Access codes</strong><div class="cell-sub">verify-password</div></td><td class="num">' +
+      ((today['access-code-redeemed'] || 0) + (today['access-code-wrong'] || 0)) + '</td><td class="num">' +
+      ((month['access-code-redeemed'] || 0) + (month['access-code-wrong'] || 0)) + '</td><td class="cell-sub">This month: ' +
+      (month['access-code-redeemed'] || 0) + ' unlocked, ' + (month['access-code-wrong'] || 0) + ' wrong tries</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="analytics-note">Days and months are UTC. The cost line is an estimate from the Google Speech fallback only (6-second clips at most); Gemini, Groq and Text-to-Speech are assumed to stay inside their free tiers — check each provider\'s dashboard for real billing. Daily limits per account: voice checks 15 (Free) / 150, AI quizzes 25, new example sentences 100, sentence audio 150.</p>';
+
+    const roster = data.roster.slice().sort(function (a, b) { return (b.lastActive || 0) - (a.lastActive || 0); });
+    const rosterRows = roster.map(function (u) {
+      const highest = u.cleared.reduce(function (m, id) { return id in sectionIndex ? Math.max(m, sectionIndex[id]) : m; }, -1);
+      return (
+        '<tr><td>' + escapeHtml(u.name || '—') + '</td><td>' + escapeHtml(u.email) + '</td>' +
+        '<td><span class="plan-badge plan-' + escapeHtml(u.plan) + '">' + escapeHtml(planLabel(u.plan)) + '</span></td>' +
+        '<td class="num">' + u.streak + ' <span class="cell-sub">(best ' + u.bestStreak + ')</span></td>' +
+        '<td>' + sectionName(highest) + '</td>' +
+        '<td class="num">' + u.cleared.length + '</td><td class="num">' + u.wordsMastered + '</td>' +
+        '<td>' + relativeDay(u.lastActive) + '</td></tr>'
+      );
+    }).join('');
+    const rosterHtml =
+      '<h3 class="browse-subhead">Learners (' + roster.length + ')</h3>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th class="num">Streak</th><th>Furthest section</th><th class="num">Cleared</th><th class="num">Words mastered</th><th>Last active</th></tr></thead><tbody>' +
+      rosterRows + '</tbody></table></div>' +
+      '<p class="analytics-note">The site has no XP points, so learners are compared by sections cleared and words mastered.</p>';
+
+    const most = Math.max(1, data.accounts.total);
+    const funnelRows = roadmapSections
+      .map(function (sec, i) {
+        if (sec.level === MY_ADDITIONS_LEVEL) return '';
+        const n = data.funnel[sec.id] || 0;
+        return (
+          '<tr><td class="num">' + (i + 1) + '</td><td>' + escapeHtml(sec.title) + ' <span class="cell-sub">' + escapeHtml(kindLabel(sec)) + '</span></td>' +
+          '<td class="funnel-cell"><div class="funnel-bar"><div class="funnel-fill" style="width:' + Math.round((n / most) * 100) + '%"></div></div></td>' +
+          '<td class="num">' + n + '</td></tr>'
+        );
+      })
+      .join('');
+    const funnel =
+      '<h3 class="browse-subhead">Section funnel</h3>' +
+      '<p class="analytics-note">How many learners have cleared each section. A sharp drop shows where people get stuck.</p>' +
+      '<div class="table-scroll funnel-scroll"><table class="data-table"><thead><tr><th class="num">#</th><th>Section</th><th>Learners who cleared it</th><th class="num">Count</th></tr></thead><tbody>' +
+      funnelRows + '</tbody></table></div>';
+
+    const missedRows = data.missedWords.slice(0, 25).map(function (w, i) {
+      return (
+        '<tr><td class="num">' + (i + 1) + '</td><td><strong>' + escapeHtml(w.sk) + '</strong></td><td>' + escapeHtml(wordEn[w.sk] || '—') + '</td>' +
+        '<td>' + sectionName(wordSection[w.sk]) + '</td><td class="num">' + w.misses + '</td><td class="num">' + w.learners + '</td></tr>'
+      );
+    }).join('');
+    const missed =
+      '<h3 class="browse-subhead">Top 25 most-missed words</h3>' +
+      '<p class="analytics-note">Misses still on record across everyone (a right answer takes one back off), so these are the words that need a better hint, note or example.</p>' +
+      (missedRows
+        ? '<div class="table-scroll"><table class="data-table"><thead><tr><th class="num">#</th><th>Slovak</th><th>English</th><th>Section</th><th class="num">Misses</th><th class="num">Learners</th></tr></thead><tbody>' + missedRows + '</tbody></table></div>'
+        : '<div class="empty-state">No missed words yet.</div>');
+
+    body.innerHTML =
+      kpis + usage + rosterHtml + funnel + missed +
+      '<p class="analytics-note">Updated ' + escapeHtml(new Date(data.generatedAt).toLocaleString()) + '.</p>';
+
+    function kpi(label, value, sub) {
+      return '<div class="kpi-card"><div class="kpi-label">' + escapeHtml(label) + '</div><div class="kpi-value">' + value + '</div><div class="kpi-sub">' + sub + '</div></div>';
+    }
   }
 
   /* ---- Tabs ---- */
@@ -437,6 +964,7 @@
           renderProfile();
           renderLeaderboard();
         }
+        if (tab === 'analytics') renderAnalytics();
         // A new tab starts at its top, not wherever the last one was
         // scrolled to — except the roadmap, which goes to your next section.
         if (tab !== 'learn' || !scrollToUpNext(false)) window.scrollTo(0, 0);
@@ -678,6 +1206,8 @@
 
   function renderVocab(groups, emptyMessage) {
     const container = document.getElementById('vocab-list');
+    const locked = hasFullAccess() ? 0 : groups.filter(function (g) { return FREE_PRACTICE_TOPICS.indexOf(g.topic) === -1; }).length;
+    if (locked) groups = groups.filter(function (g) { return FREE_PRACTICE_TOPICS.indexOf(g.topic) !== -1; });
     if (!groups.length) {
       container.innerHTML = '<div class="empty-state">' + (emptyMessage || 'No vocabulary yet.') + '</div>';
       return;
@@ -718,7 +1248,10 @@
           '</div></div>'
         );
       })
-      .join('');
+      .join('') +
+      (locked
+        ? '<div class="pro-note"><strong>' + locked + ' more word topics</strong> come with Pro. <button type="button" class="link-btn" data-upsell="code">Enter a beta code</button> · <button type="button" class="link-btn" data-legal="pricing">See plans</button></div>'
+        : '');
   }
 
   // Matches a grammar topic against a Grammar Guide search.
@@ -881,6 +1414,10 @@
         })
         .join('');
     select.value = entries.some(function (e) { return e.key === guideTopic; }) ? guideTopic : '';
+    // On the Free Preview only Sounds & Spelling can be picked.
+    if (!hasFullAccess()) {
+      select.querySelectorAll('optgroup').forEach(function (g) { if (g.label !== 'Sounds & Spelling') g.remove(); });
+    }
   }
 
   function renderGrammarGuide(query) {
@@ -892,14 +1429,20 @@
     renderGuideTopicSelect(entries);
 
     const shown = entries.filter(function (e) {
+      if (!hasFullAccess() && e.group !== 'Sounds & Spelling') return false;
       if (guideTopic) return e.key === guideTopic;
       return !q || e.matches(q);
     });
     const groups = [];
     shown.forEach(function (e) { if (groups.indexOf(e.group) === -1) groups.push(e.group); });
 
+    const lockedNote = hasFullAccess()
+      ? ''
+      : '<div class="pro-note"><strong>' + entries.filter(function (e) { return e.group !== 'Sounds & Spelling'; }).length +
+        ' grammar guides</strong> come with Pro. <button type="button" class="link-btn" data-upsell="code">Enter a beta code</button> · <button type="button" class="link-btn" data-legal="pricing">See plans</button></div>';
+
     container.innerHTML = shown.length
-      ? groups
+      ? lockedNote + groups
           .map(function (g) {
             return (
               '<div class="guide-category"><h3 class="browse-subhead">' + escapeHtml(g) + '</h3>' +
@@ -1535,7 +2078,7 @@
     return (
       '<div class="sentence-block">' +
       '<button type="button" class="sentence-btn" data-sk="' + escapeHtml(word.sk) + '" data-en="' + escapeHtml(word.en || '') + '">' +
-      'Hear it in a sentence' +
+      'Hear it in a sentence' + (hasFullAccess() ? '' : ' · Pro') +
       '</button>' +
       '<div class="sentence-slot"></div>' +
       '</div>'
@@ -1583,6 +2126,10 @@
   }
 
   async function handleSentenceClick(btn) {
+    if (!hasFullAccess()) {
+      showUpsell('Example sentences');
+      return;
+    }
     const sk = btn.dataset.sk;
     const en = btn.dataset.en || '';
     const slot = btn.parentElement.querySelector('.sentence-slot');
@@ -1608,6 +2155,16 @@
         },
       });
       const data = result.data || {};
+      if (result.status === 403) {
+        slot.innerHTML = '';
+        showUpsell('Example sentences');
+        return;
+      }
+      // Today's limit reached: say so, rather than "try again in a moment".
+      if (result.status === 429) {
+        slot.innerHTML = '<div class="sentence-error">' + escapeHtml(result.error) + '</div>';
+        return;
+      }
       if (!result.ok || !data.sentence) throw new Error(result.error || 'No sentence.');
 
       const entry = { sentence: data.sentence, translation: data.translation || '' };
@@ -1844,6 +2401,13 @@
       return;
     }
 
+    if (!hasFullAccess() && FREE_PRACTICE_TOPICS.indexOf(topic) === -1) {
+      mapEl.innerHTML =
+        '<div class="pro-note pro-note-center"><strong>' + escapeHtml(topic) + '</strong> comes with Pro. On the Free Preview you can practise ' +
+        FREE_PRACTICE_TOPICS.map(escapeHtml).join(' and ') + '.<br><button type="button" class="btn btn-primary" data-upsell="code">Enter a beta code</button> <button type="button" class="btn btn-secondary" data-legal="pricing">See plans</button></div>';
+      return;
+    }
+
     const rounds = roundsForTopic(topic);
     if (!rounds.length) {
       mapEl.innerHTML = '<div class="empty-state">No words in this topic yet.</div>';
@@ -2012,7 +2576,7 @@
     practiceRun++;
     currentRoundTopic = topic;
     currentRoundIndex = roundIndex;
-    practiceQueue = pool;
+    practiceQueue = pool.map(function (w) { return { word: w, mode: 'card' }; }).concat(practiceDrills(words));
     practiceIndex = 0;
     practiceCorrect = 0;
 
@@ -2062,7 +2626,38 @@
 
     practiceRevealed = false;
     practiceGraded = false;
-    const word = practiceQueue[practiceIndex];
+    const entry = practiceQueue[practiceIndex];
+    const word = entry.word;
+
+    if (entry.mode !== 'card') {
+      stage.innerHTML =
+        backToRoundsLinkHtml() +
+        '<div class="practice-progress">' + (practiceIndex + 1) + ' of ' + practiceQueue.length + '</div>' +
+        '<div class="practice-prompt" id="practice-prompt"></div>';
+      document.getElementById('back-to-rounds-btn').addEventListener('click', goBackToRounds);
+      const run = practiceRun;
+      const handlers = {
+        onAnswer: function (isCorrect) {
+          recordWordResult(word, isCorrect);
+          if (isCorrect) practiceCorrect++;
+          playTone(isCorrect ? 'correct' : 'incorrect');
+          recordPracticeToday();
+          incrementDailyCount();
+          checkWordCountAchievements();
+        },
+        onNext: function () {
+          if (run !== practiceRun) return; // the round was left meanwhile
+          practiceIndex++;
+          renderPracticeCard();
+        },
+      };
+      const container = document.getElementById('practice-prompt');
+      if (entry.mode === 'type') {
+        renderTypedPrompt(container, word, '', handlers);
+        return;
+      }
+      if (renderLetterPrompt(container, word, '', handlers)) return;
+    }
 
     stage.innerHTML =
       backToRoundsLinkHtml() +
@@ -2543,10 +3138,17 @@
     return furthest;
   }
 
+  // Past the Free Preview's sections, on the Free Preview.
+  function planLocked(i) {
+    const s = roadmapSections[i];
+    return !hasFullAccess() && i >= FREE_SECTIONS && !!s && s.level !== MY_ADDITIONS_LEVEL;
+  }
+
   function lockedSectionFlags() {
     const furthestCleared = furthestClearedIndex();
     return roadmapSections.map(function (s, i) {
       if (devUnlocked() || i === 0 || s.level === MY_ADDITIONS_LEVEL) return false;
+      if (planLocked(i)) return true;
       if (isSectionCleared(s.id) || i < furthestCleared) return false;
       return !isSectionCleared(roadmapSections[i - 1].id);
     });
@@ -2762,10 +3364,15 @@
             (startsLevel ? levelHeaderHtml(section.level) : '') +
             '<div class="round-row ' + LANES[i % LANES.length] + '">' +
             '<div class="round-node-slot">' +
-            '<div class="round-node ' + stateClass + '" data-section-index="' + i + '" data-locked="' + locked + '">' +
+            '<div class="round-node ' + stateClass + (planLocked(i) ? ' plan-locked' : '') + '" data-section-index="' + i + '" data-locked="' + locked + '"' +
+            (planLocked(i) ? ' data-plan="true" title="' + escapeHtml(PRO_REQUIRED) + '"' : '') + '>' +
             inner +
+            (planLocked(i) ? '<span class="round-pro-tag">Pro</span>' : '') +
             (i === nextIdx ? '<span class="round-up-next-tag">Up next</span>' : '') +
             '<div class="round-label">' +
+            // A cleared star, a lock or a trophy hides the number, so the
+            // label carries it — every section can be found by its number.
+            (cleared || locked || isCheckpoint ? '<span class="round-label-num">' + (i + 1) + '.</span> ' : '') +
             (section.kind === 'grammar' || section.kind === 'dialogue' || section.kind === 'alphabet'
               ? '<span class="round-kind kind-' + (section.useIt ? 'use' : section.kind) + '">' + kindLabel(section) + '</span>'
               : '') +
@@ -2781,10 +3388,18 @@
 
     mapEl.querySelectorAll('.round-node').forEach(function (node) {
       node.addEventListener('click', function () {
+        if (node.dataset.plan === 'true') {
+          showUpsell('Section ' + (Number(node.dataset.sectionIndex) + 1));
+          return;
+        }
         if (node.dataset.locked === 'true') return;
         startLesson(Number(node.dataset.sectionIndex));
       });
     });
+
+    // On the Free Preview, say where it ends and how to go on.
+    const banner = document.getElementById('free-preview-banner');
+    if (banner) banner.classList.toggle('hidden', hasFullAccess());
 
     renderRoadmapJump(nextIdx);
     drawRoadmapPath(mapEl);
@@ -2829,6 +3444,14 @@
     const section = roadmapSections[lessonSectionIndex];
     if (!section) return;
 
+    // Something already answered and waiting on Next: skipping just presses
+    // Next, without taking it out of the score it already counts towards.
+    const waiting = document.querySelector('#exercise-next-btn, #quiz-next-btn, #voice-next-btn, #prompt-next-btn');
+    if (waiting) {
+      waiting.click();
+      return;
+    }
+
     if (lessonPhase === 'learn') {
       lessonPhase = 'practice';
       renderLessonPhase();
@@ -2836,11 +3459,6 @@
     }
 
     if (lessonPhase === 'voice') {
-      // A miss already counted and waiting on Next: just move on.
-      if (document.getElementById('voice-next-btn')) {
-        nextVoiceItem();
-        return;
-      }
       stopVoiceRecognition();
       lessonVoiceTotal = Math.max(0, lessonVoiceTotal - 1);
       voiceIndex++;
@@ -2850,17 +3468,6 @@
 
     const usesExercises = section.kind !== 'vocab' && section.kind !== 'checkpoint';
     const inFinalTestGrammar = section.kind === 'checkpoint' && quizIndex >= quizQueue.length;
-
-    // An exercise already answered is waiting on Next: skipping just moves
-    // on, without taking it out of the score it already counts towards.
-    if (exerciseAnswered && document.getElementById('exercise-next-btn') && (usesExercises || inFinalTestGrammar)) {
-      nextExercise();
-      return;
-    }
-    if (quizAnswered && document.getElementById('quiz-next-btn')) {
-      nextQuizQuestion();
-      return;
-    }
 
     if (lessonPhase === 'practice') {
       lessonPracticeTotal = Math.max(0, lessonPracticeTotal - 1);
@@ -2887,6 +3494,11 @@
   }
 
   function startLesson(index) {
+    if (planLocked(index)) {
+      document.getElementById('lesson-overlay').classList.add('hidden');
+      showUpsell('Section ' + (index + 1));
+      return;
+    }
     lessonSectionIndex = index;
     // A checkpoint has nothing to teach — it's purely a test of what should
     // already be known, so it skips straight past Learn/Practice/Voice.
@@ -3290,7 +3902,7 @@
     // content, and content that's inherently sequential (numbers, days)
     // should be learned in that sequence, not jumbled — long-term recall
     // once it's known is already the Review tab's job, not this one's.
-    lessonQueue = section.items.slice();
+    lessonQueue = section.items.map(function (w) { return { word: w, mode: 'card' }; }).concat(practiceDrills(section.items));
     lessonQueueIndex = 0;
     lessonPracticeCorrect = 0;
     // Only this section's own words count towards clearing it. The review
@@ -3305,7 +3917,7 @@
       .slice(0, REVIEW_EXTRAS_PER_SECTION)
       .forEach(function (w) {
         lessonReviewExtras[w.sk] = true;
-        lessonQueue.push(w);
+        lessonQueue.push({ word: w, mode: 'card' });
       });
 
     renderPracticeCardStep();
@@ -3321,9 +3933,31 @@
     }
 
     lessonCardGraded = false;
-    const item = lessonQueue[lessonQueueIndex];
+    const entry = lessonQueue[lessonQueueIndex];
+    const item = entry.word;
     lessonCurrentPracticeItem = item;
     const isExtra = !!lessonReviewExtras[item.sk];
+
+    if (entry.mode !== 'card') {
+      const eyebrow = '<div class="lesson-eyebrow">Practice · ' + (lessonQueueIndex + 1) + ' / ' + lessonQueue.length + '</div>';
+      const handlers = {
+        onAnswer: function (isCorrect) {
+          recordWordResult(item, isCorrect);
+          incrementDailyCount();
+          if (isCorrect) lessonPracticeCorrect++;
+          playTone(isCorrect ? 'correct' : 'incorrect');
+        },
+        onNext: function () {
+          lessonQueueIndex++;
+          renderPracticeCardStep();
+        },
+      };
+      if (entry.mode === 'type') {
+        renderTypedPrompt(body, item, eyebrow, handlers);
+        return;
+      }
+      if (renderLetterPrompt(body, item, eyebrow, handlers)) return;
+    }
 
     body.innerHTML =
       '<div class="lesson-stage">' +
@@ -3748,6 +4382,33 @@
     }, 6000);
   }
 
+  // When a word was right except for its final vowel, says so — with the
+  // genders spelled out for adjective endings: "Almost! We heard “pekný”
+  // (masculine), but this asks for “pekné” (neuter)." null otherwise.
+  const ENDING_GENDER = { 'ý': 'masculine', 'á': 'feminine', 'é': 'neuter' };
+
+  function endingHint(transcript, item) {
+    const heard = normalizeForVoiceCompare(transcript || '').split(' ');
+    const targets = voiceTargets(item.sk).map(function (t) { return t.split(' '); });
+    for (let t = 0; t < targets.length; t++) {
+      const want = targets[t];
+      if (want.length !== heard.length) continue;
+      // Only when that one ending is the whole problem.
+      const off = [];
+      want.forEach(function (w, i) { if (!wordsAgree(heard[i], w)) off.push(i); });
+      if (off.length !== 1) continue;
+      const h = heard[off[0]];
+      const w = want[off[0]];
+      if (h.length !== w.length || withoutAccents(h.slice(0, -1)) !== withoutAccents(w.slice(0, -1))) continue;
+      const gh = ENDING_GENDER[h.slice(-1)];
+      const gw = ENDING_GENDER[w.slice(-1)];
+      return gh && gw
+        ? 'Almost! We heard “' + escapeHtml(h) + '” (' + gh + '), but this prompt asks for “' + escapeHtml(w) + '” (' + gw + ').'
+        : 'Almost! We heard “' + escapeHtml(h) + '” — listen to the ending: “' + escapeHtml(w) + '”.';
+    }
+    return null;
+  }
+
   function nextVoiceItem() {
     voiceIndex++;
     renderVoiceStep();
@@ -3795,8 +4456,11 @@
 
       // A miss waits on Next, so there's time to compare with the answer.
       playTone('incorrect');
+      const almost = endingHint(transcript, item);
       resultEl.innerHTML =
-        '<div class="voice-feedback incorrect">Not quite — the answer is “' + escapeHtml(item.sk) + '”</div>' +
+        (almost
+          ? '<div class="voice-feedback incorrect">' + almost + '</div>'
+          : '<div class="voice-feedback incorrect">Not quite — the answer is “' + escapeHtml(item.sk) + '”</div>') +
         '<button type="button" class="btn btn-primary exercise-next-btn" id="voice-next-btn">Next</button>';
       document.getElementById('lesson-mic-btn').disabled = true;
       document.getElementById('voice-next-btn').addEventListener('click', nextVoiceItem);
@@ -4037,32 +4701,16 @@
 
     const mode = quizModes[quizIndex] || 'sk-en';
     const eyebrow = '<div class="lesson-eyebrow">' + (isCheckpoint ? kindLabel(section) : 'Quiz') + ' · ' + (quizIndex + 1) + ' / ' + testLength + '</div>';
-    if (mode === 'type') {
-      renderTypedQuestion(correct, eyebrow);
-      return;
-    }
-    const letterQ = mode === 'letter' ? missingLetterQuestion(correct) : null;
-    if (letterQ) {
-      body.innerHTML =
-        '<div class="lesson-stage">' +
-        eyebrow +
-        '<div class="exercise-audio">' + speakerButtonHtml(correct.sk) + '</div>' +
-        '<h2 class="lesson-heading">' + escapeHtml(letterQ.blanked) + '</h2>' +
-        '<p class="lesson-sub">Which letter is missing? Listen to the word.</p>' +
-        '<div class="quiz-choice-list">' +
-        letterQ.options
-          .map(function (opt) {
-            return '<button type="button" class="quiz-choice-btn" data-correct="' + (opt === letterQ.letter) + '">' + escapeHtml(opt) + '</button>';
-          })
-          .join('') +
-        '</div>' +
-        '</div>';
-      body.scrollTop = 0;
-      speak(correct.sk);
-      body.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () { gradeQuizChoice(btn); });
-      });
-      return;
+    if (mode === 'type' || mode === 'letter') {
+      const handlers = {
+        onAnswer: function (isCorrect) { quizAnswered = true; recordQuizAnswer(isCorrect); },
+        onNext: nextQuizQuestion,
+      };
+      if (mode === 'type') {
+        renderTypedPrompt(body, correct, eyebrow, handlers);
+        return;
+      }
+      if (renderLetterPrompt(body, correct, eyebrow, handlers)) return;
     }
 
     const reverse = mode === 'en-sk';
@@ -4156,9 +4804,11 @@
   // "Write it": the English is shown and the Slovak is typed. Right apart
   // from the accents still counts, with the correct spelling shown. A wrong
   // or nearly-right answer waits on Next, so the spelling can be read.
-  function renderTypedQuestion(word, eyebrowHtml) {
-    const body = document.getElementById('lesson-body');
-    body.innerHTML =
+  // Used by quizzes and practice alike: handlers.onAnswer(isCorrect) records
+  // the answer, handlers.onNext() moves on.
+  function renderTypedPrompt(container, word, eyebrowHtml, handlers) {
+    let answered = false;
+    container.innerHTML =
       '<div class="lesson-stage">' +
       eyebrowHtml +
       '<h2 class="lesson-heading">' + escapeHtml(word.en) + '</h2>' +
@@ -4172,10 +4822,10 @@
       '</form>' +
       '<div class="type-feedback" id="type-feedback"></div>' +
       '</div>';
-    body.scrollTop = 0;
+    container.scrollTop = 0;
 
-    const form = document.getElementById('type-answer-form');
-    const input = document.getElementById('type-answer-input');
+    const form = container.querySelector('#type-answer-form');
+    const input = container.querySelector('#type-answer-input');
     input.focus({ preventScroll: true });
 
     // Accent buttons type into the box where the cursor is, and keep the
@@ -4193,35 +4843,100 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (quizAnswered || !input.value.trim()) return;
-      quizAnswered = true;
+      if (answered || !input.value.trim()) return;
+      answered = true;
 
       const result = markTyped(input.value, word);
       const isCorrect = result !== 'wrong';
       input.disabled = true;
       form.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-      document.getElementById('type-answer-check').classList.add('hidden');
+      form.querySelector('#type-answer-check').classList.add('hidden');
       form.classList.add(isCorrect ? 'correct' : 'incorrect');
-      recordQuizAnswer(isCorrect);
+      handlers.onAnswer(isCorrect);
 
-      const feedback = document.getElementById('type-feedback');
+      const feedback = container.querySelector('#type-feedback');
       const spelling = speakerButtonHtml(word.sk) + '<strong>' + escapeHtml(word.sk) + '</strong>';
       if (result === 'right') {
         feedback.innerHTML = '<div class="type-result correct">Correct!</div>';
-        setTimeout(nextQuizQuestion, 900);
+        setTimeout(handlers.onNext, 900);
         return;
       }
       feedback.innerHTML =
         (result === 'accents'
           ? '<div class="type-result correct">Almost — watch the accents:</div>'
           : '<div class="type-result incorrect">The answer is:</div>') +
-        '<div class="type-spelling">' + spelling + '</div>' +
-        '<button type="button" class="btn btn-primary exercise-next-btn" id="quiz-next-btn">Next</button>';
-      const next = document.getElementById('quiz-next-btn');
-      next.addEventListener('click', nextQuizQuestion);
-      next.focus({ preventScroll: true });
+        '<div class="type-spelling">' + spelling + '</div>';
+      addPromptNext(feedback, handlers.onNext);
     });
   }
+
+  // "Which letter is missing?": the word plays with one of its trickier
+  // letters blanked out. Returns false if the word has no such letter.
+  function renderLetterPrompt(container, word, eyebrowHtml, handlers) {
+    const q = missingLetterQuestion(word);
+    if (!q) return false;
+    let answered = false;
+    container.innerHTML =
+      '<div class="lesson-stage">' +
+      eyebrowHtml +
+      '<div class="exercise-audio">' + speakerButtonHtml(word.sk) + '</div>' +
+      '<h2 class="lesson-heading">' + escapeHtml(q.blanked) + '</h2>' +
+      '<p class="lesson-sub">Which letter is missing? Listen to the word.</p>' +
+      '<div class="quiz-choice-list">' +
+      q.options
+        .map(function (opt) {
+          return '<button type="button" class="quiz-choice-btn" data-correct="' + (opt === q.letter) + '">' + escapeHtml(opt) + '</button>';
+        })
+        .join('') +
+      '</div>' +
+      '</div>';
+    container.scrollTop = 0;
+    speak(word.sk);
+    container.querySelectorAll('.quiz-choice-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (answered) return;
+        answered = true;
+        const isCorrect = btn.dataset.correct === 'true';
+        container.querySelectorAll('.quiz-choice-btn').forEach(function (b) {
+          b.disabled = true;
+          if (b.dataset.correct === 'true') b.classList.add('correct');
+          else if (b === btn) b.classList.add('incorrect');
+        });
+        handlers.onAnswer(isCorrect);
+        if (isCorrect) setTimeout(handlers.onNext, 700);
+        else addPromptNext(container.querySelector('.quiz-choice-list'), handlers.onNext);
+      });
+    });
+    return true;
+  }
+
+  // The Next button a prompt waits on after a wrong answer.
+  function addPromptNext(afterEl, onNext) {
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.className = 'btn btn-primary exercise-next-btn';
+    next.id = 'prompt-next-btn';
+    next.textContent = 'Next';
+    afterEl.insertAdjacentElement('afterend', next);
+    next.addEventListener('click', onNext);
+    next.focus({ preventScroll: true });
+  }
+
+  // After a first pass with flashcards, a few active drills on the same
+  // words — write one or two, pick a missing letter — so practice isn't only
+  // marking yourself on cards.
+  function practiceDrills(words) {
+    const pool = shuffleArray(words.slice());
+    const out = [];
+    const letterWord = pool.find(function (w) { return missingLetterQuestion(w); });
+    if (letterWord) out.push({ word: letterWord, mode: 'letter' });
+    pool
+      .filter(function (w) { return w !== letterWord && typedAnswers(w).length; })
+      .slice(0, 2)
+      .forEach(function (w) { out.push({ word: w, mode: 'type' }); });
+    return shuffleArray(out);
+  }
+
 
   function renderFinishPhase() {
     updateLessonChrome('Done', 4);
@@ -4422,6 +5137,12 @@
     if (totalSections === 0) {
       nextCard.innerHTML = '<div class="next-info"><div class="next-label">Loading…</div></div>';
       nextCard.onclick = null;
+    } else if (nextIdx === -1 && !hasFullAccess()) {
+      nextCard.innerHTML =
+        '<div class="next-info"><div class="next-label">Free Preview complete</div>' +
+        '<div class="next-title">Keep going with Pro</div>' +
+        '<div class="next-sub">Sections 6+ need Pro or a beta code</div></div>';
+      nextCard.onclick = function () { showUpsell(''); };
     } else if (nextIdx === -1) {
       nextCard.innerHTML = '<div class="next-info"><div class="next-label">All done</div><div class="next-title">You’ve cleared every section!</div></div>';
       nextCard.onclick = null;
@@ -4513,7 +5234,8 @@
       const previous = learnSelect.value;
       learnSelect.innerHTML = vocabTopics
         .map(function (t) {
-          return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
+          const pro = !hasFullAccess() && FREE_PRACTICE_TOPICS.indexOf(t) === -1;
+          return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + (pro ? ' (Pro)' : '') + '</option>';
         })
         .join('');
       // Rebuilding the list (when your own additions load) keeps the topic
@@ -4555,6 +5277,7 @@
     });
 
     document.getElementById('generate-topic-btn').addEventListener('click', function () {
+      if (!hasFullAccess()) return showUpsell('AI quizzes');
       const select = document.getElementById('topic-select');
       const topic = select.value;
       if (!topic) {
@@ -4565,6 +5288,7 @@
     });
 
     document.getElementById('generate-file-btn').addEventListener('click', function () {
+      if (!hasFullAccess()) return showUpsell('AI quizzes');
       if (!selectedFile) {
         showQuizError('Please choose a file first.');
         return;
@@ -4674,6 +5398,7 @@
         location.reload();
         return;
       }
+      if (result.status === 403) return showUpsell('AI quizzes');
       showQuizError(result.error);
       return;
     }
@@ -5332,4 +6057,8 @@
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
+
+  // Everything above is defined now: restore the session (or show the
+  // onboarding screen).
+  resolveSession();
 })();

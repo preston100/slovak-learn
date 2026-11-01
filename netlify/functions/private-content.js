@@ -1,5 +1,6 @@
 const { jsonResponse } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { isDevEmail } = require('./lib/plans');
 const { contentStore, DEFAULT_CONTENT } = require('./lib/blobs');
 const { mergeGrammar, mergeVocab } = require('./lib/contentMerge');
 
@@ -15,7 +16,10 @@ exports.handler = async function (event) {
     return jsonResponse(200, { ok: true, ...(content || DEFAULT_CONTENT) });
   }
 
+  // Saving new content is part of Add Content, which only the developer
+  // accounts have; reading your own additions stays open to everyone.
   if (event.httpMethod === 'POST') {
+    if (!isDevEmail(email)) return jsonResponse(403, { error: 'Only the developer accounts can add content.' });
     let body;
     try {
       body = JSON.parse(event.body || '{}');

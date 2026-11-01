@@ -27,7 +27,19 @@ function contentStore() {
   return store('slovencina-content');
 }
 
+// API usage counters and per-account daily quotas (see lib/usage.js).
+function usageStore() {
+  return store('slovencina-usage');
+}
+
+// "Hear it in a sentence" results, shared by every account: one example
+// sentence per word, generated once and then served at no AI cost.
+function sentenceStore() {
+  return store('slovencina-sentences');
+}
+
 const DEFAULT_PROGRESS = {
+  updatedAt: 0,
   streakCount: 0,
   longestStreak: 0,
   streakLastDate: null,
@@ -35,7 +47,7 @@ const DEFAULT_PROGRESS = {
   masteredWords: {},
   achievements: [],
   roundProgress: {},
-  roadmapProgress: [],
+  roadmapProgress: {},
   timeSpentMs: 0,
   dailyGoalTarget: 10,
   dailyPracticeCount: { date: null, count: 0 },
@@ -43,4 +55,4 @@ const DEFAULT_PROGRESS = {
 
 const DEFAULT_CONTENT = { grammarTopics: [], vocabGroups: [] };
 
-module.exports = { normalizeEmail, usersStore, progressStore, contentStore, DEFAULT_PROGRESS, DEFAULT_CONTENT };
+module.exports = { normalizeEmail, usersStore, progressStore, contentStore, usageStore, sentenceStore, DEFAULT_PROGRESS, DEFAULT_CONTENT };
