@@ -5429,8 +5429,48 @@
     "id": "cases-intro",
     "topic": "What Are Cases?",
     "summary": "Why endings change (kartou, do školy, v škole): six cases, each with its own question words.",
-    "explanation": "You've already seen Slovak words change their endings: *Platím **kartou**. Idem do **obchodu**. Som v **škole**.* That's because of **cases**: a noun's ending shows its **job** in the sentence — the subject, the thing you want, where you are, who you're with…\n\nSlovak has **six cases**. Each one has its own **question words**, which help you work out which case you need. They're numbered the way Slovak schools number them: the old 5th case (for calling someone) is left out, so they go **1, 2, 3, 4, 6, 7**.\n\nYou **don't** need to learn every ending now. The easiest way in:\n- the little words in front (**prepositions**) always ask for the same case: *do* → 2nd, *v* (where?) → 6th, *s* → 7th…\n- learn new words in **pairs and phrases**: *v škole / do školy*, *s mamou*.\n\nFrom here on, the sections tell you which case you're looking at.",
+    "explanation": "You've already seen Slovak words change their endings: *Platím **kartou**. Idem do **obchodu**. Som v **škole**.* That's because of **cases**: a noun's ending shows its **job** in the sentence — the subject, the thing you want, where you are, who you're with…\n\nSlovak has **six cases**. The easiest way to find the one you need is the **question** the word answers — *Kde?* (where?), *Kam?* (where to?), *Čo?* (what?) — see the first table. They're numbered the way Slovak schools number them: the old 5th case (for calling someone) is left out, so they go **1, 2, 3, 4, 6, 7**.\n\nYou **don't** need to learn every ending now. The easiest way in:\n- the little words in front (**prepositions**) always ask for the same case: *do* → 2nd, *v* (where?) → 6th, *s* → 7th…\n- learn new words in **pairs and phrases**: *v škole / do školy*, *s mamou*.\n\nFrom here on, the sections tell you which case you're looking at.",
     "tables": [
+      {
+        "title": "Ask the question, find the case",
+        "head": [
+          "Question",
+          "Little word + case",
+          "Example"
+        ],
+        "rows": [
+          [
+            "Kde? (where?)",
+            "v / na + 6th case",
+            "Som v **škole**."
+          ],
+          [
+            "Kam? (where to?)",
+            "do + 2nd case · na + 4th case",
+            "Idem do **školy**. Idem na **poštu**."
+          ],
+          [
+            "Odkiaľ? (where from?)",
+            "z / zo + 2nd case",
+            "Som z **Ameriky**."
+          ],
+          [
+            "Čo? Koho? (what? whom?) — the thing you want, have, see",
+            "4th case",
+            "Chcem **kávu**. Volám **mamu**."
+          ],
+          [
+            "S kým? S čím? (with whom? with what?)",
+            "s / so + 7th case",
+            "Idem s **mamou**."
+          ],
+          [
+            "Bez čoho? (without what?)",
+            "bez + 2nd case",
+            "Kávu bez **cukru**."
+          ]
+        ]
+      },
       {
         "title": "The six cases",
         "head": [

@@ -1910,6 +1910,9 @@
   let practiceCorrect = 0;
   let practiceRevealed = false;
   let practiceGraded = false;
+  // Bumped whenever a round starts or is left, so a card's delayed "next"
+  // from an old round can't draw over whatever is on screen now.
+  let practiceRun = 0;
   let currentRoundTopic = null;
   let currentRoundIndex = -1;
 
@@ -1929,7 +1932,10 @@
   // topic in the middle of a round used to clear the round but leave the
   // round picker hidden, so the screen went blank.
   function showRoundTopic(topic) {
+    practiceRun++;
     practiceQueue = [];
+    practiceIndex = 0;
+    practiceCorrect = 0;
     currentRoundTopic = topic;
     document.getElementById('round-map').classList.remove('hidden');
     renderRoundMap(topic);
@@ -2003,6 +2009,7 @@
       pool[j] = tmp;
     }
 
+    practiceRun++;
     currentRoundTopic = topic;
     currentRoundIndex = roundIndex;
     practiceQueue = pool;
@@ -2111,7 +2118,9 @@
     const card = document.getElementById('practice-card');
     card.classList.add(gotIt ? 'flash-correct' : 'flash-incorrect');
 
+    const run = practiceRun;
     setTimeout(function () {
+      if (run !== practiceRun) return; // the round was left (another topic picked) meanwhile
       practiceIndex++;
       renderPracticeCard();
     }, 450);
@@ -2827,6 +2836,11 @@
     }
 
     if (lessonPhase === 'voice') {
+      // A miss already counted and waiting on Next: just move on.
+      if (document.getElementById('voice-next-btn')) {
+        nextVoiceItem();
+        return;
+      }
       stopVoiceRecognition();
       lessonVoiceTotal = Math.max(0, lessonVoiceTotal - 1);
       voiceIndex++;
@@ -3404,13 +3418,25 @@
   // garbling a long word, not a different word) — and never in the last two
   // letters, because Slovak endings carry the grammar: "pracujeme" (we work)
   // is not "pracujem" (I work).
+  //
+  // A missed accent is forgiven anywhere except on a final vowel, which must
+  // match exactly: -ý / -á / -é carry the gender (pekný, pekná, pekné), and
+  // pekné (nice) / pekne (nicely) differ only by that accent.
   function wordsAgree(heardWord, targetWord) {
     if (heardWord === targetWord) return true;
-    return (
-      targetWord.length >= 6 &&
-      heardWord.slice(-2) === targetWord.slice(-2) &&
-      editDistance(heardWord, targetWord) <= 1
-    );
+    if (!finalVowelsAgree(heardWord, targetWord)) return false;
+    const h = withoutAccents(heardWord);
+    const t = withoutAccents(targetWord);
+    if (h === t) return true;
+    return t.length >= 6 && h.slice(-2) === t.slice(-2) && editDistance(h, t) <= 1;
+  }
+
+  const VOWELS = 'aáäeéiíoóôuúyý';
+
+  function finalVowelsAgree(a, b) {
+    const x = a.slice(-1);
+    const y = b.slice(-1);
+    return (VOWELS.indexOf(x) === -1 && VOWELS.indexOf(y) === -1) || x === y;
   }
 
   // How many words are missing, extra or wrong, in order.
@@ -3439,10 +3465,13 @@
     // Long sentences may have one stray word per six; short ones none.
     if (wordErrors(h, t) <= Math.floor(t.length / 6)) return true;
     // A compound like "tridsaťpäť" can come back split ("tridsať päť"), or
-    // two words joined — so also compare with the spaces taken out. Exactly:
-    // this is only for spacing, and a looser match here would let a wrong
-    // ending back in ("pracujeme doma" for "pracujem doma").
-    return h.join('') === t.join('');
+    // two words joined — so also compare with the spaces taken out. Exactly
+    // (bar accents, except on a final vowel): this is only for spacing, and a
+    // looser match here would let a wrong ending back in ("pracujeme doma"
+    // for "pracujem doma").
+    const hj = h.join('');
+    const tj = t.join('');
+    return finalVowelsAgree(hj, tj) && withoutAccents(hj) === withoutAccents(tj);
   }
 
   // Everything that counts as saying this item: the whole text, the text
@@ -3474,12 +3503,14 @@
     return voiceTargets(item.sk).some(function (target) { return isCloseEnough(heard, target); });
   }
 
+  // Lower case, punctuation gone, accents kept (wordsAgree decides where
+  // they matter).
   function normalizeForVoiceCompare(text) {
     return text
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/[^a-z0-9\s]/g, '')
+      .normalize('NFC')
+      .replace(/[^\p{L}0-9\s]/gu, '')
+      .replace(/\s+/g, ' ')
       .trim();
   }
 
@@ -3717,6 +3748,11 @@
     }, 6000);
   }
 
+  function nextVoiceItem() {
+    voiceIndex++;
+    renderVoiceStep();
+  }
+
   function transcribeRecording(blob, encoding, item) {
     const heardEl = document.getElementById('voice-heard');
     const resultEl = document.getElementById('voice-result');
@@ -3746,22 +3782,24 @@
       const transcript = result.data.transcript || '';
       const isMatch = voiceMatches(transcript, item);
 
-      heardEl.textContent = transcript ? 'Heard: “' + transcript + '”' : 'Didn’t catch that — try again next time.';
-      resultEl.innerHTML = isMatch
-        ? '<div class="voice-feedback correct">Nice!</div>'
-        : '<div class="voice-feedback incorrect">Not quite — expected “' + escapeHtml(item.sk) + '”</div>';
+      // Always exactly what the recogniser wrote down — never the target.
+      heardEl.textContent = transcript ? 'You said: “' + transcript + '”' : 'Didn’t catch that.';
 
       if (isMatch) {
         lessonVoiceCorrect++;
         playTone('correct');
-      } else {
-        playTone('incorrect');
+        resultEl.innerHTML = '<div class="voice-feedback correct">Nice!</div>';
+        setTimeout(nextVoiceItem, 1200);
+        return;
       }
 
-      setTimeout(function () {
-        voiceIndex++;
-        renderVoiceStep();
-      }, 1200);
+      // A miss waits on Next, so there's time to compare with the answer.
+      playTone('incorrect');
+      resultEl.innerHTML =
+        '<div class="voice-feedback incorrect">Not quite — the answer is “' + escapeHtml(item.sk) + '”</div>' +
+        '<button type="button" class="btn btn-primary exercise-next-btn" id="voice-next-btn">Next</button>';
+      document.getElementById('lesson-mic-btn').disabled = true;
+      document.getElementById('voice-next-btn').addEventListener('click', nextVoiceItem);
     };
     reader.onerror = function () {
       heardEl.textContent = 'Could not process the recording.';
@@ -4073,7 +4111,20 @@
     });
 
     recordQuizAnswer(isCorrect);
-    setTimeout(nextQuizQuestion, 700);
+    if (isCorrect) {
+      setTimeout(nextQuizQuestion, 700);
+      return;
+    }
+    // A wrong pick waits on Next, with the right answer highlighted, so
+    // there's time to take it in.
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.className = 'btn btn-primary exercise-next-btn';
+    next.id = 'quiz-next-btn';
+    next.textContent = 'Next';
+    body.querySelector('.quiz-choice-list').insertAdjacentElement('afterend', next);
+    next.addEventListener('click', nextQuizQuestion);
+    next.focus({ preventScroll: true });
   }
 
   function nextQuizQuestion() {
@@ -4696,6 +4747,7 @@
   function gradeQuiz(area, total) {
     let correctCount = 0;
     let wordsAnswered = 0;
+    let newlyMastered = 0;
     const cards = area.querySelectorAll('.quiz-question');
     const knownWords = {};
     vocabData.forEach(function (g) { (g.words || []).forEach(function (w) { knownWords[w.sk] = w; }); });
@@ -4707,12 +4759,17 @@
 
       if (selectedIndex === correctIndex) correctCount++;
 
-      // A question about one of the course's words counts for that word, like
-      // any other answer: a miss sends it to Revise, a right answer can
-      // master it. Questions left blank don't count either way.
+      // A question about one of the course's words counts for that word: a
+      // miss sends it to Revise, and a right answer masters it, as on a
+      // checkpoint. Questions left blank don't count either way.
       const word = knownWords[card.dataset.word];
       if (word && selectedIndex !== -1) {
-        recordWordResult(word, selectedIndex === correctIndex);
+        const right = selectedIndex === correctIndex;
+        recordWordResult(word, right);
+        if (right && !loadMasteredWords()[word.sk]) {
+          markWordMastered(word.sk);
+          newlyMastered++;
+        }
         incrementDailyCount();
         wordsAnswered++;
       }
@@ -4740,6 +4797,14 @@
     const scoreCard = area.querySelector('.quiz-score');
     scoreCard.classList.remove('hidden');
     area.querySelector('#score-num').textContent = correctCount + '/' + total;
+    if (wordsAnswered) {
+      const line = document.createElement('div');
+      line.className = 'score-mastered';
+      line.textContent =
+        (newlyMastered ? newlyMastered + (newlyMastered === 1 ? ' new word mastered' : ' new words mastered') : 'No new words mastered this time') +
+        ' · ' + masteredWordCount() + ' total';
+      scoreCard.appendChild(line);
+    }
     scoreCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
