@@ -2,7 +2,7 @@ const { jsonResponse } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
 const { usersStore, progressStore } = require('./lib/blobs');
 const { requireDev, planOf } = require('./lib/plans');
-const { readUsage, utcDay } = require('./lib/usage');
+const { readUsage, readActiveDays, utcDay } = require('./lib/usage');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -75,7 +75,7 @@ exports.handler = async function (event) {
   });
 
   const today = utcDay();
-  const usage = await readUsage(today);
+  const [usage, days] = await Promise.all([readUsage(today), readActiveDays(7)]);
 
   return jsonResponse(200, {
     ok: true,
@@ -85,6 +85,7 @@ exports.handler = async function (event) {
     active: { last7: active7, last30: active30 },
     sectionsCleared,
     usage,
+    days,
     roster,
     funnel,
     missedWords: Object.values(misses).sort((a, b) => b.misses - a.misses).slice(0, 60),

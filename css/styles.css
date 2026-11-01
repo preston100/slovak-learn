@@ -3100,11 +3100,6 @@ input[type='password']:focus {
   }
 }
 
-/* Section number in the label of a node whose circle shows a star, lock or trophy. */
-.round-label-num {
-  font-weight: 800;
-  color: var(--color-text-faint);
-}
 
 /* ======================================================================
    Launch: onboarding, plans, account, legal, Free Preview, Analytics
@@ -3688,3 +3683,485 @@ td.cell-sub { min-width: 200px; }
   .free-banner-actions .btn { flex: 1; }
 }
 .pro-note .btn { width: auto; margin: 12px 4px 0; padding: 9px 16px; font-size: 13.5px; }
+
+/* ======================================================================
+   Polish pass 2 (November 2026): folk crest, two-step onboarding,
+   tactile roadmap, lesson steps, card flip, voice rings, podium, analytics
+   ====================================================================== */
+
+/* ---------- Folk crest (logo) and divider ---------- */
+.crest { display: block; width: 100%; height: 100%; overflow: visible; }
+.crest-star { fill: #b23a3a; }
+.crest-core { fill: #8f2c2b; }
+.crest-ring { fill: none; stroke: #e0a94c; stroke-width: 2; }
+.crest-dots { fill: #e8b458; }
+.crest-letter { fill: #fff8ee; font-family: var(--font-display); font-weight: 700; font-size: 22px; }
+
+.gate-logo {
+  display: block;
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 12px;
+  background: none;
+  border-radius: 0;
+  filter: drop-shadow(0 6px 14px rgba(178, 58, 58, 0.28));
+}
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  background: none;
+  border-radius: 0;
+}
+.brand-mark .crest-dots { display: none; }
+.brand-mark .crest-letter { font-size: 24px; }
+
+/* Embroidery-style ornament: a mask filled with the red-to-gold gradient,
+   so it follows the theme. */
+.folk-divider {
+  width: 180px;
+  max-width: 70%;
+  height: 14px;
+  margin: 10px auto 12px;
+  background: linear-gradient(90deg, var(--warm), var(--color-accent) 50%, var(--warm));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='14' viewBox='0 0 180 14'%3E%3Cpath d='M2 7h56M122 7h56' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='64' cy='7' r='1.7'/%3E%3Ccircle cx='116' cy='7' r='1.7'/%3E%3Cpath d='M75 2.5l4.5 4.5-4.5 4.5-4.5-4.5z M105 2.5l4.5 4.5-4.5 4.5-4.5-4.5z'/%3E%3Cpath fill-rule='evenodd' d='M90 0l7 7-7 7-7-7z M90 3.4l3.6 3.6-3.6 3.6-3.6-3.6z'/%3E%3Ccircle cx='90' cy='7' r='1.4'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='14' viewBox='0 0 180 14'%3E%3Cpath d='M2 7h56M122 7h56' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='64' cy='7' r='1.7'/%3E%3Ccircle cx='116' cy='7' r='1.7'/%3E%3Cpath d='M75 2.5l4.5 4.5-4.5 4.5-4.5-4.5z M105 2.5l4.5 4.5-4.5 4.5-4.5-4.5z'/%3E%3Cpath fill-rule='evenodd' d='M90 0l7 7-7 7-7-7z M90 3.4l3.6 3.6-3.6 3.6-3.6-3.6z'/%3E%3Ccircle cx='90' cy='7' r='1.4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.folk-divider-small { width: 130px; height: 10px; margin: 12px auto 0; opacity: 0.85; }
+
+/* ---------- Onboarding: two steps ---------- */
+.onboarding-head h1 { margin-bottom: 0; }
+.value-pills {
+  list-style: none;
+  padding: 0;
+  margin: 16px auto 0;
+  max-width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.value-pills li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.value-pills li::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--warm);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.preview-plans-btn {
+  margin-top: -12px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+.preview-plans-btn:hover { color: var(--color-accent); }
+
+.onboarding-step2 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+.onboarding-step2.step-enter { animation: step-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes step-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+#onboarding-plans { scroll-margin-top: 16px; }
+#onboarding-account { scroll-margin-top: 16px; }
+
+.inline-code { margin-top: 12px; text-align: left; }
+.inline-code-toggle { font-size: 13.5px; }
+#ob-inline-code { max-width: 170px; letter-spacing: 0.3em; font-size: 16px; }
+.field-optional { margin-left: 4px; font-size: 12px; font-weight: 500; color: var(--color-text-faint); }
+.onboarding[data-step='plans'] #onboarding-account { padding: 18px 22px; }
+
+/* ---------- Roadmap: tactile medallions ---------- */
+:is(#roadmap-map, #round-map) .round-node {
+  --rim: var(--color-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 5px 0 var(--rim), var(--shadow-md);
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease, border-color 0.15s ease;
+}
+:is(#roadmap-map, #round-map) .round-node.cleared { --rim: #8c5d14; }
+:is(#roadmap-map, #round-map) .round-node.current { --rim: var(--color-accent-hover); }
+:is(#roadmap-map, #round-map) .round-node.checkpoint:not(.locked):not(.cleared) { --rim: #a5562a; }
+:is(#roadmap-map, #round-map) .round-node.locked { box-shadow: 0 3px 0 var(--rim); }
+:is(#roadmap-map, #round-map) .round-node:not(.locked):hover,
+:is(#roadmap-map, #round-map) .round-node.plan-locked:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 7px 0 var(--rim), var(--shadow-lg);
+}
+/* Pressed: the medallion sinks onto its rim. */
+:is(#roadmap-map, #round-map) .round-node:not(.locked):active,
+:is(#roadmap-map, #round-map) .round-node.plan-locked:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 0 var(--rim), var(--shadow-sm);
+  transition-duration: 0.06s;
+}
+:is(#roadmap-map, #round-map) .round-node.current:active { animation: none; }
+@keyframes node-pulse {
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 5px 0 var(--rim, #96302f), var(--shadow-md), 0 0 0 0 rgba(178, 58, 58, 0.35); }
+  50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 5px 0 var(--rim, #96302f), var(--shadow-md), 0 0 0 10px rgba(178, 58, 58, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(#roadmap-map, #round-map) .round-node:not(.locked):hover,
+  :is(#roadmap-map, #round-map) .round-node.plan-locked:hover,
+  :is(#roadmap-map, #round-map) .round-node:not(.locked):active,
+  :is(#roadmap-map, #round-map) .round-node.plan-locked:active { transform: none; }
+}
+
+/* Section number on the rim when the circle shows a star, lock or trophy. */
+.round-corner-num {
+  position: absolute;
+  top: -6px;
+  left: -8px;
+  z-index: 2;
+  min-width: 25px;
+  height: 25px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.round-node.cleared .round-corner-num { color: #8c5d14; border-color: #e0b050; }
+.round-node.checkpoint:not(.locked) .round-corner-num { color: #a5562a; border-color: var(--warm); }
+
+/* ---------- Level milestone banners ---------- */
+.roadmap-level-header {
+  max-width: 380px;
+  padding: 14px 20px 12px;
+  border-width: 1.5px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--warm-soft) 40%, var(--color-surface)) 0%, var(--color-surface) 60%);
+}
+.roadmap-level-header.complete { border-color: var(--warm); }
+.roadmap-level-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.roadmap-level-badge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+.roadmap-level-top { align-items: center; }
+.roadmap-level-name { font-size: 21px; }
+.roadmap-level-progress {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+.roadmap-level-sub {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+.roadmap-level-bar { height: 8px; margin-top: 12px; overflow: visible; }
+.roadmap-level-fill { box-shadow: 0 0 10px rgba(201, 138, 46, 0.55); }
+
+/* ---------- Lesson: 4-step indicator ---------- */
+.lesson-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.lesson-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--color-text-faint);
+}
+.lesson-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-faint);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.lesson-step-dot svg { width: 12px; height: 12px; }
+.lesson-step.done { color: var(--color-text-muted); }
+.lesson-step.done .lesson-step-dot { background: var(--color-success); border-color: var(--color-success); color: #fff; }
+.lesson-step.active { color: var(--color-accent); }
+.lesson-step.active .lesson-step-dot {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+.lesson-step.single .lesson-step-dot { background: var(--warm); border-color: var(--warm); }
+.lesson-step-sep { width: 14px; height: 2px; border-radius: 2px; background: var(--color-border); flex-shrink: 0; }
+/* Phones: the steps get their own row under the bar, names only for the
+   step you're on. */
+@media (max-width: 640px) {
+  .lesson-topbar { flex-wrap: wrap; row-gap: 10px; }
+  .lesson-steps { order: 10; width: 100%; justify-content: center; }
+  .lesson-step:not(.active) .lesson-step-name { display: none; }
+  .lesson-step-sep { width: 12px; }
+}
+
+/* ---------- Flashcards: flip on Show Answer ---------- */
+.practice-card.revealed:not(.flash-correct):not(.flash-incorrect) {
+  border-color: color-mix(in srgb, var(--warm) 55%, var(--color-border));
+  background: linear-gradient(180deg, var(--color-surface) 0%, color-mix(in srgb, var(--warm-soft) 60%, var(--color-surface)) 100%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warm) 14%, transparent), var(--shadow-md);
+}
+.practice-card.flipping {
+  transform-origin: 50% 50%;
+  animation: card-flip 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes card-flip {
+  0% { transform: perspective(900px) rotateX(-24deg) scale(0.96); }
+  60% { transform: perspective(900px) rotateX(4deg) scale(1.01); }
+  100% { transform: perspective(900px) rotateX(0deg) scale(1); }
+}
+
+/* ---------- Voice: soundwave rings + ending diff ---------- */
+.mic-btn { position: relative; }
+.mic-btn.listening::before,
+.mic-btn.listening::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-error);
+  opacity: 0;
+  pointer-events: none;
+  animation: mic-ring 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.mic-btn.listening::after { animation-delay: 0.9s; }
+@keyframes mic-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+.ending-diff {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 2px 0 10px;
+}
+.diff-word {
+  padding: 4px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.diff-word mark { padding: 0 2px; border-radius: 4px; }
+mark.diff-wrong { background: var(--color-error-soft); color: var(--color-error); box-shadow: inset 0 -2px 0 var(--color-error); }
+mark.diff-right { background: var(--color-success-soft); color: var(--color-success); box-shadow: inset 0 -2px 0 var(--color-success); }
+.diff-arrow { font-size: 18px; color: var(--color-text-faint); }
+
+/* ---------- Leaderboard: podium and you ---------- */
+.leaderboard-rank {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.leaderboard-rank.podium { font-weight: 800; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.16), var(--shadow-sm); }
+.podium-gold { background: linear-gradient(160deg, #f6d77a, #d29a35); color: #5a3b06; }
+.podium-silver { background: linear-gradient(160deg, #eef1f4, #aab3bc); color: #353d45; }
+.podium-bronze { background: linear-gradient(160deg, #ebb894, #b36d3e); color: #fff; }
+.leaderboard-row.is-me {
+  margin: 2px -6px;
+  padding: 10px 10px;
+  background: var(--color-accent-soft);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-md);
+}
+.you-pill {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+/* ---------- Analytics: gauges, drop-offs, last 7 days ---------- */
+.quota-meter { display: flex; flex-direction: column; gap: 4px; max-width: 280px; margin-top: 8px; }
+.quota-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+.quota-fill { height: 100%; border-radius: 999px; }
+.quota-good .quota-fill { background: var(--color-success); }
+.quota-warn .quota-fill { background: var(--warm); }
+.quota-bad .quota-fill { background: var(--color-error); }
+.quota-label { font-size: 11.5px; color: var(--color-text-muted); }
+.quota-label strong { color: var(--color-text); }
+
+.drop-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--warm-soft);
+  border: 1px solid color-mix(in srgb, var(--warm) 55%, transparent);
+  color: #7a4f10;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.drop-badge::before { content: '▼ '; font-size: 9px; }
+.data-table tr.drop-row td { background: color-mix(in srgb, var(--warm-soft) 50%, transparent); }
+
+.activity-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 18px 12px;
+}
+.activity-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.activity-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: none;
+  cursor: default;
+}
+.activity-bar-area {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--color-border);
+}
+.activity-bar {
+  width: min(30px, 70%);
+  border-radius: 4px 4px 0 0;
+  background: var(--color-accent);
+  transition: filter 0.15s ease;
+}
+.activity-value { margin-bottom: 4px; font-size: 12px; font-weight: 700; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.activity-day { margin-top: 6px; font-size: 11.5px; color: var(--color-text-muted); }
+.activity-col.today .activity-day { font-weight: 800; color: var(--color-text); }
+.activity-col:hover .activity-bar,
+.activity-col:focus-visible .activity-bar { filter: brightness(1.12); }
+.activity-col:hover::after,
+.activity-col:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% - 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+.activity-col:first-child::after { left: 0; transform: none; }
+.activity-col:last-child::after { left: auto; right: 0; transform: none; }
+
+/* ---------- Polish pass 2: reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-step2.step-enter,
+  .practice-card.flipping { animation: none; }
+  .mic-btn.listening::before,
+  .mic-btn.listening::after { animation: none; display: none; }
+}
+
+/* ---------- Polish pass 2: dark mode ---------- */
+@media (prefers-color-scheme: dark) {
+  .value-pills li { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.12); }
+  .round-corner-num { background: #2a1c1a; }
+  .round-node.cleared .round-corner-num { color: var(--warm); border-color: #a6721f; }
+  .round-node.checkpoint:not(.locked) .round-corner-num { color: #f0a46e; }
+  :is(#roadmap-map, #round-map) .round-node { --rim: rgba(255, 255, 255, 0.16); }
+  :is(#roadmap-map, #round-map) .round-node.cleared { --rim: #7a5110; }
+  :is(#roadmap-map, #round-map) .round-node.current { --rim: #a8423b; }
+  :is(#roadmap-map, #round-map) .round-node.checkpoint:not(.locked):not(.cleared) { --rim: #8a4520; }
+  .roadmap-level-header { background: linear-gradient(180deg, rgba(224, 169, 76, 0.08) 0%, #2a1c1a 60%); }
+  .drop-badge { color: var(--warm); }
+  .podium-bronze { color: #fff; }
+  .activity-card { background: rgba(255, 255, 255, 0.045); border-color: rgba(255, 255, 255, 0.1); }
+}
+.onboarding-head { width: 100%; }
+.value-pills { max-width: 700px; }
+/* Up next sits on top of the node, so its number pill moves to the lower left. */
+.round-node.up-next .round-corner-num { top: auto; bottom: -4px; }
+/* A playable checkpoint's trophy in white, readable on its orange medallion. */
+.round-node.checkpoint:not(.locked) .round-icon { color: #fff; }

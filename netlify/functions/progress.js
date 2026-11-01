@@ -2,6 +2,7 @@ const { jsonResponse } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
 const { progressStore, DEFAULT_PROGRESS } = require('./lib/blobs');
 const { accountFor } = require('./lib/plans');
+const { markActive } = require('./lib/usage');
 const { mergeProgress } = require('../../js/progress-merge');
 
 const MAX_BODY_BYTES = 200 * 1024;
@@ -42,6 +43,7 @@ exports.handler = async function (event) {
     const stored = await store.get(email, { type: 'json' });
     const merged = mergeProgress(stored || DEFAULT_PROGRESS, { ...incoming, updatedAt: Date.now() });
     await store.setJSON(email, merged);
+    await markActive(email); // for the Analytics tab's last-7-days chart
     return jsonResponse(200, { ok: true, progress: merged });
   }
 

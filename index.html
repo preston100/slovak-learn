@@ -18,9 +18,29 @@
   <div id="onboarding-gate" class="onboarding hidden">
     <div class="onboarding-inner">
       <header class="onboarding-head">
-        <div class="gate-logo">S</div>
+        <div class="gate-logo">
+        <svg class="crest" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <g class="crest-star">
+            <rect x="12" y="12" width="40" height="40" rx="4"/>
+            <rect x="12" y="12" width="40" height="40" rx="4" transform="rotate(45 32 32)"/>
+          </g>
+          <circle class="crest-core" cx="32" cy="32" r="16"/>
+          <circle class="crest-ring" cx="32" cy="32" r="16"/>
+          <g class="crest-dots">
+            <circle cx="55" cy="32" r="1.8"/><circle cx="9" cy="32" r="1.8"/><circle cx="32" cy="55" r="1.8"/><circle cx="32" cy="9" r="1.8"/>
+            <circle cx="48.3" cy="48.3" r="1.8"/><circle cx="15.7" cy="15.7" r="1.8"/><circle cx="48.3" cy="15.7" r="1.8"/><circle cx="15.7" cy="48.3" r="1.8"/>
+          </g>
+          <text class="crest-letter" x="32" y="33" text-anchor="middle" dominant-baseline="central">S</text>
+        </svg>
+        </div>
         <h1>Slovenčina</h1>
+        <div class="folk-divider" aria-hidden="true"></div>
         <p class="onboarding-tagline">Learn Slovak from the alphabet to A1: lessons, voice practice and help when you're stuck.</p>
+        <ul class="value-pills" aria-label="What's inside">
+          <li>104+ Guided Lessons</li>
+          <li>Native Audio &amp; Voice Check</li>
+          <li>A1 Grammar &amp; Dialogues</li>
+        </ul>
       </header>
 
       <section class="onboarding-card" id="onboarding-account" aria-labelledby="onboarding-account-title">
@@ -51,6 +71,13 @@
               <input type="checkbox" id="ob-terms" />
               <span>I agree to the <button type="button" class="link-btn" data-legal="terms">Terms of Service</button> and <button type="button" class="link-btn" data-legal="privacy">Privacy Policy</button></span>
             </label>
+            <div class="inline-code">
+              <button type="button" class="link-btn inline-code-toggle" id="ob-inline-code-toggle" aria-expanded="false" aria-controls="ob-inline-code-wrap">Have a 4-digit beta or dev code? (Optional)</button>
+              <div class="auth-field hidden" id="ob-inline-code-wrap">
+                <label class="field-label" for="ob-inline-code">Beta or dev code <span class="field-optional">optional</span></label>
+                <input type="text" id="ob-inline-code" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="4 digits" />
+              </div>
+            </div>
             <div class="gate-error" id="ob-error" role="alert"></div>
             <button class="btn btn-primary" type="submit" id="ob-submit">Create Account</button>
           </form>
@@ -62,6 +89,10 @@
         </div>
       </section>
 
+      <button type="button" class="link-btn preview-plans-btn" id="ob-preview-plans" aria-expanded="false" aria-controls="onboarding-step2">Preview pricing plans →</button>
+
+      <!-- Step 2: shown after creating an account (or opened early to look at prices) -->
+      <div class="onboarding-step2 hidden" id="onboarding-step2">
       <section class="onboarding-plans" id="onboarding-plans" aria-labelledby="plans-title">
         <h2 id="plans-title">Choose your plan</h2>
         <div class="plan-grid" id="onboarding-plan-grid"></div>
@@ -76,6 +107,7 @@
         </form>
         <div class="gate-error" id="ob-code-error" role="alert"></div>
       </section>
+      </div>
 
       <nav class="legal-links" aria-label="Legal">
         <button type="button" class="link-btn" data-legal="terms">Terms of Service</button>
@@ -98,14 +130,28 @@
         </button>
         <div class="lesson-section-num" id="lesson-section-num"></div>
         <div class="lesson-progress-track"><div class="lesson-progress-fill" id="lesson-progress-fill"></div></div>
-        <div class="lesson-phase-label" id="lesson-phase-label"></div>
+        <div class="lesson-steps" id="lesson-phase-label" role="group" aria-label="Lesson steps"></div>
       </div>
       <div class="lesson-body" id="lesson-body"></div>
     </div>
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">
-          <div class="brand-mark">S</div>
+          <div class="brand-mark">
+          <svg class="crest" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <g class="crest-star">
+          <rect x="12" y="12" width="40" height="40" rx="4"/>
+          <rect x="12" y="12" width="40" height="40" rx="4" transform="rotate(45 32 32)"/>
+        </g>
+        <circle class="crest-core" cx="32" cy="32" r="16"/>
+        <circle class="crest-ring" cx="32" cy="32" r="16"/>
+        <g class="crest-dots">
+          <circle cx="55" cy="32" r="1.8"/><circle cx="9" cy="32" r="1.8"/><circle cx="32" cy="55" r="1.8"/><circle cx="32" cy="9" r="1.8"/>
+          <circle cx="48.3" cy="48.3" r="1.8"/><circle cx="15.7" cy="15.7" r="1.8"/><circle cx="48.3" cy="15.7" r="1.8"/><circle cx="15.7" cy="48.3" r="1.8"/>
+        </g>
+        <text class="crest-letter" x="32" y="33" text-anchor="middle" dominant-baseline="central">S</text>
+      </svg>
+          </div>
           <span>Slovenčina</span>
         </div>
         <nav class="tabs" role="tablist" aria-label="Sections">

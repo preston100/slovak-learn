@@ -50,4 +50,29 @@ async function takeQuota(email, kind, limit) {
   return { ok: true, used: used + 1, limit };
 }
 
-module.exports = { utcDay, countUsage, readUsage, takeQuota };
+// Marks an account as active today (any progress save — opening the site
+// is enough). One document per day listing who was active. Never throws.
+async function markActive(email) {
+  try {
+    const store = usageStore();
+    const key = 'active/' + utcDay();
+    const who = normalizeEmail(email);
+    const doc = (await store.get(key, { type: 'json' })) || {};
+    if (doc[who]) return;
+    doc[who] = true;
+    await store.setJSON(key, doc);
+  } catch (err) {
+    console.error('active marker failed', err && err.message);
+  }
+}
+
+// How many accounts were active on each of the last `n` days, oldest first.
+async function readActiveDays(n) {
+  const store = usageStore();
+  const days = [];
+  for (let i = n - 1; i >= 0; i--) days.push(utcDay(new Date(Date.now() - i * 86400000)));
+  const docs = await Promise.all(days.map((d) => store.get('active/' + d, { type: 'json' }).catch(() => null)));
+  return days.map((day, i) => ({ day, learners: Object.keys(docs[i] || {}).length }));
+}
+
+module.exports = { utcDay, countUsage, readUsage, takeQuota, markActive, readActiveDays };

@@ -186,6 +186,15 @@ Everything locked on Free shows **"Pro Plan Required"** with *Enter a beta code*
 
 **Martina's bugs**: the voice check names the gender when only the ending is off ("Almost! We heard 'pekný' (masculine), but this prompt asks for 'pekné' (neuter)."); cleared and locked roadmap nodes show their section number; lesson Practice and Tests → Practice now mix in one *missing letter* and two *write it in Slovak* questions.
 
+### Visual polish pass (November 2026, on the preview)
+
+- **Sign-up in two steps**: first just the account form (with three "what's inside" pills and a *Preview pricing plans →* link); after creating the account, the plan cards and the code box. A beta tester can type their 4-digit code into the sign-up form itself (*Have a 4-digit beta or dev code?*) and goes straight into the app in one click; a wrong code still creates the account and says why the code failed.
+- **Folk crest logo** (an embroidery-style star around the S) on the sign-up screen and in the top bar, and a small red-and-gold ornament under the title and in each level banner.
+- **Roadmap**: medallions have a raised 3D rim and sink when tapped; the section number sits in a small pill on the rim of starred, locked and checkpoint circles; level banners show *Level 1 · CEFR A1.1*, a name (*First Steps*, *Everyday Slovak*), one line on what the level covers, and a glowing progress bar. Level names and lines: `LEVEL_INFO` in `js/app.js`.
+- **Lessons**: the top bar shows the four steps (Learn · Practice · Speak · Quiz) with ticks for done steps; flashcards flip when you press Show Answer; the mic shows expanding rings while recording; a near miss on an ending shows the two words side by side with the ending marked (*pekn**ý*** → *pekn**é***).
+- **Leaderboard**: gold, silver and bronze badges for the top three; your own row highlighted with a *You* pill.
+- **Analytics**: a *learners active, last 7 days* bar chart (counted from this update; any visit counts); gauges for the Google Speech free minutes and the sentence cache hit rate; *Drop-off point* badges in the funnel where a section has 30%+ fewer learners than the one before.
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.

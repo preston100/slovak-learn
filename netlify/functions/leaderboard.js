@@ -1,6 +1,6 @@
 const { jsonResponse } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
-const { usersStore, progressStore } = require('./lib/blobs');
+const { usersStore, progressStore, normalizeEmail } = require('./lib/blobs');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'GET') {
@@ -14,6 +14,7 @@ exports.handler = async function (event) {
   const progress = progressStore();
 
   const { blobs } = await users.list();
+  const me = normalizeEmail(auth.session.email);
 
   const entries = await Promise.all(
     blobs.map(async (blob) => {
@@ -26,7 +27,12 @@ exports.handler = async function (event) {
       // this account has ever hit), not streakCount (today's live streak,
       // which resets to 0 or 1 the moment someone misses a day) — otherwise
       // the board would reshuffle every time anyone had an off day.
-      return { name: (user && user.name) || 'Unknown', bestStreak: (userProgress && userProgress.longestStreak) || 0 };
+      // isMe lets the page highlight your own row without sending anyone's email.
+      return {
+        name: (user && user.name) || 'Unknown',
+        bestStreak: (userProgress && userProgress.longestStreak) || 0,
+        isMe: normalizeEmail(blob.key) === me,
+      };
     })
   );
 

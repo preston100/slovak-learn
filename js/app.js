@@ -269,12 +269,17 @@
 
   /* ---------------- Onboarding: account → plan → app ---------------- */
 
+  // Two steps: 'account' (sign up / sign in; the plans stay folded away
+  // unless the visitor asks to see them) and 'plans' (signed in: pick a plan
+  // or enter a code).
   function showOnboarding(step) {
     appEl.classList.add('hidden');
     onboardingEl.classList.remove('hidden');
     const signedIn = step === 'plans';
+    onboardingEl.dataset.step = signedIn ? 'plans' : 'account';
     document.getElementById('onboarding-signed-out').classList.toggle('hidden', signedIn);
     document.getElementById('onboarding-signed-in').classList.toggle('hidden', !signedIn);
+    document.getElementById('ob-preview-plans').classList.toggle('hidden', signedIn);
     if (signedIn) {
       const user = getSessionUser() || {};
       document.getElementById('ob-signed-name').textContent = user.name || '';
@@ -282,6 +287,25 @@
     }
     renderPlanCards(document.getElementById('onboarding-plan-grid'), 'gate');
     hidePlanMessage();
+    setPlansOpen(signedIn, signedIn);
+  }
+
+  // Folds the plans + code box open or shut; `scroll` brings them into view.
+  function setPlansOpen(open, scroll) {
+    const step2 = document.getElementById('onboarding-step2');
+    const toggle = document.getElementById('ob-preview-plans');
+    const wasOpen = !step2.classList.contains('hidden');
+    step2.classList.toggle('hidden', !open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Hide pricing plans ↑' : 'Preview pricing plans →';
+    if (open && !wasOpen) {
+      step2.classList.remove('step-enter');
+      void step2.offsetWidth; // restart the entrance animation
+      step2.classList.add('step-enter');
+    }
+    if (open && scroll) {
+      document.getElementById('onboarding-plans').scrollIntoView({ behavior: smoothScroll(), block: 'start' });
+    }
   }
 
   function enterApp() {
@@ -458,6 +482,23 @@
       });
     });
 
+    // The optional code field inside the form.
+    const inlineToggle = document.getElementById('ob-inline-code-toggle');
+    const inlineWrap = document.getElementById('ob-inline-code-wrap');
+    const inlineInput = document.getElementById('ob-inline-code');
+    function showInlineCode(focus) {
+      inlineWrap.classList.remove('hidden');
+      inlineToggle.classList.add('hidden');
+      inlineToggle.setAttribute('aria-expanded', 'true');
+      if (focus) inlineInput.focus();
+    }
+    inlineToggle.addEventListener('click', function () { showInlineCode(true); });
+
+    document.getElementById('ob-preview-plans').addEventListener('click', function () {
+      const open = document.getElementById('onboarding-step2').classList.contains('hidden');
+      setPlansOpen(open, open);
+    });
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       const name = document.getElementById('ob-name').value.trim();
@@ -465,6 +506,9 @@
       const password = passwordInput.value;
       const confirm = document.getElementById('ob-confirm').value;
       const terms = document.getElementById('ob-terms').checked;
+      // A code typed in the form, or in the code box below it before signing up.
+      const codeBox = document.getElementById('ob-code');
+      const code = inlineInput.value.trim() || codeBox.value.trim();
 
       if (mode === 'register') {
         if (!name || !email || !password || !confirm) return (errorEl.textContent = 'Please fill in all the fields.');
@@ -473,6 +517,10 @@
         if (!terms) return (errorEl.textContent = 'Please agree to the Terms of Service and Privacy Policy.');
       } else if (!email || !password) {
         return (errorEl.textContent = 'Please enter your email and password.');
+      }
+      if (code && !/^[0-9]{4}$/.test(code)) {
+        showInlineCode(false);
+        return (errorEl.textContent = 'Access codes are 4 digits. Check it, or leave the code empty.');
       }
 
       errorEl.textContent = '';
@@ -497,7 +545,31 @@
           return;
         }
         form.reset();
-        await finishLogin(data.token, data.user, data.account, false);
+        codeBox.value = '';
+        // With a code, unlock before choosing where to go, so a beta tester
+        // goes straight into the app in one click.
+        let account = data.account;
+        let codeProblem = '';
+        if (code) {
+          setSession(data.token, data.user);
+          const codeError = document.getElementById('ob-code-error');
+          if (await redeemAccessCode(code, codeError, submit)) {
+            account = Object.assign({}, account, { plan: currentPlan, planChosen: true });
+          } else {
+            codeProblem = codeError.textContent || 'That code is not right.';
+          }
+        }
+        await finishLogin(data.token, data.user, account, false);
+        if (codeProblem) {
+          if (!onboardingEl.classList.contains('hidden')) {
+            codeBox.value = code;
+            document.getElementById('ob-code-error').textContent = 'Your account is ready, but the code didn’t work: ' + codeProblem;
+          } else {
+            showNotice('Code not applied', 'You’re signed in, but the code didn’t work: ' + codeProblem, [
+              { label: 'Try another code', primary: true, onClick: goToCodeEntry },
+            ]);
+          }
+        }
       } catch (err) {
         errorEl.textContent = 'Could not reach the server. Please try again.';
       } finally {
@@ -514,6 +586,20 @@
     const codeForm = document.getElementById('ob-code-form');
     codeForm.addEventListener('submit', async function (e) {
       e.preventDefault();
+      // Not signed in yet: the code rides along with the account form.
+      if (!getSessionToken()) {
+        const typed = document.getElementById('ob-code').value.trim();
+        if (typed) inlineInput.value = typed;
+        showInlineCode(false);
+        document.getElementById('ob-code-error').textContent = '';
+        errorEl.textContent = typed
+          ? 'Create your account or sign in here — your code will be applied automatically.'
+          : 'Create your account or sign in here first.';
+        document.getElementById('onboarding-account').scrollIntoView({ behavior: smoothScroll(), block: 'start' });
+        const first = mode === 'register' ? document.getElementById('ob-name') : document.getElementById('ob-email');
+        (first.value ? document.getElementById('ob-email') : first).focus({ preventScroll: true });
+        return;
+      }
       const ok = await redeemAccessCode(
         document.getElementById('ob-code').value.trim(),
         document.getElementById('ob-code-error'),
@@ -863,15 +949,19 @@
     const usageRows = API_ROWS.map(function (r) {
       let note = '';
       if (r.key === 'transcribe-audio') {
-        note = 'Google fallback this month: ' + (month['stt-google'] || 0) + ' calls ≈ ' + sttMinutes.toFixed(1) + ' of ' + STT_FREE_MINUTES + ' free minutes';
+        note =
+          escapeHtml('Google fallback this month: ' + (month['stt-google'] || 0) + ' calls ≈ ' + sttMinutes.toFixed(1) + ' of ' + STT_FREE_MINUTES + ' free minutes') +
+          quotaMeter(sttMinutes / STT_FREE_MINUTES, 'of the free minutes used', false);
       }
       if (r.key === 'word-sentence') {
-        note = 'Served from the cache this month: ' + hits + ' (hit rate ' + hitRate + ')';
+        note =
+          escapeHtml('Served from the cache this month: ' + hits + ' (hit rate ' + hitRate + ')') +
+          (hits + misses ? quotaMeter(hits / (hits + misses), 'cache hit rate', true) : '');
       }
       return (
         '<tr><td><strong>' + escapeHtml(r.name) + '</strong><div class="cell-sub">' + escapeHtml(r.detail) + '</div></td>' +
         '<td class="num">' + (today[r.key] || 0) + '</td><td class="num">' + (month[r.key] || 0) + '</td>' +
-        '<td class="cell-sub">' + escapeHtml(note) + '</td></tr>'
+        '<td class="cell-sub">' + note + '</td></tr>'
       );
     }).join('');
     const usage =
@@ -904,12 +994,20 @@
       '<p class="analytics-note">The site has no XP points, so learners are compared by sections cleared and words mastered.</p>';
 
     const most = Math.max(1, data.accounts.total);
+    let prevCount = null;
+    let dropOffs = 0;
     const funnelRows = roadmapSections
       .map(function (sec, i) {
         if (sec.level === MY_ADDITIONS_LEVEL) return '';
         const n = data.funnel[sec.id] || 0;
+        // More than 30% fewer learners than the section before: worth a look.
+        const drop = prevCount !== null && prevCount > 0 && (prevCount - n) / prevCount > 0.3;
+        if (drop) dropOffs++;
+        const dropPct = drop ? Math.round(((prevCount - n) / prevCount) * 100) : 0;
+        prevCount = n;
         return (
-          '<tr><td class="num">' + (i + 1) + '</td><td>' + escapeHtml(sec.title) + ' <span class="cell-sub">' + escapeHtml(kindLabel(sec)) + '</span></td>' +
+          '<tr' + (drop ? ' class="drop-row"' : '') + '><td class="num">' + (i + 1) + '</td><td>' + escapeHtml(sec.title) + ' <span class="cell-sub">' + escapeHtml(kindLabel(sec)) + '</span>' +
+          (drop ? ' <span class="drop-badge" title="' + dropPct + '% fewer learners than the section before">Drop-off point · −' + dropPct + '%</span>' : '') + '</td>' +
           '<td class="funnel-cell"><div class="funnel-bar"><div class="funnel-fill" style="width:' + Math.round((n / most) * 100) + '%"></div></div></td>' +
           '<td class="num">' + n + '</td></tr>'
         );
@@ -917,7 +1015,7 @@
       .join('');
     const funnel =
       '<h3 class="browse-subhead">Section funnel</h3>' +
-      '<p class="analytics-note">How many learners have cleared each section. A sharp drop shows where people get stuck.</p>' +
+      '<p class="analytics-note">How many learners have cleared each section. <strong>Drop-off point</strong> marks a section with more than 30% fewer learners than the one before (' + dropOffs + ' now) — the place to look for easier examples. Expect one after section ' + FREE_SECTIONS + ', where the Free Preview ends.</p>' +
       '<div class="table-scroll funnel-scroll"><table class="data-table"><thead><tr><th class="num">#</th><th>Section</th><th>Learners who cleared it</th><th class="num">Count</th></tr></thead><tbody>' +
       funnelRows + '</tbody></table></div>';
 
@@ -935,8 +1033,63 @@
         : '<div class="empty-state">No missed words yet.</div>');
 
     body.innerHTML =
-      kpis + usage + rosterHtml + funnel + missed +
+      kpis + activityChart(data.days || []) + usage + rosterHtml + funnel + missed +
       '<p class="analytics-note">Updated ' + escapeHtml(new Date(data.generatedAt).toLocaleString()) + '.</p>';
+
+    // A free-tier gauge: green under 60%, amber to 85%, red above — or the
+    // other way round when higher is better (the cache hit rate). Always
+    // with the percentage and a word, never colour alone.
+    function quotaMeter(fraction, what, higherIsBetter) {
+      const pct = Math.max(0, Math.round(fraction * 100));
+      const load = higherIsBetter ? 100 - pct : pct;
+      const level = load > 85 ? 'bad' : load >= 60 ? 'warn' : 'good';
+      const word = higherIsBetter
+        ? { good: 'Healthy', warn: 'Fair', bad: 'Low' }[level]
+        : { good: 'Healthy', warn: 'Watch', bad: 'Near limit' }[level];
+      return (
+        '<div class="quota-meter quota-' + level + '" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.min(pct, 100) + '" aria-label="' + escapeHtml(what) + '">' +
+        '<div class="quota-track"><div class="quota-fill" style="width:' + Math.min(pct, 100) + '%"></div></div>' +
+        '<span class="quota-label">' + pct + '% ' + escapeHtml(what) + ' · <strong>' + word + '</strong></span>' +
+        '</div>'
+      );
+    }
+
+    // Learners active on each of the last 7 days, as bars, with the numbers
+    // in a table for screen readers.
+    function activityChart(days) {
+      if (!days.length) return '';
+      const peak = Math.max(1, Math.max.apply(null, days.map(function (d) { return d.learners; })));
+      const peakIndex = days.map(function (d) { return d.learners; }).lastIndexOf(peak);
+      const label = function (d) {
+        return new Date(d.day + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' });
+      };
+      const bars = days.map(function (d, i) {
+        const isToday = i === days.length - 1;
+        const tip = d.learners + (d.learners === 1 ? ' learner' : ' learners') + ' · ' + d.day + (isToday ? ' (today)' : '');
+        return (
+          '<div class="activity-col' + (isToday ? ' today' : '') + '" tabindex="0" data-tip="' + escapeHtml(tip) + '">' +
+          '<div class="activity-bar-area">' +
+          ((isToday || i === peakIndex) && d.learners ? '<span class="activity-value">' + d.learners + '</span>' : '') +
+          '<div class="activity-bar" style="height:' + (d.learners ? Math.max(4, Math.round((d.learners / peak) * 100)) : 0) + '%"></div>' +
+          '</div>' +
+          '<div class="activity-day">' + escapeHtml(isToday ? 'Today' : label(d)) + '</div>' +
+          '</div>'
+        );
+      }).join('');
+      const total = days.reduce(function (n, d) { return n + d.learners; }, 0);
+      return (
+        '<h3 class="browse-subhead">Learners active, last 7 days</h3>' +
+        '<div class="activity-card">' +
+        '<div class="activity-chart" aria-hidden="true">' + bars + '</div>' +
+        '<table class="visually-hidden"><caption>Learners active per day</caption><tbody>' +
+        days.map(function (d) { return '<tr><th>' + escapeHtml(d.day) + '</th><td>' + d.learners + '</td></tr>'; }).join('') +
+        '</tbody></table>' +
+        '<p class="analytics-note">' + (total
+          ? 'Accounts that opened the site each day (UTC). Recorded from this update on.'
+          : 'No activity recorded yet — this starts counting from this update.') + '</p>' +
+        '</div>'
+      );
+    }
 
     function kpi(label, value, sub) {
       return '<div class="kpi-card"><div class="kpi-label">' + escapeHtml(label) + '</div><div class="kpi-value">' + value + '</div><div class="kpi-sub">' + sub + '</div></div>';
@@ -2679,6 +2832,7 @@
 
     document.getElementById('practice-reveal-btn').addEventListener('click', function () {
       practiceRevealed = true;
+      flipReveal(document.getElementById('practice-card'));
       document.getElementById('practice-answer').innerHTML = cardBackHtml(word);
       document.getElementById('practice-reveal-btn').classList.add('hidden');
       document.getElementById('practice-grade-row').classList.remove('hidden');
@@ -2757,6 +2911,21 @@
     renderReviewCard();
   }
 
+  // Show Answer: the card flips over with a little spring and keeps a warm
+  // border while the answer is showing.
+  function flipReveal(card) {
+    if (!card) return;
+    card.classList.add('revealed');
+    card.classList.remove('flipping');
+    void card.offsetWidth; // restart the animation
+    card.classList.add('flipping');
+    card.addEventListener('animationend', function done(e) {
+      if (e.animationName !== 'card-flip') return;
+      card.classList.remove('flipping');
+      card.removeEventListener('animationend', done);
+    });
+  }
+
   function renderReviewCard() {
     const stage = document.getElementById('review-stage');
     if (reviewIndex >= reviewQueue.length) {
@@ -2784,6 +2953,7 @@
 
     wireCardDirection(stage, word, 'review-answer');
     document.getElementById('review-reveal-btn').addEventListener('click', function () {
+      flipReveal(document.getElementById('review-card'));
       document.getElementById('review-answer').innerHTML = cardBackHtml(word);
       document.getElementById('review-reveal-btn').classList.add('hidden');
       document.getElementById('review-grade-row').classList.remove('hidden');
@@ -3182,16 +3352,28 @@
     const inLevel = roadmapSections.filter(function (s) { return s.level === level; });
     const cleared = inLevel.filter(function (s) { return isSectionCleared(s.id); }).length;
     const pct = inLevel.length ? Math.round((cleared / inLevel.length) * 100) : 0;
+    const levels = [];
+    roadmapSections.forEach(function (s) { if (s.level !== MY_ADDITIONS_LEVEL && levels.indexOf(s.level) === -1) levels.push(s.level); });
+    const info = LEVEL_INFO[level] || { title: 'Level ' + level, subtitle: '' };
     return (
-      '<div class="roadmap-level-header" data-level="' + escapeHtml(level) + '">' +
+      '<div class="roadmap-level-header' + (pct === 100 ? ' complete' : '') + '" data-level="' + escapeHtml(level) + '">' +
+      '<div class="roadmap-level-eyebrow"><span class="roadmap-level-badge">Level ' + (levels.indexOf(level) + 1) + '</span> CEFR ' + escapeHtml(level) + '</div>' +
       '<div class="roadmap-level-top">' +
-      '<div class="roadmap-level-name">' + escapeHtml(level) + '</div>' +
+      '<div class="roadmap-level-name">' + escapeHtml(info.title) + '</div>' +
       '<div class="roadmap-level-progress">' + cleared + ' / ' + inLevel.length + ' cleared</div>' +
       '</div>' +
+      (info.subtitle ? '<p class="roadmap-level-sub">' + escapeHtml(info.subtitle) + '</p>' : '') +
       '<div class="roadmap-level-bar"><div class="roadmap-level-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="folk-divider folk-divider-small" aria-hidden="true"></div>' +
       '</div>'
     );
   }
+
+  // The name and one line on what each level teaches, for its banner.
+  const LEVEL_INFO = {
+    'A1.1': { title: 'First Steps', subtitle: 'Sounds and spelling, greetings, numbers, family, food and your first verbs.' },
+    'A1.2': { title: 'Everyday Slovak', subtitle: 'Cases, dates and prices, around town, health — and talking about past and future.' },
+  };
 
   // The path the nodes sit on: a dashed curve through every node in order,
   // and a gold one over the stretch already done (cleared nodes, up to Up
@@ -3367,12 +3549,12 @@
             '<div class="round-node ' + stateClass + (planLocked(i) ? ' plan-locked' : '') + '" data-section-index="' + i + '" data-locked="' + locked + '"' +
             (planLocked(i) ? ' data-plan="true" title="' + escapeHtml(PRO_REQUIRED) + '"' : '') + '>' +
             inner +
+            // A cleared star, a lock or a trophy hides the number, so a pill
+            // on the rim carries it — every section can be found by its number.
+            (cleared || locked || isCheckpoint ? '<span class="round-corner-num" aria-label="Section ' + (i + 1) + '">' + (i + 1) + '</span>' : '') +
             (planLocked(i) ? '<span class="round-pro-tag">Pro</span>' : '') +
             (i === nextIdx ? '<span class="round-up-next-tag">Up next</span>' : '') +
             '<div class="round-label">' +
-            // A cleared star, a lock or a trophy hides the number, so the
-            // label carries it — every section can be found by its number.
-            (cleared || locked || isCheckpoint ? '<span class="round-label-num">' + (i + 1) + '.</span> ' : '') +
             (section.kind === 'grammar' || section.kind === 'dialogue' || section.kind === 'alphabet'
               ? '<span class="round-kind kind-' + (section.useIt ? 'use' : section.kind) + '">' + kindLabel(section) + '</span>'
               : '') +
@@ -3532,8 +3714,41 @@
     if (node) node.scrollIntoView({ behavior: smoothScroll(), block: 'center' });
   }
 
+  // The four steps of a section, shown as a segmented indicator in the
+  // lesson's top bar. A checkpoint or final test is one step of its own.
+  const LESSON_STEPS = [
+    { phase: 'Learn', name: 'Learn' },
+    { phase: 'Practice', name: 'Practice' },
+    { phase: 'Voice', name: 'Speak' },
+    { phase: 'Quiz', name: 'Quiz' },
+  ];
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+  function lessonStepsHtml(label) {
+    const active = label === 'Done' ? LESSON_STEPS.length : LESSON_STEPS.map(function (s) { return s.phase; }).indexOf(label);
+    if (active === -1) {
+      // Checkpoint / final test: no Learn, Practice or Speak to show.
+      return '<span class="lesson-step active single"><span class="lesson-step-dot">' + TROPHY_SMALL_SVG + '</span><span class="lesson-step-name">' + escapeHtml(label) + '</span></span>';
+    }
+    return LESSON_STEPS.map(function (step, i) {
+      const state = i < active ? 'done' : i === active ? 'active' : 'upcoming';
+      return (
+        '<span class="lesson-step ' + state + '"' + (state === 'active' ? ' aria-current="step"' : '') + '>' +
+        '<span class="lesson-step-dot">' + (state === 'done' ? CHECK_SVG : i + 1) + '</span>' +
+        '<span class="lesson-step-name">' + step.name + '</span>' +
+        '</span>'
+      );
+    }).join('<span class="lesson-step-sep" aria-hidden="true"></span>');
+  }
+  const TROPHY_SMALL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/></svg>';
+
   function updateLessonChrome(label, stepIndex) {
-    document.getElementById('lesson-phase-label').textContent = label;
+    const steps = document.getElementById('lesson-phase-label');
+    if (steps.dataset.label !== label) {
+      steps.dataset.label = label;
+      steps.innerHTML = lessonStepsHtml(label);
+      steps.setAttribute('aria-label', label === 'Done' ? 'Section finished' : 'Step: ' + label);
+    }
     document.getElementById('lesson-progress-fill').style.width = (stepIndex / 4) * 100 + '%';
 
     const topbar = document.querySelector('.lesson-topbar');
@@ -3979,6 +4194,7 @@
 
     wireCardDirection(body, item, 'lesson-practice-answer');
     document.getElementById('lesson-reveal-btn').addEventListener('click', function () {
+      flipReveal(document.getElementById('lesson-practice-card'));
       document.getElementById('lesson-practice-answer').innerHTML = cardBackHtml(item);
       document.getElementById('lesson-reveal-btn').classList.add('hidden');
       document.getElementById('lesson-grade-row').classList.remove('hidden');
@@ -4402,9 +4618,16 @@
       if (h.length !== w.length || withoutAccents(h.slice(0, -1)) !== withoutAccents(w.slice(0, -1))) continue;
       const gh = ENDING_GENDER[h.slice(-1)];
       const gw = ENDING_GENDER[w.slice(-1)];
-      return gh && gw
+      // The two words side by side with just the ending marked.
+      const diff =
+        '<div class="ending-diff" aria-hidden="true">' +
+        '<span class="diff-word">' + escapeHtml(h.slice(0, -1)) + '<mark class="diff-wrong">' + escapeHtml(h.slice(-1)) + '</mark></span>' +
+        '<span class="diff-arrow">→</span>' +
+        '<span class="diff-word">' + escapeHtml(w.slice(0, -1)) + '<mark class="diff-right">' + escapeHtml(w.slice(-1)) + '</mark></span>' +
+        '</div>';
+      return diff + (gh && gw
         ? 'Almost! We heard “' + escapeHtml(h) + '” (' + gh + '), but this prompt asks for “' + escapeHtml(w) + '” (' + gw + ').'
-        : 'Almost! We heard “' + escapeHtml(h) + '” — listen to the ending: “' + escapeHtml(w) + '”.';
+        : 'Almost! We heard “' + escapeHtml(h) + '” — listen to the ending: “' + escapeHtml(w) + '”.');
     }
     return null;
   }
@@ -5189,17 +5412,16 @@
         return;
       }
 
+      // Gold, silver and bronze for the top three; your own row stands out.
+      const PODIUM = ['gold', 'silver', 'bronze'];
       listEl.innerHTML = entries
         .map(function (e, i) {
           return (
-            '<div class="leaderboard-row"><span class="leaderboard-rank">' +
-            (i + 1) +
-            '</span><span class="leaderboard-name">' +
-            escapeHtml(e.name) +
-            '</span><span class="leaderboard-streak">' +
-            e.bestStreak +
-            (e.bestStreak === 1 ? ' day' : ' days in a row') +
-            '</span></div>'
+            '<div class="leaderboard-row' + (e.isMe ? ' is-me' : '') + '">' +
+            '<span class="leaderboard-rank' + (i < 3 ? ' podium podium-' + PODIUM[i] : '') + '" aria-label="Rank ' + (i + 1) + '">' + (i + 1) + '</span>' +
+            '<span class="leaderboard-name">' + escapeHtml(e.name) + (e.isMe ? ' <span class="you-pill">You</span>' : '') + '</span>' +
+            '<span class="leaderboard-streak">' + e.bestStreak + (e.bestStreak === 1 ? ' day' : ' days in a row') + '</span>' +
+            '</div>'
           );
         })
         .join('');
