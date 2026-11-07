@@ -1,5 +1,7 @@
 const { jsonResponse, callCloudTTS } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { accountFor, hasFullAccess, dailyLimit } = require('./lib/plans');
+const { takeQuota, countUsage } = require('./lib/usage');
 
 // Speaks arbitrary text with the same Slovak Wavenet voice as the rest of the
 // app, WITHOUT saving it to the repo. generate-audio exists for the fixed
@@ -20,6 +22,13 @@ exports.handler = async function (event) {
 
   const auth = requireSession(event);
   if (auth.error) return auth.error;
+
+  const account = await accountFor(auth.session.email);
+  if (!hasFullAccess(account.plan)) {
+    return jsonResponse(403, { error: 'Example sentences are part of Pro.', upgrade: true });
+  }
+  const quota = await takeQuota(auth.session.email, 'speak', dailyLimit('speak', account.plan));
+  if (!quota.ok) return jsonResponse(429, { error: "That's today's sentence audio. It resets tomorrow.", quota: true });
 
   let body;
   try {
@@ -50,5 +59,6 @@ exports.handler = async function (event) {
     return jsonResponse(502, { error: 'Google TTS returned no audio.' });
   }
 
+  await countUsage('speak');
   return jsonResponse(200, { ok: true, audioBase64: data.audioContent });
 };

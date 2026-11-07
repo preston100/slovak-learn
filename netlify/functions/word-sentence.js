@@ -1,5 +1,9 @@
+const crypto = require('crypto');
 const { jsonResponse, callGemini, geminiText, friendlyGeminiError } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { sentenceStore } = require('./lib/blobs');
+const { accountFor, hasFullAccess, dailyLimit } = require('./lib/plans');
+const { takeQuota, countUsage } = require('./lib/usage');
 
 // One short, natural Slovak sentence using a given word, so any word can be
 // heard in context rather than only in isolation. Text only — audio for the
@@ -13,6 +17,15 @@ const SENTENCE_SCHEMA = {
   },
   required: ['sentence', 'translation'],
 };
+
+// Every account shares one sentence per word: the first request for a word
+// asks Gemini and stores the result, and every later one — from anyone, on
+// any device — is answered from storage at no AI cost. The key is the word
+// in a fixed form, so "Dobrý deň", "dobrý deň " and "DOBRÝ DEŇ" share it.
+function cacheKey(sk) {
+  const norm = sk.normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim();
+  return 'v1/' + crypto.createHash('sha1').update(norm).digest('hex');
+}
 
 function buildPrompt(sk, en) {
   return `You are a Slovak teacher helping an English-speaking beginner.
@@ -53,6 +66,24 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'A word is required.' });
   }
 
+  // Example sentences come with full access (Pro, beta or dev).
+  const account = await accountFor(auth.session.email);
+  if (!hasFullAccess(account.plan)) {
+    return jsonResponse(403, { error: 'Example sentences are part of Pro. Upgrade, or enter a beta code in your account.', upgrade: true });
+  }
+
+  const store = sentenceStore();
+  const key = cacheKey(sk);
+  const cached = await store.get(key, { type: 'json' }).catch(() => null);
+  if (cached && cached.sentence) {
+    await countUsage('sentence-cache-hit');
+    return jsonResponse(200, { ok: true, sentence: cached.sentence, translation: cached.translation || '', cached: true });
+  }
+
+  // Only a cache miss costs anything, so only misses count against the limit.
+  const quota = await takeQuota(auth.session.email, 'sentence', dailyLimit('sentence', account.plan));
+  if (!quota.ok) return jsonResponse(429, { error: "That's today's new example sentences. They reset tomorrow.", quota: true });
+
   let res;
   try {
     // One short sentence doesn't need the bigger model: Flash-Lite first.
@@ -86,9 +117,14 @@ exports.handler = async function (event) {
     return jsonResponse(502, { error: 'No sentence came back. Please try again.' });
   }
 
-  return jsonResponse(200, {
-    ok: true,
+  const entry = {
     sentence: String(parsed.sentence).trim(),
     translation: String(parsed.translation || '').trim(),
-  });
+    word: sk,
+    createdAt: new Date().toISOString(),
+  };
+  await countUsage('word-sentence');
+  // A failed save just means the next request asks Gemini again.
+  await store.setJSON(key, entry).catch(() => {});
+  return jsonResponse(200, { ok: true, sentence: entry.sentence, translation: entry.translation });
 };

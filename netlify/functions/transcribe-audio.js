@@ -1,5 +1,7 @@
 const { jsonResponse } = require('./lib/shared');
 const { requireSession } = require('./lib/auth');
+const { accountFor, dailyLimit, DAILY_LIMITS } = require('./lib/plans');
+const { takeQuota, countUsage } = require('./lib/usage');
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
 const GOOGLE_URL = 'https://speech.googleapis.com/v1/speech:recognize';
@@ -133,6 +135,19 @@ exports.handler = async function (event) {
   const auth = requireSession(event);
   if (auth.error) return auth.error;
 
+  // Voice checks per day: 15 on the Free Preview, 150 with full access.
+  const account = await accountFor(auth.session.email);
+  const quota = await takeQuota(auth.session.email, 'transcribe', dailyLimit('transcribe', account.plan));
+  if (!quota.ok) {
+    return jsonResponse(429, {
+      error:
+        account.plan === 'free'
+          ? "That's today's " + quota.limit + ' voice checks on the Free Preview. Upgrade, or enter a beta code in your account, for ' + DAILY_LIMITS.transcribe.full + ' a day.'
+          : "That's today's " + quota.limit + ' voice checks. They reset tomorrow.',
+      quota: true,
+    });
+  }
+
   let body;
   try {
     body = JSON.parse(event.body || '{}');
@@ -164,6 +179,8 @@ exports.handler = async function (event) {
         encoding,
         Math.min(GROQ_MAX_MS, remaining())
       );
+      await countUsage('transcribe-audio');
+      await countUsage('stt-groq');
       return jsonResponse(200, { ok: true, transcript: transcript, provider: 'groq' });
     } catch (err) {
       // Fall through to Google rather than failing outright, so an outage or
@@ -175,6 +192,8 @@ exports.handler = async function (event) {
   if (googleKey && remaining() > GOOGLE_MIN_MS) {
     try {
       const transcript = await transcribeWithGoogle(googleKey, audioBase64, encoding, remaining());
+      await countUsage('transcribe-audio');
+      await countUsage('stt-google'); // Google's free tier is 60 minutes a month
       return jsonResponse(200, { ok: true, transcript: transcript, provider: 'google' });
     } catch (err) {
       const message = err.name === 'AbortError' ? 'Transcription took too long. Please try again.' : err.message;

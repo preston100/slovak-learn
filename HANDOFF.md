@@ -3,17 +3,18 @@
 - **Live site**: https://slovaklearn.netlify.app
 - **GitHub repo**: https://github.com/preston100/slovak-learn
 
-## What it is (as of October 2026)
+## What it is (as of November 2026)
 
-A website for learning Slovak from scratch to the end of **A1**, behind two locks: a shared site code (checked on the server), then a personal account (email + password). Each account's progress is saved on the server, so it follows you between devices.
+A website for learning Slovak from scratch to the end of **A1**. Visitors land on a sign-up screen: **create an account** (name, email, password, agree to the Terms) or **sign in**, then pick a plan — the **Free Preview** (sections 1–5), or full access with a **beta/dev access code**. Paid plans (Monthly €11.99, Annual €79) are shown but checkout isn't live yet. Each account's progress is saved on the server, so it follows you between devices.
 
 - **Profile** — progress ring, streak, daily goal, badges, leaderboard, and an "Up next" card that takes you to where you left off.
 - **Learn** — one path through the course, split into levels: **A1.1** (alphabet → basics) and **A1.2** (numbers, dates, food, town, health, past & future). Every section is Learn → Practice → Voice → Quiz and needs 80% to unlock the next. A checkpoint test every 10 sections (70%), and a **final test** at the end of each level (80%) that opens the next one. **Word Lists** shows every word, by level.
 - **Grammar Guide** — every grammar section in course order, by level: tables, examples and the explanation, with a "Practice this" button. *The Six Cases* sits at the end as reference only.
 - **Tests** — an AI-written quiz (Gemini) on any topic, free practice rounds per word topic, and **Revise** for words you keep missing.
-- **Add Content** — upload a photo of notes; Gemini proposes vocab/grammar, you approve it, and it appears under "My additions" for your account only. Also home to the **pronunciation audio** generator.
+- **Add Content** *(dev accounts only)* — upload a photo of notes; Gemini proposes vocab/grammar, you approve it, and it appears under "My additions". Also home to the **pronunciation audio** generator.
+- **Analytics** *(dev accounts only)* — accounts by plan, active learners, API usage and cost, every learner's progress, where people get stuck, the most-missed words.
 
-**Dev accounts** (`prestonandersen100@gmail.com`, `mravikovamartina@gmail.com`) see every section unlocked, and can press **P** in a lesson to skip a question. Tapping the elephant on the Profile switches **student view** on and off (locks and no P-skip, exactly as a student sees it; remembered on that device).
+**Dev accounts** (`prestonandersen100@gmail.com`, `mravikovamartina@gmail.com`) see every section unlocked, see Add Content and Analytics, and can press **P** in a lesson to skip a question. Tapping the elephant on the Profile switches **student view** on and off (locks and no P-skip, exactly as a student sees it; remembered on that device).
 
 **Content lives in plain files** in `data/`: `curriculum.json` (the order of the course and each unit's level), `vocab.json`, `grammar.json`, `dialogues.json`, `alphabet.json`, plus `audio-manifest.json` → the clips in `audio/`.
 
@@ -160,10 +161,55 @@ New Slovak text needs recordings: Add Content → Pronunciation audio → "Check
 
 Section numbers from 61 on moved again (the cases section, then two Use it sections).
 
+## Subscription launch prep (November 2026)
+
+**Sign-up screen** (replaces the shared site code). Create Account / Sign In tabs; three plan cards; a box for a developer or beta access code. Order: make the account, then either *Start Free Preview* or enter the code. The paid buttons say "Paid subscriptions launching soon!".
+
+**Plans** — decided on the server (`netlify/functions/lib/plans.js`), shown in the account window (person icon, top right):
+
+| Plan | Who | Gets |
+|---|---|---|
+| Developer | the two dev emails | everything + Add Content + Analytics |
+| Beta access | entered the access code (`SITE_PASSWORD`); **also every account made before this update** (they all used the old site code) | everything |
+| Pro (paid) | nobody yet — for when Stripe is on | everything |
+| Free Preview | new accounts | sections 1–5, Sounds & Spelling in the Grammar Guide, Greetings & Basics and Everyday Phrases in Tests → Practice, 15 voice checks a day. No AI quiz or example sentences. |
+
+Everything locked on Free shows **"Pro Plan Required"** with *Enter a beta code* / *See plans*. Locked sections carry a gold **Pro** tag on the roadmap. The code can be entered on the sign-up screen or later in the account window (10 tries a day per account).
+
+**Cost protection** (limits per account per day, in `lib/plans.js`): voice checks 15 Free / 150 otherwise; AI quizzes 25; new example sentences 100; sentence audio 150. Example sentences are now cached for everyone — a word's sentence is made once and then served free to every learner. Add Content's two AI tools are dev-only on the server, not just hidden.
+
+**Progress sync fix**: the browser's and the server's copies are now *merged* (cleared sections, mastered words and badges combined; counters take the higher value) instead of one replacing the other — so signing in on a fresh phone can no longer wipe progress. Shared code in `js/progress-merge.js`.
+
+**Analytics tab** (dev only): accounts by plan; active learners (7/30 days); sections cleared; API calls today/this month with a cost line ("$0.00 — Within Free Tier" unless Google's speech fallback passes its 60 free minutes); a usage table (incl. the sentence cache hit rate and access-code tries); a learner list (plan, streak, furthest section, cleared, words mastered, last active — the site has no XP); the section funnel; the 25 most-missed words. Counting starts from this update.
+
+**Legal**: Terms, Privacy Policy, Refund & Cancellation, and Pricing open from links on the sign-up screen, the account window and the new footer. Operator name and contact email are in `LEGAL_CONFIG` at the top of `js/app.js` — **swap in a registered business name and address before turning on Stripe**, and have the texts checked.
+
+**Martina's bugs**: the voice check names the gender when only the ending is off ("Almost! We heard 'pekný' (masculine), but this prompt asks for 'pekné' (neuter)."); cleared and locked roadmap nodes show their section number; lesson Practice and Tests → Practice now mix in one *missing letter* and two *write it in Slovak* questions.
+
+### Visual polish pass (November 2026, on the preview)
+
+- **Sign-up in two steps**: first just the account form (with three "what's inside" pills and a *Preview pricing plans →* link); after creating the account, the plan cards and the code box. A beta tester can type their 4-digit code into the sign-up form itself (*Have a 4-digit beta or dev code?*) and goes straight into the app in one click; a wrong code still creates the account and says why the code failed.
+- **Folk crest logo** (an embroidery-style star around the S) on the sign-up screen and in the top bar, and a small red-and-gold ornament under the title and in each level banner.
+- **Roadmap**: medallions have a raised 3D rim and sink when tapped; the section number sits in a small pill on the rim of starred, locked and checkpoint circles; level banners show *Level 1 · CEFR A1.1*, a name (*First Steps*, *Everyday Slovak*), one line on what the level covers, and a glowing progress bar. Level names and lines: `LEVEL_INFO` in `js/app.js`.
+- **Lessons**: the top bar shows the four steps (Learn · Practice · Speak · Quiz) with ticks for done steps; flashcards flip when you press Show Answer; the mic shows expanding rings while recording; a near miss on an ending shows the two words side by side with the ending marked (*pekn**ý*** → *pekn**é***).
+- **Leaderboard**: gold, silver and bronze badges for the top three; your own row highlighted with a *You* pill.
+- **Analytics**: a *learners active, last 7 days* bar chart (counted from this update; any visit counts); gauges for the Google Speech free minutes and the sentence cache hit rate; *Drop-off point* badges in the funnel where a section has 30%+ fewer learners than the one before.
+
+### Teacher's notes 5 (November 2026, on the preview)
+
+- **AI quiz came back with 5 questions**: a quiz is made as two halves at once, and when one half didn't come back in time the quiz showed only the other. Now the page asks for the missing half again straight away ("Adding the last few questions…"). The AI quiz is multiple-choice by design; the typing and missing-letter questions are in the roadmap's section quizzes, checkpoints and practice.
+- **Checkpoints and final tests** mix question types like a section quiz: choice both ways, about a quarter to write in Slovak, and a missing-letter question or two. Only words already taught in a word section are asked for in writing (not the alphabet's example words).
+- **Voice check**: the mic says what it's doing — *Tap the mic, then say it* → *Recording — speak now* with a bar counting down the 6 seconds (and a short buzz on phones) → *Checking what you said…*.
+- **Voice check strictness**: the final vowel must still be the same vowel (pekný / pekná / pekné are different answers), but its **length is forgiven** — the recogniser often drops the long mark ("Som chora." for "Som chorá."). i and y count as the same sound. Trade-off: *pekne* now passes for *pekné*.
+- **Revision cards** in a section's practice (old words you missed, e.g. *kuchyňa* in Body & Health) now say so: "Revision · you missed this in Rooms".
+- Dev fix: pressing P on a revision card no longer pushes a section's score over 100%.
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.
 - **Two voices**: recordings use Google's Slovak voice (female). Anything without a recording yet falls back to the browser's own voice, which varies by device and is often male — Add Content → "Check & Generate Missing Audio" replaces it. Slashes in entries (*ujo / strýko*) are spoken as a pause, not "lomka".
 - **Levels**: every entry in `data/curriculum.json` has a `level` (`"A1.1"`, `"A1.2"`…). Checkpoints and each level's final test are generated from that — nothing else to set.
-- **To change the password**: Netlify → Site configuration → Environment variables → edit `SITE_PASSWORD` → Trigger deploy.
-- **To publish any local change**: `git add -A`, `git commit -m "..."`, `git push` from the project folder — Netlify redeploys automatically within about a minute.
+- **To change the beta/dev access code**: Netlify → Site configuration → Environment variables → edit `SITE_PASSWORD` → Trigger deploy. Accounts already unlocked stay unlocked.
+- **Dev emails** are listed twice: `js/app.js` (what's shown) and `netlify/functions/lib/plans.js` (what's allowed). Change both.
+- **Plan limits and prices**: limits in `netlify/functions/lib/plans.js`; plan cards (`PLAN_INFO`) and the legal texts at the top of `js/app.js`.
+- **To publish any local change**: `git add -A`, `git commit -m "..."`, `git push` from the project folder — Netlify redeploys automatically within about a minute. Production deploys from `main`; other branches don't touch the live site.
