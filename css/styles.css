@@ -4165,3 +4165,53 @@ mark.diff-right { background: var(--color-success-soft); color: var(--color-succ
 .round-node.up-next .round-corner-num { top: auto; bottom: -4px; }
 /* A playable checkpoint's trophy in white, readable on its orange medallion. */
 .round-node.checkpoint:not(.locked) .round-icon { color: #fff; }
+
+/* ---------- Voice check: what the mic is doing ---------- */
+.mic-state {
+  min-height: 22px;
+  margin: -6px 0 8px;
+  font-size: 15px;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.mic-state strong { color: var(--color-text); }
+.mic-state[data-state='recording'] strong { color: var(--color-error); }
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-error);
+  flex-shrink: 0;
+  animation: rec-blink 1s ease-in-out infinite;
+}
+@keyframes rec-blink { 50% { opacity: 0.25; } }
+/* Runs down over the recording time, so it's clear how long is left. */
+.mic-timer {
+  width: 160px;
+  height: 6px;
+  margin: 0 auto 12px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+  visibility: hidden;
+}
+.mic-timer.running { visibility: visible; }
+.mic-timer-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--color-error);
+  transform-origin: left center;
+}
+.mic-timer.running .mic-timer-fill { animation: mic-countdown var(--record-ms, 6000ms) linear forwards; }
+@keyframes mic-countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .rec-dot { animation: none; }
+}
+
+/* Revision cards name where the word was taught, so it reads as a sentence. */
+.review-tag { text-transform: none; letter-spacing: 0; font-size: 12.5px; }

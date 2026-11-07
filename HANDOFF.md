@@ -195,6 +195,15 @@ Everything locked on Free shows **"Pro Plan Required"** with *Enter a beta code*
 - **Leaderboard**: gold, silver and bronze badges for the top three; your own row highlighted with a *You* pill.
 - **Analytics**: a *learners active, last 7 days* bar chart (counted from this update; any visit counts); gauges for the Google Speech free minutes and the sentence cache hit rate; *Drop-off point* badges in the funnel where a section has 30%+ fewer learners than the one before.
 
+### Teacher's notes 5 (November 2026, on the preview)
+
+- **AI quiz came back with 5 questions**: a quiz is made as two halves at once, and when one half didn't come back in time the quiz showed only the other. Now the page asks for the missing half again straight away ("Adding the last few questions…"). The AI quiz is multiple-choice by design; the typing and missing-letter questions are in the roadmap's section quizzes, checkpoints and practice.
+- **Checkpoints and final tests** mix question types like a section quiz: choice both ways, about a quarter to write in Slovak, and a missing-letter question or two. Only words already taught in a word section are asked for in writing (not the alphabet's example words).
+- **Voice check**: the mic says what it's doing — *Tap the mic, then say it* → *Recording — speak now* with a bar counting down the 6 seconds (and a short buzz on phones) → *Checking what you said…*.
+- **Voice check strictness**: the final vowel must still be the same vowel (pekný / pekná / pekné are different answers), but its **length is forgiven** — the recogniser often drops the long mark ("Som chora." for "Som chorá."). i and y count as the same sound. Trade-off: *pekne* now passes for *pekné*.
+- **Revision cards** in a section's practice (old words you missed, e.g. *kuchyňa* in Body & Health) now say so: "Revision · you missed this in Rooms".
+- Dev fix: pressing P on a revision card no longer pushes a section's score over 100%.
+
 ## Quick reference
 
 - **To add content later**: edit `data/grammar.json` / `data/vocab.json` directly and push to GitHub, or use the Add Content tab on the site itself. Any word can take an optional `"note": "..."` next to `"sk"` and `"en"`.

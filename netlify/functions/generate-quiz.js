@@ -165,6 +165,12 @@ exports.handler = async function (event) {
   }
 
   const { mode, topic, filename, mimeType, content, isBase64, material } = body;
+  // Which halves to make: both, or (a follow-up when one failed) only the
+  // missing one.
+  const wanted = Array.isArray(body.batches)
+    ? FOCUS.map((_, i) => i).filter((i) => body.batches.indexOf(i) !== -1)
+    : FOCUS.map((_, i) => i);
+  if (!wanted.length) return jsonResponse(400, { error: 'No questions asked for.' });
 
   // The request parts for each batch (0 or 1), each with its own focus.
   let partsFor;
@@ -201,14 +207,19 @@ exports.handler = async function (event) {
     return jsonResponse(400, { error: 'Invalid mode. Expected "topic" or "file".' });
   }
 
-  // Both batches at once. If one fails, the other's questions still make a
-  // (shorter) quiz rather than an error.
-  const results = await Promise.allSettled(FOCUS.map((_, batch) => generateBatch(geminiKey, partsFor(batch))));
+  // Both batches at once. If one fails (Gemini busy, or too slow for the
+  // time limit), the other's questions still come back, with `missing`
+  // naming the half to ask for again — the page does that straight away.
+  const results = await Promise.allSettled(wanted.map((batch) => generateBatch(geminiKey, partsFor(batch))));
   await countUsage('generate-quiz');
   const seen = new Set();
   const questions = [];
-  results.forEach((r) => {
-    if (r.status !== 'fulfilled') return;
+  const missing = [];
+  results.forEach((r, i) => {
+    if (r.status !== 'fulfilled' || !r.value.length) {
+      missing.push(wanted[i]);
+      return;
+    }
     r.value.forEach((q) => {
       const key = q.question.trim().toLowerCase();
       if (seen.has(key)) return;
@@ -222,5 +233,5 @@ exports.handler = async function (event) {
     return jsonResponse(502, { error: (failed && failed.reason && failed.reason.message) || 'Gemini returned an empty quiz.' });
   }
 
-  return jsonResponse(200, { questions });
+  return jsonResponse(200, { questions, missing });
 };

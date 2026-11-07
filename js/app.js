@@ -3652,7 +3652,11 @@
     const inFinalTestGrammar = section.kind === 'checkpoint' && quizIndex >= quizQueue.length;
 
     if (lessonPhase === 'practice') {
-      lessonPracticeTotal = Math.max(0, lessonPracticeTotal - 1);
+      // Revision cards from earlier sections never counted towards this
+      // section's total, so skipping one takes nothing off it.
+      const entry = !usesExercises && lessonQueue[lessonQueueIndex];
+      const isExtra = !!(entry && entry.word && lessonReviewExtras[entry.word.sk]);
+      if (!isExtra) lessonPracticeTotal = Math.max(0, lessonPracticeTotal - 1);
       if (usesExercises) {
         exerciseIndex++;
         renderExerciseStep();
@@ -4138,6 +4142,16 @@
     renderPracticeCardStep();
   }
 
+  // "Revision · you missed this in Rooms": an old word folded into this
+  // section's practice, and where it was taught.
+  function revisionLabel(word) {
+    const from = roadmapSections.find(function (sec) {
+      return sec.kind !== 'checkpoint' && (sec.items || []).some(function (w) { return w && w.sk === word.sk; });
+    });
+    const title = from ? from.title.replace(/\s*·\s*Part \d+ of \d+$/, '') : '';
+    return 'Revision · you missed this' + (title ? ' in ' + title : ' before');
+  }
+
   function renderPracticeCardStep() {
     const body = document.getElementById('lesson-body');
 
@@ -4179,7 +4193,7 @@
       '<div class="lesson-eyebrow">Practice · ' + (lessonQueueIndex + 1) + ' / ' + lessonQueue.length + '</div>' +
       cardDirectionToggleHtml() +
       '<div class="practice-card" id="lesson-practice-card" style="max-width:460px;">' +
-      (isExtra ? '<div class="review-tag">Hard word · revision</div>' : '') +
+      (isExtra ? '<div class="review-tag">' + escapeHtml(revisionLabel(item)) + '</div>' : '') +
       '<div class="practice-word">' + cardFrontHtml(item) + '</div>' +
       '<div class="practice-answer" id="lesson-practice-answer"></div>' +
       '<button class="btn btn-secondary" id="lesson-reveal-btn">Show Answer</button>' +
@@ -4275,18 +4289,26 @@
   function wordsAgree(heardWord, targetWord) {
     if (heardWord === targetWord) return true;
     if (!finalVowelsAgree(heardWord, targetWord)) return false;
-    const h = withoutAccents(heardWord);
-    const t = withoutAccents(targetWord);
+    // i and y are one sound, so a recogniser may write either.
+    const h = withoutAccents(heardWord).replace(/y/g, 'i');
+    const t = withoutAccents(targetWord).replace(/y/g, 'i');
     if (h === t) return true;
     return t.length >= 6 && h.slice(-2) === t.slice(-2) && editDistance(h, t) <= 1;
   }
 
   const VOWELS = 'aáäeéiíoóôuúyý';
 
+  // Which vowel a letter is, ignoring length: recognisers often drop the
+  // long mark ("Som chora." for "Som chorá."), and i/y sound the same.
+  const VOWEL_SOUND = { a: 'a', 'á': 'a', 'ä': 'a', e: 'e', 'é': 'e', i: 'i', 'í': 'i', y: 'i', 'ý': 'i', o: 'o', 'ó': 'o', 'ô': 'o', u: 'u', 'ú': 'u' };
+
+  // A final vowel must be the same vowel — pekný, pekná and pekné are three
+  // different answers — but its length is forgiven.
   function finalVowelsAgree(a, b) {
     const x = a.slice(-1);
     const y = b.slice(-1);
-    return (VOWELS.indexOf(x) === -1 && VOWELS.indexOf(y) === -1) || x === y;
+    if (VOWELS.indexOf(x) === -1 && VOWELS.indexOf(y) === -1) return true;
+    return !!VOWEL_SOUND[x] && VOWEL_SOUND[x] === VOWEL_SOUND[y];
   }
 
   // How many words are missing, extra or wrong, in order.
@@ -4456,7 +4478,7 @@
         '</div></div>' +
         '</div>'
       : '<h2 class="lesson-heading">' + speakerButtonHtml(item.sk) + escapeHtml(item.sk) + '</h2>' +
-        '<p class="lesson-sub">Listen, tap the mic, say it, then tap again to check.</p>';
+        '<p class="lesson-sub">Listen first if you like, then record yourself saying it.</p>';
 
     body.innerHTML =
       '<div class="lesson-stage">' +
@@ -4465,6 +4487,10 @@
       '<button class="mic-btn" id="lesson-mic-btn" aria-label="Start recording">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 19v3"/></svg>' +
       '</button>' +
+      // What the mic is doing right now, in words, with a bar that runs
+      // down while it records — so nobody waits not knowing to speak.
+      '<div class="mic-state" id="mic-state" aria-live="polite">' + MIC_STATES.idle + '</div>' +
+      '<div class="mic-timer" id="mic-timer" aria-hidden="true"><div class="mic-timer-fill"></div></div>' +
       '<div class="voice-heard" id="voice-heard"></div>' +
       '<div id="voice-result"></div>' +
       '<div id="voice-skip-wrap"></div>' +
@@ -4515,6 +4541,28 @@
     document.getElementById('voice-skip-btn').addEventListener('click', skipRestOfVoicePhase);
   }
 
+  // The words under the mic, for each thing it can be doing.
+  const MIC_STATES = {
+    idle: '<strong>Tap the mic</strong>, then say it',
+    starting: 'Starting the microphone…',
+    recording: '<span class="rec-dot"></span><strong>Recording — speak now</strong> · tap again when you’re done',
+    checking: 'Checking what you said…',
+  };
+  const RECORD_MS = 6000;
+
+  function setMicState(state) {
+    const el = document.getElementById('mic-state');
+    if (el) {
+      el.innerHTML = state ? MIC_STATES[state] : '';
+      el.dataset.state = state || '';
+    }
+    const timer = document.getElementById('mic-timer');
+    if (timer) {
+      timer.classList.toggle('running', state === 'recording');
+      timer.style.setProperty('--record-ms', RECORD_MS + 'ms');
+    }
+  }
+
   async function toggleVoiceRecording(item) {
     const micBtn = document.getElementById('lesson-mic-btn');
     const heardEl = document.getElementById('voice-heard');
@@ -4527,6 +4575,8 @@
 
     const format = getSupportedRecordingFormat();
     resultEl.innerHTML = '';
+    heardEl.textContent = '';
+    setMicState('starting');
 
     let stream;
     try {
@@ -4553,6 +4603,7 @@
         },
       });
     } catch (err) {
+      setMicState(null);
       heardEl.textContent = 'Microphone access was denied or is unavailable.';
       showVoiceSkipOption();
       return;
@@ -4565,6 +4616,7 @@
     try {
       recorder = new MediaRecorder(stream, { mimeType: format.mime });
     } catch (err) {
+      setMicState(null);
       heardEl.textContent = 'Could not start recording in this browser.';
       stream.getTracks().forEach(function (t) { t.stop(); });
       showVoiceSkipOption();
@@ -4590,12 +4642,18 @@
 
     recorder.start();
     micBtn.classList.add('listening');
-    heardEl.textContent = 'Listening… tap the mic again to stop.';
+    micBtn.setAttribute('aria-label', 'Stop recording');
+    setMicState('recording');
+    // A short buzz on phones that support it: the moment to start talking.
+    if (navigator.vibrate) {
+      try { navigator.vibrate(40); } catch (err) { /* not allowed here */ }
+    }
 
-    // Safety-net auto-stop so a forgotten tap doesn't record indefinitely.
+    // Stops by itself after a few seconds (the bar shows how long is left),
+    // so a forgotten tap doesn't record indefinitely.
     setTimeout(function () {
       if (recorder.state !== 'inactive') recorder.stop();
-    }, 6000);
+    }, RECORD_MS);
   }
 
   // When a word was right except for its final vowel, says so — with the
@@ -4640,7 +4698,10 @@
   function transcribeRecording(blob, encoding, item) {
     const heardEl = document.getElementById('voice-heard');
     const resultEl = document.getElementById('voice-result');
-    heardEl.textContent = 'Checking what you said…';
+    const micBtn = document.getElementById('lesson-mic-btn');
+    if (micBtn) micBtn.setAttribute('aria-label', 'Start recording');
+    setMicState('checking');
+    heardEl.textContent = '';
 
     const reader = new FileReader();
     reader.onload = async function () {
@@ -4658,6 +4719,7 @@
           location.reload();
           return;
         }
+        setMicState('idle');
         heardEl.textContent = result.error;
         showVoiceSkipOption();
         return;
@@ -4665,6 +4727,7 @@
 
       const transcript = result.data.transcript || '';
       const isMatch = voiceMatches(transcript, item);
+      setMicState(null);
 
       // Always exactly what the recogniser wrote down — never the target.
       heardEl.textContent = transcript ? 'You said: “' + transcript + '”' : 'Didn’t catch that.';
@@ -4689,6 +4752,7 @@
       document.getElementById('voice-next-btn').addEventListener('click', nextVoiceItem);
     };
     reader.onerror = function () {
+      setMicState('idle');
       heardEl.textContent = 'Could not process the recording.';
       showVoiceSkipOption();
     };
@@ -4742,12 +4806,32 @@
       if (letters > 0 && missingLetterQuestion(words[i])) {
         modes[i] = 'letter';
         letters--;
-      } else if (typed > 0 && typedAnswers(words[i]).length) {
+      } else if (typed > 0 && isVocabWord(words[i]) && typedAnswers(words[i]).length) {
         modes[i] = 'type';
         typed--;
       }
     });
     return modes;
+  }
+
+  // Only words already taught as vocabulary (in a word section up to this
+  // one) are asked for in writing — not the alphabet's example words (vŕba,
+  // kôň…) a checkpoint also draws on, nor words whose word section comes
+  // later (ruka is an alphabet example long before Body & Health).
+  let firstVocabIndex = null;
+  let firstVocabIndexFor = null;
+  function isVocabWord(word) {
+    if (!firstVocabIndex || firstVocabIndexFor !== roadmapSections.length) {
+      firstVocabIndexFor = roadmapSections.length;
+      firstVocabIndex = {};
+      roadmapSections.forEach(function (sec, i) {
+        if (sec.kind !== 'vocab') return;
+        (sec.items || []).forEach(function (w) {
+          if (w && w.sk && !(w.sk in firstVocabIndex)) firstVocabIndex[w.sk] = i;
+        });
+      });
+    }
+    return word.sk in firstVocabIndex && firstVocabIndex[word.sk] <= lessonSectionIndex;
   }
 
   // What counts as writing a word correctly: any of its alternatives
@@ -4855,7 +4939,9 @@
       const fresh = shuffleArray(section.items.filter(function (w) { return !mastered[w.sk]; }));
       const known = shuffleArray(section.items.filter(function (w) { return mastered[w.sk]; }));
       quizQueue = shuffleArray(fresh.concat(known).slice(0, isFinal ? FINAL_TEST_WORD_QUESTIONS : CHECKPOINT_MAX_QUESTIONS));
-      quizModes = mixedDirections(quizQueue.length);
+      // The same mix as a section quiz: choice questions both ways, about a
+      // quarter to write in Slovak, and a missing-letter question or two.
+      quizModes = assignQuizModes(quizQueue);
       exerciseQueue = isFinal
         ? shuffleArray(
             (section.grammarPools || []).map(function (pool) { return shuffleArray(pool.slice())[0]; })
@@ -5612,9 +5698,8 @@
       onStatus: showQuizStatus,
     });
 
-    hideQuizStatus();
-
     if (!result.ok) {
+      hideQuizStatus();
       if (result.status === 401) {
         clearSessionToken();
         location.reload();
@@ -5625,7 +5710,29 @@
       return;
     }
 
-    renderQuiz(result.data.questions);
+    // A quiz is made in two halves at once; when one doesn't come back in
+    // time, ask for just that half again rather than show a 5-question quiz.
+    let questions = result.data.questions || [];
+    const missing = result.data.missing || [];
+    if (missing.length) {
+      const more = await postJsonWithRetry('/.netlify/functions/generate-quiz', Object.assign({}, payload, { batches: missing }), {
+        initialMessage: 'Adding the last few questions…',
+        onStatus: showQuizStatus,
+      });
+      if (more.ok && more.data.questions) {
+        const seen = {};
+        questions.forEach(function (q) { seen[String(q.question).trim().toLowerCase()] = true; });
+        more.data.questions.forEach(function (q) {
+          const key = String(q.question).trim().toLowerCase();
+          if (!seen[key]) {
+            seen[key] = true;
+            questions.push(q);
+          }
+        });
+      }
+    }
+    hideQuizStatus();
+    renderQuiz(questions);
   }
 
   function renderQuiz(questions) {
